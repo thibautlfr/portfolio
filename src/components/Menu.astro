@@ -37,10 +37,6 @@
       <span>menu</span>
       <span>close</span>
       <span>menu</span>
-      <span>close</span>
-      <span>menu</span>
-      <span>close</span>
-      <span>menu</span>
     </span>
   </span>
   <span class="mt-0.5 cross inline-flex items-center h-[1em]">+</span>
@@ -49,113 +45,128 @@
 <script>
   import { gsap } from "gsap";
 
-  const button = document.querySelector(".menu-button");
-  const menuText = button?.querySelector(".menu-text");
-  const cross = button?.querySelector(".cross");
-  const overlay = document.querySelector(".menu-overlay");
+  const button = document.querySelector(".menu-button")!;
+  const menuText = button.querySelector(".menu-text")!;
+  const cross = button.querySelector(".cross")!;
+  const overlay = document.querySelector(".menu-overlay")!;
   const layers = document.querySelectorAll(".menu-layer");
   const links = document.querySelectorAll(".menu-links a");
 
-  if (!button || !menuText || !cross || !overlay)
-    throw new Error("Menu elements not found");
+  const ANIM = {
+    slideDuration: 0.8,
+    linksDuration: 0.6,
+    slideEase: "power4.inOut",
+    contentEase: "power3.out",
+    layerStagger: 0.06,
+    linkStagger: 0.07,
+    colorOpen: "#f0fdfa",
+    colorClosed: "#000000",
+    linkRotation: 6,
+    crossRotation: 405,
+    overlayOffset: 0.12,
+    linksOffset: 0.4,
+  };
 
-  const spans = menuText.querySelectorAll("span");
-  const total = spans.length;
+  const total = menuText.querySelectorAll("span").length;
   const mid = Math.floor(total / 2);
   const step = (1 / total) * 100;
 
   let isOpen = false;
-  let isAnimating = false;
+  let textTween: gsap.core.Tween | null = null;
 
   gsap.set(overlay, { xPercent: 100 });
   gsap.set(layers, { xPercent: 100 });
-  gsap.set(links, { yPercent: 100, rotate: 6 });
+  gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+
+  const tl = gsap.timeline({
+    paused: true,
+    onStart: () => {
+      gsap.set([overlay, ...layers], { visibility: "visible" });
+    },
+    onReverseComplete: () => {
+      gsap.set([overlay, ...layers], { visibility: "hidden" });
+      gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+    },
+  });
+
+  tl.to(
+    layers,
+    {
+      xPercent: 0,
+      duration: ANIM.slideDuration,
+      ease: ANIM.slideEase,
+      stagger: ANIM.layerStagger,
+    },
+    0,
+  )
+    .to(
+      button,
+      {
+        color: ANIM.colorOpen,
+        duration: ANIM.slideDuration,
+        ease: ANIM.slideEase,
+      },
+      0,
+    )
+    .to(
+      overlay,
+      {
+        xPercent: 0,
+        duration: ANIM.slideDuration,
+        ease: ANIM.slideEase,
+      },
+      ANIM.overlayOffset,
+    );
+
+  function animateTextOpen() {
+    textTween = gsap.to(menuText, {
+      yPercent: -(mid * step),
+      duration: ANIM.slideDuration,
+      ease: ANIM.contentEase,
+    });
+  }
+
+  function animateTextClose() {
+    textTween = gsap.to(menuText, {
+      yPercent: -((total - 1) * step),
+      duration: ANIM.slideDuration,
+      ease: ANIM.contentEase,
+      onComplete: () => gsap.set(menuText, { yPercent: 0 }),
+    });
+  }
+
+  function animateLinks() {
+    gsap.to(links, {
+      yPercent: 0,
+      rotate: 0,
+      duration: ANIM.linksDuration,
+      ease: ANIM.contentEase,
+      stagger: ANIM.linkStagger,
+      delay: ANIM.linksOffset,
+    });
+  }
+
+  function animateCross() {
+    gsap.to(cross, {
+      rotation: isOpen ? 0 : ANIM.crossRotation,
+      duration: ANIM.slideDuration,
+      ease: ANIM.contentEase,
+    });
+  }
 
   button.addEventListener("click", () => {
-    if (isAnimating) return;
-    isAnimating = true;
+    if (tl.isActive() || textTween?.isActive()) return;
 
     if (!isOpen) {
-      gsap.set(overlay, { visibility: "visible" });
-      gsap.set(layers, { visibility: "visible" });
-
-      gsap.to(layers, {
-        xPercent: 0,
-        duration: 0.8,
-        ease: "power4.inOut",
-        stagger: 0.06,
-      });
-
-      gsap.to(button, {
-        color: "#f0fdfa",
-        duration: 0.8,
-        ease: "power4.inOut",
-      });
-      gsap.to(overlay, {
-        xPercent: 0,
-        duration: 0.8,
-        ease: "power4.inOut",
-        delay: 0.12,
-      });
-
-      gsap.to(links, {
-        yPercent: 0,
-        rotate: 0,
-        duration: 0.6,
-        ease: "power3.out",
-        stagger: 0.07,
-        delay: 0.4,
-      });
-
-      gsap.to(menuText, {
-        yPercent: -(mid * step),
-        duration: 0.8,
-        ease: "power3.out",
-        onComplete: () => {
-          isOpen = true;
-          isAnimating = false;
-        },
-      });
+      tl.play(0);
+      animateLinks();
+      animateTextOpen();
     } else {
-      gsap.to(button, {
-        color: "#000000",
-        duration: 0.8,
-        ease: "power4.inOut",
-      });
-
-      gsap.to(overlay, {
-        xPercent: 100,
-        duration: 0.8,
-        ease: "power4.inOut",
-      });
-
-      gsap.to([...layers].reverse(), {
-        xPercent: 100,
-        duration: 0.8,
-        ease: "power4.inOut",
-        stagger: 0.06,
-        delay: 0.12,
-        onComplete: () => {
-          gsap.set(overlay, { visibility: "hidden" });
-          gsap.set(layers, { visibility: "hidden" });
-          gsap.set(links, { yPercent: 100, rotate: 6 });
-          isOpen = false;
-          isAnimating = false;
-        },
-      });
-
-      gsap.to(menuText, {
-        yPercent: -((total - 1) * step),
-        duration: 0.8,
-        ease: "power3.out",
-        onComplete: () => gsap.set(menuText, { yPercent: 0 }),
-      });
+      tl.reverse();
+      animateTextClose();
     }
 
-    gsap.to(cross, {
-      rotation: isOpen ? 0 : 405,
-      duration: 0.8,
-      ease: "power3.out",
-    });
+    animateCross();
+    isOpen = !isOpen;
   });
 </script>
