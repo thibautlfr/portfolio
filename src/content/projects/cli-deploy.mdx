@@ -1,0 +1,26 @@
+---
+title: cli-deploy
+description: CLI minimaliste pour deployer des apps statiques sur S3 + CloudFront en une commande.
+date: 2026-05-10
+status: finished
+stack: [Go, AWS SDK, Cobra]
+repository: https://github.com/thibautlfr/cli-deploy
+featured: false
+---
+
+Un outil en ligne de commande pour deployer des sites statiques sur AWS S3 avec invalidation CloudFront automatique.
+
+## Usage
+
+```bash
+cli-deploy init
+cli-deploy push --env production
+```
+
+## Fonctionnalites
+
+- Detection automatique du framework (Astro, Next.js, Vite)
+- Upload incremental (ne pousse que les fichiers modifies)
+- Invalidation CloudFront automatique
+- Gestion multi-environnements
+- Configuration via fichier `.deploy.toml`

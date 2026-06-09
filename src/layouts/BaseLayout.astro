@@ -6,9 +6,15 @@ import PageTransition from "@components/PageTransition.astro";
 
 interface Props {
   pageTitle?: string;
+  subtitle?: string;
+  subtitleCount?: number;
 }
 
-const { pageTitle = "Thibaut LEFRANCOIS - portfolio" } = Astro.props;
+const {
+  pageTitle = "Thibaut LEFRANCOIS - portfolio",
+  subtitle,
+  subtitleCount,
+} = Astro.props;
 ---
 
 <html lang="en">
@@ -21,9 +27,23 @@ const { pageTitle = "Thibaut LEFRANCOIS - portfolio" } = Astro.props;
     <ClientRouter />
   </head>
 
-  <body class="p-8 flex flex-col w-dvw min-h-dvh">
+  <body class="flex flex-col w-dvw min-h-dvh">
     <PageTransition />
     <Header />
-    <slot />
+    <main class="flex flex-col flex-1 px-8 pb-8">
+      {
+        subtitle && (
+          <h2 class="text-xl">
+            {subtitle}
+            {subtitleCount !== undefined && (
+              <sub class="text-base font-sans align-sub opacity-50">
+                ({subtitleCount})
+              </sub>
+            )}
+          </h2>
+        )
+      }
+      <slot />
+    </main>
   </body>
 </html>

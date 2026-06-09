@@ -1,11 +1,18 @@
 ---
 import IconCube from "@components/icons/IconCube.astro";
 import Menu from "@components/Menu.astro";
+
+const slug = Astro.url.pathname.replace(/\/$/, "");
 ---
 
-<div class="flex items-center justify-between mb-4 select-none">
-  <h1 class="text-3xl font-bold flex items-center leading-none">
-    <IconCube size={30} />/thibautlfr
-  </h1>
+<div
+  class="sticky top-0 z-30 flex items-center justify-between px-8 py-8 select-none bg-white"
+>
+  <a
+    href="/"
+    class="text-xl md:text-3xl font-bold flex items-center leading-none"
+  >
+    <IconCube class="size-5 md:size-7.5" />/thibautlfr{slug}
+  </a>
   <Menu />
 </div>

@@ -1,0 +1,24 @@
+---
+title: Pourquoi j'ai choisi Astro pour mon portfolio
+description: Retour d'experience sur le choix d'Astro face a Next.js et Nuxt pour un site personnel.
+date: 2026-06-05
+tags: [astro, frontend, opinion]
+draft: false
+---
+
+Quand j'ai decide de refaire mon portfolio, j'ai hesitee entre trois frameworks : Next.js, Nuxt et Astro. Voici pourquoi Astro l'a emporte.
+
+## Le probleme avec les SPA
+
+Pour un portfolio, envoyer 200ko de JavaScript au client pour afficher du contenu statique n'a pas de sens. Les visiteurs veulent voir des projets, lire des articles, pas attendre un bundle.
+
+## Ce qui m'a convaincu
+
+- **Zero JS par defaut** : Astro n'envoie aucun JavaScript sauf si je le demande explicitement
+- **Content Collections** : le systeme de collections avec validation Zod est parfait pour gerer projets et articles
+- **Island Architecture** : je peux utiliser React ou Svelte uniquement la ou j'ai besoin d'interactivite
+- **Performance** : score Lighthouse a 100 sans effort
+
+## Le seul bemol
+
+L'ecosysteme est plus petit que celui de Next.js. Certains patterns avances necessitent de creuser la doc ou de bricoler. Mais pour un portfolio, c'est largement suffisant.
