@@ -1,0 +1,62 @@
+---
+
+---
+
+<div id="page-transition" transition:persist>
+  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-400"></div>
+  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-600"></div>
+  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-900"></div>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  const layers = document.querySelectorAll<HTMLElement>(".transition-layer");
+
+  const ANIM = {
+    duration: 0.5,
+    ease: "power4.inOut",
+    stagger: 0.05,
+  };
+
+  function leave(): Promise<void> {
+    return new Promise((resolve) => {
+      gsap.killTweensOf(layers);
+      gsap.set(layers, { visibility: "visible", xPercent: 100 });
+      gsap.to(layers, {
+        xPercent: 0,
+        duration: ANIM.duration,
+        ease: ANIM.ease,
+        stagger: ANIM.stagger,
+        onComplete: resolve,
+      });
+    });
+  }
+
+  function enter(): Promise<void> {
+    return new Promise((resolve) => {
+      gsap.to(layers, {
+        xPercent: -100,
+        duration: ANIM.duration,
+        ease: ANIM.ease,
+        stagger: ANIM.stagger,
+        onComplete: () => {
+          gsap.set(layers, { visibility: "hidden" });
+          resolve();
+        },
+      });
+    });
+  }
+
+  document.addEventListener("astro:before-preparation", (e) => {
+    const originalLoader = e.loader;
+    e.loader = async () => {
+      await Promise.all([leave(), originalLoader()]);
+    };
+  });
+
+  document.addEventListener("astro:after-swap", () => {
+    document.body.style.overflow = ""; // needed if switching from the menu
+    enter();
+  });
+</script>
