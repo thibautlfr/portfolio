@@ -1,0 +1,51 @@
+---
+title: Creer un visualiseur audio avec la Web Audio API
+description: Comment analyser un signal audio en temps reel dans le navigateur et le transformer en visuel.
+date: 2026-05-02
+tags: [javascript, web-audio, canvas, tutorial]
+project: music-visualizer
+draft: false
+---
+
+En travaillant sur mon projet Music Visualizer, j'ai plonge dans la Web Audio API. Voici les bases pour analyser un signal audio et en tirer des donnees exploitables.
+
+## Le pipeline audio
+
+```
+Source -> AnalyserNode -> Destination (speakers)
+                |
+          getByteFrequencyData()
+                |
+          Canvas / WebGL
+```
+
+## Creer un analyser
+
+```javascript
+const ctx = new AudioContext();
+const analyser = ctx.createAnalyser();
+analyser.fftSize = 2048;
+
+const source = ctx.createMediaElementSource(audioElement);
+source.connect(analyser);
+analyser.connect(ctx.destination);
+```
+
+## Lire les donnees
+
+```javascript
+const data = new Uint8Array(analyser.frequencyBinCount);
+
+function draw() {
+  analyser.getByteFrequencyData(data);
+  // data contient maintenant les amplitudes par frequence
+  // de 0 (silence) a 255 (max)
+  requestAnimationFrame(draw);
+}
+```
+
+## Astuces
+
+- `fftSize` controle la precision : plus c'est grand, plus c'est precis mais plus c'est lent
+- Pensez a lisser les donnees entre les frames pour eviter les saccades
+- `getByteTimeDomainData()` donne la forme d'onde si vous voulez un oscilloscope

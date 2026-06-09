@@ -1,0 +1,27 @@
+---
+title: "Go pour un dev TypeScript : retour apres 6 mois"
+description: Ce que j'ai appris en passant de TypeScript a Go pour mes projets CLI et backend.
+date: 2026-03-15
+tags: [go, typescript, backend, opinion]
+draft: false
+---
+
+Apres plusieurs annees de TypeScript, j'ai decide d'apprendre Go pour mes outils CLI et certains services backend. Six mois plus tard, voici mon bilan.
+
+## Ce qui m'a surpris en bien
+
+- **La compilation** : un binaire statique, zero dependance runtime. Deployer un CLI c'est copier un fichier
+- **La stdlib** : HTTP server, JSON, crypto, testing... tout est la sans npm install
+- **La simplicite** : pas de generics complexes, pas de decorateurs, pas de magie. Le code fait ce qu'il dit
+- **Les goroutines** : la concurrence est triviale comparee aux Promises
+
+## Ce qui m'a manque
+
+- Le systeme de types de TypeScript est plus expressif (unions, mapped types, template literals)
+- L'ecosysteme npm est incomparablement plus large
+- L'error handling `if err != nil` est repetitif (mais au moins c'est explicite)
+- Pas d'enum natif digne de ce nom
+
+## Mon verdict
+
+Go est devenu mon choix par defaut pour les CLI et les micro-services. TypeScript reste mon choix pour le frontend et les APIs qui ont besoin d'un ORM riche. Les deux se completent bien.
