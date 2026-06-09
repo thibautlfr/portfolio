@@ -2,8 +2,12 @@
 
 ---
 
-<div class="menu-overlay fixed inset-0 z-50 invisible bg-teal-900 text-teal-50">
-  <nav class="h-full flex items-center p-8">
+<div class="menu-layer fixed inset-0 z-40 invisible bg-teal-400"></div>
+<div class="menu-layer fixed inset-0 z-40 invisible bg-teal-600"></div>
+<div
+  class="menu-overlay fixed inset-0 z-50 invisible bg-teal-900 text-teal-50 px-8 py-18"
+>
+  <nav class="h-full flex">
     <ul
       class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold"
     >
@@ -49,7 +53,7 @@
   const menuText = button?.querySelector(".menu-text");
   const cross = button?.querySelector(".cross");
   const overlay = document.querySelector(".menu-overlay");
-
+  const layers = document.querySelectorAll(".menu-layer");
   const links = document.querySelectorAll(".menu-links a");
 
   if (!button || !menuText || !cross || !overlay)
@@ -64,6 +68,7 @@
   let isAnimating = false;
 
   gsap.set(overlay, { xPercent: 100 });
+  gsap.set(layers, { xPercent: 100 });
   gsap.set(links, { yPercent: 100, rotate: 6 });
 
   button.addEventListener("click", () => {
@@ -72,9 +77,17 @@
 
     if (!isOpen) {
       gsap.set(overlay, { visibility: "visible" });
+      gsap.set(layers, { visibility: "visible" });
+
+      gsap.to(layers, {
+        xPercent: 0,
+        duration: 0.8,
+        ease: "power4.inOut",
+        stagger: 0.06,
+      });
 
       gsap.to(button, {
-        color: "#f0fdfa", // tailwind color teal-50
+        color: "#f0fdfa",
         duration: 0.8,
         ease: "power4.inOut",
       });
@@ -82,6 +95,7 @@
         xPercent: 0,
         duration: 0.8,
         ease: "power4.inOut",
+        delay: 0.12,
       });
 
       gsap.to(links, {
@@ -113,9 +127,20 @@
         xPercent: 100,
         duration: 0.8,
         ease: "power4.inOut",
+      });
+
+      gsap.to([...layers].reverse(), {
+        xPercent: 100,
+        duration: 0.8,
+        ease: "power4.inOut",
+        stagger: 0.06,
+        delay: 0.12,
         onComplete: () => {
           gsap.set(overlay, { visibility: "hidden" });
+          gsap.set(layers, { visibility: "hidden" });
           gsap.set(links, { yPercent: 100, rotate: 6 });
+          isOpen = false;
+          isAnimating = false;
         },
       });
 
@@ -123,11 +148,7 @@
         yPercent: -((total - 1) * step),
         duration: 0.8,
         ease: "power3.out",
-        onComplete: () => {
-          gsap.set(menuText, { yPercent: 0 });
-          isOpen = false;
-          isAnimating = false;
-        },
+        onComplete: () => gsap.set(menuText, { yPercent: 0 }),
       });
     }
 
