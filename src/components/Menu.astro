@@ -3,12 +3,16 @@
 ---
 
 <div class="menu-overlay fixed inset-0 z-50 invisible bg-teal-900 text-teal-50">
-  <nav class="h-full flex items-center justify-center p-8">
-    <ul class="flex flex-col gap-6 text-5xl font-heading">
-      <li><a href="/">Home</a></li>
-      <li><a href="/projects">Projects</a></li>
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="/about">About</a></li>
+  <nav class="h-full flex items-center p-8">
+    <ul
+      class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold"
+    >
+      <li class="overflow-hidden"><a class="block" href="/">HOME</a></li>
+      <li class="overflow-hidden">
+        <a class="block" href="/projects">PROJECTS</a>
+      </li>
+      <li class="overflow-hidden"><a class="block" href="/blog">BLOG</a></li>
+      <li class="overflow-hidden"><a class="block" href="/about">ABOUT</a></li>
     </ul>
   </nav>
 </div>
@@ -46,6 +50,8 @@
   const cross = button?.querySelector(".cross");
   const overlay = document.querySelector(".menu-overlay");
 
+  const links = document.querySelectorAll(".menu-links a");
+
   if (!button || !menuText || !cross || !overlay)
     throw new Error("Menu elements not found");
 
@@ -58,6 +64,7 @@
   let isAnimating = false;
 
   gsap.set(overlay, { xPercent: 100 });
+  gsap.set(links, { yPercent: 100, rotate: 6 });
 
   button.addEventListener("click", () => {
     if (isAnimating) return;
@@ -75,6 +82,15 @@
         xPercent: 0,
         duration: 0.8,
         ease: "power4.inOut",
+      });
+
+      gsap.to(links, {
+        yPercent: 0,
+        rotate: 0,
+        duration: 0.6,
+        ease: "power3.out",
+        stagger: 0.07,
+        delay: 0.4,
       });
 
       gsap.to(menuText, {
@@ -97,7 +113,10 @@
         xPercent: 100,
         duration: 0.8,
         ease: "power4.inOut",
-        onComplete: () => gsap.set(overlay, { visibility: "hidden" }),
+        onComplete: () => {
+          gsap.set(overlay, { visibility: "hidden" });
+          gsap.set(links, { yPercent: 100, rotate: 6 });
+        },
       });
 
       gsap.to(menuText, {
