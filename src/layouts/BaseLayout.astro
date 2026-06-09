@@ -1,10 +1,14 @@
 ---
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import Header from "@components/Header.astro";
+import PageTransition from "@components/PageTransition.astro";
+
 interface Props {
   pageTitle?: string;
 }
 
-const { pageTitle = "@thibautlfr - portfolio" } = Astro.props;
+const { pageTitle = "Thibaut LEFRANCOIS - portfolio" } = Astro.props;
 ---
 
 <html lang="en">
@@ -14,9 +18,11 @@ const { pageTitle = "@thibautlfr - portfolio" } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
+    <ClientRouter />
   </head>
 
   <body class="p-8 flex flex-col w-dvw min-h-dvh">
+    <PageTransition />
     <Header />
     <slot />
   </body>

@@ -1,7 +1,8 @@
 ---
-
+import { navLinks, socials } from "../config";
 ---
 
+<!-- Invisible layers for opening effect-->
 <div
   class="menu-layer fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-40 invisible bg-teal-400"
 >
@@ -10,25 +11,50 @@
   class="menu-layer fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-40 invisible bg-teal-600"
 >
 </div>
+
 <div
-  class="menu-overlay fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-50 invisible bg-teal-900 text-teal-50 px-8 py-18"
+  class="menu-overlay fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-50 invisible bg-teal-900 text-teal-50 px-8 pt-18 pb-8"
 >
-  <nav class="h-full flex">
-    <ul
-      class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold"
-    >
-      <li class="overflow-hidden"><a class="block" href="/">HOME</a></li>
-      <li class="overflow-hidden">
-        <a class="block" href="/projects">PROJECTS</a>
-      </li>
-      <li class="overflow-hidden"><a class="block" href="/blog">BLOG</a></li>
-      <li class="overflow-hidden"><a class="block" href="/about">ABOUT</a></li>
+  <nav class="h-full flex flex-col justify-between">
+    <!-- prettier-ignore -->
+    <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
+      {navLinks.map((link, i) => (
+        <li class="overflow-hidden">
+          <a class="block" href={link.href}>
+            {link.label}<sup class="text-base font-sans align-super opacity-50 ml-1">{i + 1}</sup>
+          </a>
+        </li>
+      ))}
     </ul>
+
+    <div class="menu-socials">
+      <p class="text-sm font-sans uppercase tracking-widest opacity-50 mb-3">
+        Socials
+      </p>
+      <ul
+        class="flex gap-6 text-base font-sans [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100"
+      >
+        {
+          socials.map((s) => (
+            <li class="overflow-hidden">
+              <a
+                class="social-link block"
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </nav>
 </div>
 
 <button
-  class="menu-button relative z-60 w-fit flex items-center gap-[0.3rem] cursor-pointer leading-none overflow-visible"
+  class="menu-button relative z-60 w-fit flex items-center gap-[0.3rem] cursor-pointer leading-none overflow-visible border px-2 py-1 rounded-full"
 >
   <span class="relative inline-block whitespace-nowrap h-[1em] overflow-hidden">
     <span class="menu-text flex flex-col leading-none">
@@ -51,128 +77,152 @@
 <script>
   import { gsap } from "gsap";
 
-  const button = document.querySelector(".menu-button")!;
-  const menuText = button.querySelector(".menu-text")!;
-  const cross = button.querySelector(".cross")!;
-  const overlay = document.querySelector(".menu-overlay")!;
-  const layers = document.querySelectorAll(".menu-layer");
-  const links = document.querySelectorAll(".menu-links a");
+  document.addEventListener("astro:page-load", () => {
+    const button = document.querySelector(".menu-button")!;
+    const menuText = button.querySelector(".menu-text")!;
+    const cross = button.querySelector(".cross")!;
+    const overlay = document.querySelector(".menu-overlay")!;
+    const layers = document.querySelectorAll(".menu-layer");
+    const links = document.querySelectorAll(".menu-links a");
+    const socials = document.querySelector(".menu-socials")!;
+    const socialLinks = document.querySelectorAll(".social-link");
 
-  const ANIM = {
-    slideDuration: 0.8,
-    linksDuration: 0.6,
-    slideEase: "power4.inOut",
-    contentEase: "power3.out",
-    layerStagger: 0.06,
-    linkStagger: 0.07,
-    colorOpen: "#f0fdfa",
-    colorClosed: "#000000",
-    linkRotation: 6,
-    crossRotation: 405,
-    overlayOffset: 0.12,
-    linksOffset: 0.4,
-  };
+    const ANIM = {
+      slideDuration: 0.8,
+      linksDuration: 0.6,
+      slideEase: "power4.inOut",
+      contentEase: "power3.out",
+      layerStagger: 0.06,
+      linkStagger: 0.07,
+      colorOpen: "#f0fdfa",
+      colorClosed: "#000000",
+      linkRotation: 6,
+      crossRotation: 405,
+      overlayOffset: 0.12,
+      linksOffset: 0.4,
+    };
 
-  const total = menuText.querySelectorAll("span").length;
-  const mid = Math.floor(total / 2);
-  const step = (1 / total) * 100;
+    const total = menuText.querySelectorAll("span").length;
+    const mid = Math.floor(total / 2);
+    const step = (1 / total) * 100;
 
-  let isOpen = false;
-  let textTween: gsap.core.Tween | null = null;
+    let isOpen = false;
+    let textTween: gsap.core.Tween | null = null;
 
-  gsap.set(overlay, { xPercent: 100 });
-  gsap.set(layers, { xPercent: 100 });
-  gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+    gsap.set(overlay, { xPercent: 100 });
+    gsap.set(layers, { xPercent: 100 });
+    gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+    gsap.set(socials, { opacity: 0, yPercent: 20 });
+    gsap.set(socialLinks, { yPercent: 100 });
 
-  const tl = gsap.timeline({
-    paused: true,
-    onStart: () => {
-      gsap.set([overlay, ...layers], { visibility: "visible" });
-    },
-    onReverseComplete: () => {
-      gsap.set([overlay, ...layers], { visibility: "hidden" });
-      gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
-    },
-  });
-
-  tl.to(
-    layers,
-    {
-      xPercent: 0,
-      duration: ANIM.slideDuration,
-      ease: ANIM.slideEase,
-      stagger: ANIM.layerStagger,
-    },
-    0,
-  )
-    .to(
-      button,
-      {
-        color: ANIM.colorOpen,
-        duration: ANIM.slideDuration,
-        ease: ANIM.slideEase,
+    const tl = gsap.timeline({
+      paused: true,
+      onStart: () => {
+        gsap.set([overlay, ...layers], { visibility: "visible" });
       },
-      0,
-    )
-    .to(
-      overlay,
+      onReverseComplete: () => {
+        gsap.set([overlay, ...layers], { visibility: "hidden" });
+        gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+        gsap.set(socials, { opacity: 0, yPercent: 20 });
+        gsap.set(socialLinks, { yPercent: 100 });
+      },
+    });
+
+    tl.to(
+      layers,
       {
         xPercent: 0,
         duration: ANIM.slideDuration,
         ease: ANIM.slideEase,
+        stagger: ANIM.layerStagger,
       },
-      ANIM.overlayOffset,
-    );
+      0,
+    )
+      .to(
+        button,
+        {
+          color: ANIM.colorOpen,
+          duration: ANIM.slideDuration,
+          ease: ANIM.slideEase,
+        },
+        0,
+      )
+      .to(
+        overlay,
+        {
+          xPercent: 0,
+          duration: ANIM.slideDuration,
+          ease: ANIM.slideEase,
+        },
+        ANIM.overlayOffset,
+      );
 
-  function animateTextOpen() {
-    textTween = gsap.to(menuText, {
-      yPercent: -(mid * step),
-      duration: ANIM.slideDuration,
-      ease: ANIM.contentEase,
-    });
-  }
-
-  function animateTextClose() {
-    textTween = gsap.to(menuText, {
-      yPercent: -((total - 1) * step),
-      duration: ANIM.slideDuration,
-      ease: ANIM.contentEase,
-      onComplete: () => gsap.set(menuText, { yPercent: 0 }),
-    });
-  }
-
-  function animateLinks() {
-    gsap.to(links, {
-      yPercent: 0,
-      rotate: 0,
-      duration: ANIM.linksDuration,
-      ease: ANIM.contentEase,
-      stagger: ANIM.linkStagger,
-      delay: ANIM.linksOffset,
-    });
-  }
-
-  function animateCross() {
-    gsap.to(cross, {
-      rotation: isOpen ? 0 : ANIM.crossRotation,
-      duration: ANIM.slideDuration,
-      ease: ANIM.contentEase,
-    });
-  }
-
-  button.addEventListener("click", () => {
-    if (tl.isActive() || textTween?.isActive()) return;
-
-    if (!isOpen) {
-      tl.play(0);
-      animateLinks();
-      animateTextOpen();
-    } else {
-      tl.reverse();
-      animateTextClose();
+    function animateTextOpen() {
+      textTween = gsap.to(menuText, {
+        yPercent: -(mid * step),
+        duration: ANIM.slideDuration,
+        ease: ANIM.contentEase,
+      });
     }
 
-    animateCross();
-    isOpen = !isOpen;
+    function animateTextClose() {
+      textTween = gsap.to(menuText, {
+        yPercent: -((total - 1) * step),
+        duration: ANIM.slideDuration,
+        ease: ANIM.contentEase,
+        onComplete: () => gsap.set(menuText, { yPercent: 0 }),
+      });
+    }
+
+    function animateLinks() {
+      gsap.to(links, {
+        yPercent: 0,
+        rotate: 0,
+        duration: ANIM.linksDuration,
+        ease: ANIM.contentEase,
+        stagger: ANIM.linkStagger,
+        delay: ANIM.linksOffset,
+      });
+      gsap.to(socials, {
+        opacity: 1,
+        yPercent: 0,
+        duration: ANIM.linksDuration,
+        ease: ANIM.contentEase,
+        delay: ANIM.linksOffset + ANIM.linkStagger * links.length,
+      });
+      gsap.to(socialLinks, {
+        yPercent: 0,
+        duration: ANIM.linksDuration,
+        ease: ANIM.contentEase,
+        stagger: 0.05,
+        delay: ANIM.linksOffset + ANIM.linkStagger * links.length,
+      });
+    }
+
+    function animateCross() {
+      gsap.to(cross, {
+        rotation: isOpen ? 0 : ANIM.crossRotation,
+        duration: ANIM.slideDuration,
+        ease: ANIM.contentEase,
+      });
+    }
+
+    button.addEventListener("click", () => {
+      if (tl.isActive() || textTween?.isActive()) return;
+
+      if (!isOpen) {
+        document.body.style.overflow = "hidden";
+        tl.play(0);
+        animateLinks();
+        animateTextOpen();
+      } else {
+        document.body.style.overflow = "";
+        tl.reverse();
+        animateTextClose();
+      }
+
+      animateCross();
+      isOpen = !isOpen;
+    });
   });
 </script>

@@ -1,14 +1,37 @@
 ---
-import "../styles/global.css";
-import IconCube from "@components/icons/IconCube.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 ---
 
 <BaseLayout>
-  <h2 class="text-xl">
-    full-stack and passionate creative <span class="italic underline"
-      >developer</span
-    >
-  </h2>
-  <p class="mt-auto">work in progress...</p>
+  <h2 class="text-xl">full-stack and creative developer</h2>
+
+  <div
+    class="max-w-lg mt-12 text-sm leading-relaxed text-neutral-500 flex flex-col gap-4"
+  >
+    <p>
+      This portfolio was published far too early, intentionally. I wanted a
+      place to write, and Astro was the tool I'd chosen for both the blog and
+      the portfolio, so I shipped what I had.
+    </p>
+    <p>
+      The <a href="/blog" class="underline text-neutral-700">blog</a> is where I document
+      what I learn along the way ; short experiments, discoveries, and the web rabbit
+      holes that feed my
+      <a href="/projects" class="underline text-neutral-700">project list</a>.
+    </p>
+    <p>
+      Eventually, those projects will be showcased here in a more creative
+      manner. For now, I'm still practicing to get there.
+    </p>
+    <p>
+      <a
+        href="https://drive.google.com/file/d/1l69ztiHjXb1Q0WuAgiSPmeoh-eoq8Ep9/view?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline text-neutral-700">View my CV &rarr;</a
+      >
+    </p>
+  </div>
+
+  <p class="mt-auto text-xs text-neutral-400 animate-pulse">work in progress</p>
 </BaseLayout>
