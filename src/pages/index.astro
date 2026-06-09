@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import IconCube from "@components/icons/IconCube.astro";
 ---
 
 <html lang="en">
@@ -15,8 +16,15 @@ import "../styles/global.css";
     />
   </head>
 
-  <body>
-    <h1 class="text-3xl font-bold underline">@thibautlfr - Portfolio</h1>
-    <p>test</p>
+  <body class="p-4 flex flex-col w-dvw h-dvh overflow-hidden">
+    <h1 class="text-3xl font-extrabold flex items-center">
+      <IconCube size={30} />/thibautlfr
+    </h1>
+    <h2 class="text-xl">
+      full-stack and passionate creative <span class="italic underline"
+        >developer</span
+      >
+    </h2>
+    <p class="mt-auto">work in progress...</p>
   </body>
 </html>
