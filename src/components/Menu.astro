@@ -1,0 +1,121 @@
+---
+
+---
+
+<div class="menu-overlay fixed inset-0 z-50 invisible bg-teal-900 text-teal-50">
+  <nav class="h-full flex items-center justify-center p-8">
+    <ul class="flex flex-col gap-6 text-5xl font-heading">
+      <li><a href="/">Home</a></li>
+      <li><a href="/projects">Projects</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+  </nav>
+</div>
+
+<button
+  class="menu-button relative z-60 w-fit flex items-center gap-[0.3rem] cursor-pointer leading-none overflow-visible"
+>
+  <span class="relative inline-block whitespace-nowrap h-[1em] overflow-hidden">
+    <span class="menu-text flex flex-col leading-none">
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+      <span>close</span>
+      <span>menu</span>
+    </span>
+  </span>
+  <span class="mt-0.5 cross inline-flex items-center h-[1em]">+</span>
+</button>
+
+<script>
+  import { gsap } from "gsap";
+
+  const button = document.querySelector(".menu-button");
+  const menuText = button?.querySelector(".menu-text");
+  const cross = button?.querySelector(".cross");
+  const overlay = document.querySelector(".menu-overlay");
+
+  if (!button || !menuText || !cross || !overlay)
+    throw new Error("Menu elements not found");
+
+  const spans = menuText.querySelectorAll("span");
+  const total = spans.length;
+  const mid = Math.floor(total / 2);
+  const step = (1 / total) * 100;
+
+  let isOpen = false;
+  let isAnimating = false;
+
+  gsap.set(overlay, { xPercent: 100 });
+
+  button.addEventListener("click", () => {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    if (!isOpen) {
+      gsap.set(overlay, { visibility: "visible" });
+
+      gsap.to(button, {
+        color: "#f0fdfa", // tailwind color teal-50
+        duration: 0.8,
+        ease: "power4.inOut",
+      });
+      gsap.to(overlay, {
+        xPercent: 0,
+        duration: 0.8,
+        ease: "power4.inOut",
+      });
+
+      gsap.to(menuText, {
+        yPercent: -(mid * step),
+        duration: 0.8,
+        ease: "power3.out",
+        onComplete: () => {
+          isOpen = true;
+          isAnimating = false;
+        },
+      });
+    } else {
+      gsap.to(button, {
+        color: "#000000",
+        duration: 0.8,
+        ease: "power4.inOut",
+      });
+
+      gsap.to(overlay, {
+        xPercent: 100,
+        duration: 0.8,
+        ease: "power4.inOut",
+        onComplete: () => gsap.set(overlay, { visibility: "hidden" }),
+      });
+
+      gsap.to(menuText, {
+        yPercent: -((total - 1) * step),
+        duration: 0.8,
+        ease: "power3.out",
+        onComplete: () => {
+          gsap.set(menuText, { yPercent: 0 });
+          isOpen = false;
+          isAnimating = false;
+        },
+      });
+    }
+
+    gsap.to(cross, {
+      rotation: isOpen ? 0 : 405,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+  });
+</script>

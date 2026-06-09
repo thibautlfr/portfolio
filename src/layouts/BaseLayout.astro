@@ -1,5 +1,5 @@
 ---
-import MenuButton from "@components/MenuButton.astro";
+import Header from "@components/Header.astro";
 interface Props {
   pageTitle?: string;
 }
@@ -17,7 +17,7 @@ const { pageTitle = "@thibautlfr - portfolio" } = Astro.props;
   </head>
 
   <body class="p-8 flex flex-col w-dvw min-h-dvh">
-    <MenuButton />
+    <Header />
     <slot />
   </body>
 </html>
