@@ -205,10 +205,12 @@ import { navLinks, socials } from "../config";
     if (tl.isActive() || textTween?.isActive()) return;
 
     if (!isOpen) {
+      document.body.style.overflow = "hidden";
       tl.play(0);
       animateLinks();
       animateTextOpen();
     } else {
+      document.body.style.overflow = "";
       tl.reverse();
       animateTextClose();
     }
