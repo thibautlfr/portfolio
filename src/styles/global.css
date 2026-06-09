@@ -1,8 +1,12 @@
+@import url("https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@100,200,300,400,500,700,800,900&f[]=satoshi@100,200,300,400,500,700,800,900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Schoolbell&display=swap');
+
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Satoshi", sans-serif;
   --font-heading: "Cabinet Grotesk", sans-serif;
+  --font-button: "Schoolbell", sans-serif;
 }
 
 h1,
@@ -12,4 +16,9 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
+}
+
+button {
+  font-size: var(--text-xl);
+  font-family: var(--font-button);
 }
