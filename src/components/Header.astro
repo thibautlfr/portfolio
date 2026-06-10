@@ -2,7 +2,9 @@
 import IconCube from "@components/icons/IconCube.astro";
 import Menu from "@components/Menu.astro";
 
-const slug = Astro.url.pathname === "/" ? "/home" : Astro.url.pathname.replace(/\/$/, "");
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/home";
+const segments = pathname.split("/").filter(Boolean);
+const slug = "/" + (segments[0] || "home");
 ---
 
 <header
