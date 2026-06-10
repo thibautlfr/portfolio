@@ -16,7 +16,7 @@ const { title, description, date, status, stack, repository, live } =
 
 <article class="py-8 first:pt-0">
   <div class="flex items-baseline gap-3">
-    <h3 class="text-xl font-bold">{title}</h3>
+    <h3 class="text-xl md:text-2xl font-bold">{title}</h3>
     {
       status === "wip" && (
         <span class="text-xs text-neutral-400 border border-neutral-300 rounded-full px-2">
@@ -26,7 +26,7 @@ const { title, description, date, status, stack, repository, live } =
     }
   </div>
 
-  <p class="text-sm text-neutral-500 mt-1 max-w-lg">{description}</p>
+  <p class="text-base text-neutral-500 mt-1 max-w-lg">{description}</p>
 
   <div
     class="mt-2 text-xs text-neutral-400 flex items-center gap-x-4 gap-y-1 flex-wrap"

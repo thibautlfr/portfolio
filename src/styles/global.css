@@ -18,6 +18,12 @@ h6 {
   font-family: var(--font-heading), sans-serif;
 }
 
+body {
+  font-size: var(--text-base);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 button {
   font-size: var(--text-xl);
 }

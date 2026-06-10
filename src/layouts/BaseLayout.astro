@@ -6,12 +6,16 @@ import PageTransition from "@components/PageTransition.astro";
 
 interface Props {
   pageTitle?: string;
+  title?: string;
+  srOnlyTitle?: boolean;
   subtitle?: string;
   subtitleCount?: number;
 }
 
 const {
   pageTitle = "Thibaut LEFRANCOIS - portfolio",
+  title,
+  srOnlyTitle = true,
   subtitle,
   subtitleCount,
 } = Astro.props;
@@ -30,10 +34,22 @@ const {
   <body class="flex flex-col w-dvw min-h-dvh">
     <PageTransition />
     <Header />
-    <main class="flex flex-col flex-1 px-8 pb-8">
+    <main class="flex flex-col flex-1 px-6 pb-8">
+      {
+        title && (
+          <h1
+            class:list={[
+              "text-3xl md:text-4xl font-bold",
+              srOnlyTitle && "sr-only",
+            ]}
+          >
+            {title}
+          </h1>
+        )
+      }
       {
         subtitle && (
-          <h2 class="text-xl">
+          <h2 class="text-xl md:text-2xl font-semibold">
             {subtitle}
             {subtitleCount !== undefined && (
               <sub class="text-base font-sans align-sub opacity-50">
