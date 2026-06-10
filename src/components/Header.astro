@@ -2,17 +2,24 @@
 import IconCube from "@components/icons/IconCube.astro";
 import Menu from "@components/Menu.astro";
 
-const slug = Astro.url.pathname === "/" ? "/home" : Astro.url.pathname.replace(/\/$/, "");
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const segments = pathname.split("/").filter(Boolean);
+const slug = segments[0] || null;
 ---
 
 <header
-  class="sticky top-0 z-30 flex items-center justify-between bg-white px-6 py-6 select-none md:px-10 lg:px-16"
+  class="sticky top-0 z-30 flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-6 select-none md:px-10 lg:px-16"
 >
-  <a
-    href="/"
-    class="flex items-center text-xl leading-none font-bold md:text-3xl"
-  >
-    <IconCube class="size-5 md:size-7.5" />/thibautlfr{slug}
-  </a>
+  <div class="flex items-center text-xl leading-none font-bold md:text-3xl">
+    <IconCube class="size-5 md:size-7.5" />
+    <a href="/" class="ease-in hover:text-teal-600">thibautlfr</a>
+    {
+      slug && (
+        <a href={`/${slug}`} class="ease-in hover:text-teal-600">
+          /{slug}
+        </a>
+      )
+    }
+  </div>
   <Menu />
 </header>

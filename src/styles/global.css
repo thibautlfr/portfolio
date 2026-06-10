@@ -24,10 +24,6 @@ body {
   line-height: 1.5;
 }
 
-button {
-  font-size: var(--text-xl);
-}
-
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
