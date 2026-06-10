@@ -2,21 +2,25 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 ---
 
-<BaseLayout subtitle="full-stack and creative developer">
-
+<BaseLayout title="Thibaut LEFRANCOIS">
   <div
-    class="max-w-lg mt-12 text-sm leading-relaxed text-neutral-500 flex flex-col gap-4"
+    class="flex max-w-prose flex-col gap-5 text-base leading-relaxed text-neutral-500 md:gap-6"
   >
+    <h2
+      class="mt-auto text-center text-xl font-semibold italic sm:text-left md:text-2xl"
+    >
+      full-stack and creative developer
+    </h2>
     <p>
       This portfolio was published far too early, intentionally. I wanted a
       place to write, and Astro was the tool I'd chosen for both the blog and
       the portfolio, so I shipped what I had.
     </p>
     <p>
-      The <a href="/blog" class="underline text-neutral-700">blog</a> is where I document
+      The <a href="/blog" class="text-neutral-700 underline">blog</a> is where I document
       what I learn along the way ; short experiments, discoveries, and the web rabbit
       holes that feed my
-      <a href="/projects" class="underline text-neutral-700">project list</a>.
+      <a href="/projects" class="text-neutral-700 underline">project list</a>.
     </p>
     <p>
       Eventually, those projects will be showcased here in a more creative
@@ -27,10 +31,9 @@ import BaseLayout from "@layouts/BaseLayout.astro";
         href="https://drive.google.com/file/d/1l69ztiHjXb1Q0WuAgiSPmeoh-eoq8Ep9/view?usp=sharing"
         target="_blank"
         rel="noopener noreferrer"
-        class="underline text-neutral-700">View my CV &rarr;</a
+        class="text-neutral-700 underline"
+        >View my CV &rarr;<span class="sr-only"> (opens in new tab)</span></a
       >
     </p>
   </div>
-
-  <p class="mt-auto text-xs text-neutral-400 animate-pulse">work in progress</p>
 </BaseLayout>

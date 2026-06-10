@@ -6,12 +6,16 @@ import PageTransition from "@components/PageTransition.astro";
 
 interface Props {
   pageTitle?: string;
+  title?: string;
+  srOnlyTitle?: boolean;
   subtitle?: string;
   subtitleCount?: number;
 }
 
 const {
   pageTitle = "Thibaut LEFRANCOIS - portfolio",
+  title,
+  srOnlyTitle = true,
   subtitle,
   subtitleCount,
 } = Astro.props;
@@ -27,16 +31,37 @@ const {
     <ClientRouter />
   </head>
 
-  <body class="flex flex-col w-dvw min-h-dvh">
+  <body class="flex min-h-dvh w-dvw flex-col">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-black focus:outline-2 focus:outline-offset-2 focus:outline-current"
+    >
+      Skip to content
+    </a>
     <PageTransition />
     <Header />
-    <main class="flex flex-col flex-1 px-8 pb-8">
+    <main
+      id="main-content"
+      class="flex flex-1 flex-col px-6 pb-10 md:px-10 md:pb-16 lg:px-16"
+    >
+      {
+        title && (
+          <h1
+            class:list={[
+              "text-3xl font-bold md:text-4xl",
+              srOnlyTitle && "sr-only",
+            ]}
+          >
+            {title}
+          </h1>
+        )
+      }
       {
         subtitle && (
-          <h2 class="text-xl">
+          <h2 class="text-xl font-semibold md:text-2xl">
             {subtitle}
             {subtitleCount !== undefined && (
-              <sub class="text-base font-sans align-sub opacity-50">
+              <sub class="align-sub font-sans text-base opacity-50">
                 ({subtitleCount})
               </sub>
             )}
@@ -45,5 +70,8 @@ const {
       }
       <slot />
     </main>
+    <footer class="px-6 py-6 text-xs text-neutral-400 md:px-10 lg:px-16">
+      <p>&copy; {new Date().getFullYear()} Thibaut LEFRANCOIS</p>
+    </footer>
   </body>
 </html>
