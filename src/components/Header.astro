@@ -5,7 +5,7 @@ import Menu from "@components/Menu.astro";
 const slug = Astro.url.pathname.replace(/\/$/, "/home");
 ---
 
-<div
+<header
   class="sticky top-0 z-30 flex items-center justify-between px-6 md:px-10 lg:px-16 py-6 select-none bg-white"
 >
   <a
@@ -15,4 +15,4 @@ const slug = Astro.url.pathname.replace(/\/$/, "/home");
     <IconCube class="size-5 md:size-7.5" />/thibautlfr{slug}
   </a>
   <Menu />
-</div>
+</header>

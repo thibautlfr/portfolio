@@ -2,7 +2,7 @@
 
 ---
 
-<div id="page-transition" transition:persist>
+<div id="page-transition" aria-hidden="true" transition:persist>
   <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-400"></div>
   <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-600"></div>
   <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-900"></div>
@@ -12,6 +12,7 @@
   import { gsap } from "gsap";
 
   const layers = document.querySelectorAll<HTMLElement>(".transition-layer");
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const ANIM = {
     duration: 0.5,
@@ -20,6 +21,10 @@
   };
 
   function leave(): Promise<void> {
+    if (prefersReduced) {
+      gsap.set(layers, { visibility: "visible", xPercent: 0 });
+      return Promise.resolve();
+    }
     return new Promise((resolve) => {
       gsap.killTweensOf(layers);
       gsap.set(layers, { visibility: "visible", xPercent: 100 });
@@ -34,6 +39,10 @@
   }
 
   function enter(): Promise<void> {
+    if (prefersReduced) {
+      gsap.set(layers, { visibility: "hidden" });
+      return Promise.resolve();
+    }
     return new Promise((resolve) => {
       gsap.to(layers, {
         xPercent: -100,
