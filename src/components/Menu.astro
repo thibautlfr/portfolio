@@ -4,18 +4,18 @@ import { navLinks, socials } from "../config";
 
 <!-- Invisible layers for opening effect-->
 <div
-  class="menu-layer fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-40 invisible bg-teal-400"
+  class="menu-layer invisible fixed top-0 right-0 bottom-0 z-40 w-full bg-teal-400 lg:w-[40%] xl:w-1/4"
 >
 </div>
 <div
-  class="menu-layer fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-40 invisible bg-teal-600"
+  class="menu-layer invisible fixed top-0 right-0 bottom-0 z-40 w-full bg-teal-600 lg:w-[40%] xl:w-1/4"
 >
 </div>
 
 <div
-  class="menu-overlay fixed top-0 bottom-0 right-0 w-full xl:w-1/4 lg:w-[40%] z-50 invisible bg-teal-900 text-teal-50 px-8 pt-18 pb-8"
+  class="menu-overlay invisible fixed top-0 right-0 bottom-0 z-50 w-full bg-teal-900 px-8 pt-18 pb-8 text-teal-50 lg:w-[40%] xl:w-1/4"
 >
-  <nav id="main-nav" class="h-full flex flex-col justify-between">
+  <nav id="main-nav" class="flex h-full flex-col justify-between">
     <!-- prettier-ignore -->
     <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
       {navLinks.map((link, i) => (
@@ -28,11 +28,11 @@ import { navLinks, socials } from "../config";
     </ul>
 
     <div class="menu-socials">
-      <p class="text-sm font-sans uppercase tracking-widest text-teal-400 mb-3">
+      <p class="mb-3 font-sans text-sm tracking-widest text-teal-400 uppercase">
         Socials
       </p>
       <ul
-        class="flex gap-6 text-base font-sans [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100"
+        class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
       >
         {
           socials.map((s) => (
@@ -43,7 +43,8 @@ import { navLinks, socials } from "../config";
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {s.label}<span class="sr-only"> (opens in new tab)</span>
+                {s.label}
+                <span class="sr-only"> (opens in new tab)</span>
               </a>
             </li>
           ))
@@ -54,10 +55,10 @@ import { navLinks, socials } from "../config";
 </div>
 
 <button
-  class="menu-button relative z-60 w-fit flex items-center gap-[0.3rem] cursor-pointer leading-none overflow-visible border px-3 py-1.5 rounded-full"
+  class="menu-button relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 leading-none"
   aria-label="Menu"
 >
-  <span class="relative inline-block whitespace-nowrap h-[1em] overflow-hidden">
+  <span class="relative inline-block h-[1em] overflow-hidden whitespace-nowrap">
     <span class="menu-text flex flex-col leading-none">
       <span>menu</span>
       <span>close</span>
@@ -72,7 +73,7 @@ import { navLinks, socials } from "../config";
       <span>menu</span>
     </span>
   </span>
-  <span class="mt-0.5 cross inline-flex items-center h-[1em]">+</span>
+  <span class="cross mt-0.5 inline-flex h-[1em] items-center">+</span>
 </button>
 
 <script>
@@ -88,7 +89,9 @@ import { navLinks, socials } from "../config";
     const socials = document.querySelector(".menu-socials")!;
     const socialLinks = document.querySelectorAll(".social-link");
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     const ANIM = {
       slideDuration: 0.8,
@@ -216,7 +219,10 @@ import { navLinks, socials } from "../config";
       if (!isOpen) {
         document.body.style.overflow = "hidden";
         if (prefersReduced) {
-          gsap.set([overlay, ...layers], { visibility: "visible", xPercent: 0 });
+          gsap.set([overlay, ...layers], {
+            visibility: "visible",
+            xPercent: 0,
+          });
           gsap.set(links, { yPercent: 0, rotate: 0 });
           gsap.set(socials, { opacity: 1, yPercent: 0 });
           gsap.set(socialLinks, { yPercent: 0 });
@@ -231,7 +237,10 @@ import { navLinks, socials } from "../config";
       } else {
         document.body.style.overflow = "";
         if (prefersReduced) {
-          gsap.set([overlay, ...layers], { visibility: "hidden", xPercent: 100 });
+          gsap.set([overlay, ...layers], {
+            visibility: "hidden",
+            xPercent: 100,
+          });
           gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
           gsap.set(socials, { opacity: 0, yPercent: 20 });
           gsap.set(socialLinks, { yPercent: 100 });

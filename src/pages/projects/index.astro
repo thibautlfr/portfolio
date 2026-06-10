@@ -9,7 +9,7 @@ const projects = (await getCollection("projects")).sort(
 ---
 
 <BaseLayout pageTitle="Projects — Thibaut LEFRANCOIS" title="Projects">
-  <div class="mt-6 md:mt-8 flex flex-col divide-y divide-neutral-200">
+  <div class="mt-6 flex flex-col divide-y divide-neutral-200 md:mt-8">
     {
       projects.map((project) => (
         <ProjectCard

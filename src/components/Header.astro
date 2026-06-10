@@ -6,11 +6,11 @@ const slug = Astro.url.pathname.replace(/\/$/, "/home");
 ---
 
 <header
-  class="sticky top-0 z-30 flex items-center justify-between px-6 md:px-10 lg:px-16 py-6 select-none bg-white"
+  class="sticky top-0 z-30 flex items-center justify-between bg-white px-6 py-6 select-none md:px-10 lg:px-16"
 >
   <a
     href="/"
-    class="text-xl md:text-3xl font-bold flex items-center leading-none"
+    class="flex items-center text-xl leading-none font-bold md:text-3xl"
   >
     <IconCube class="size-5 md:size-7.5" />/thibautlfr{slug}
   </a>

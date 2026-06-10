@@ -3,16 +3,18 @@
 ---
 
 <div id="page-transition" aria-hidden="true" transition:persist>
-  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-400"></div>
-  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-600"></div>
-  <div class="transition-layer fixed inset-0 z-70 invisible bg-teal-900"></div>
+  <div class="transition-layer invisible fixed inset-0 z-70 bg-teal-400"></div>
+  <div class="transition-layer invisible fixed inset-0 z-70 bg-teal-600"></div>
+  <div class="transition-layer invisible fixed inset-0 z-70 bg-teal-900"></div>
 </div>
 
 <script>
   import { gsap } from "gsap";
 
   const layers = document.querySelectorAll<HTMLElement>(".transition-layer");
-  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   const ANIM = {
     duration: 0.5,
