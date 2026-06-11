@@ -115,6 +115,26 @@ import { navLinks, socials } from "../config";
     let isOpen = false;
     let textTween: gsap.core.Tween | null = null;
 
+    function setOpenState() {
+      gsap.set([overlay, ...layers], { visibility: "visible", xPercent: 0 });
+      gsap.set(links, { yPercent: 0, rotate: 0 });
+      gsap.set(socials, { opacity: 1, yPercent: 0 });
+      gsap.set(socialLinks, { yPercent: 0 });
+      gsap.set(button, { color: ANIM.colorOpen });
+      gsap.set(cross, { rotation: ANIM.crossRotation });
+      gsap.set(menuText, { yPercent: -(mid * step) });
+    }
+
+    function setClosedState() {
+      gsap.set([overlay, ...layers], { visibility: "hidden", xPercent: 100 });
+      gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
+      gsap.set(socials, { opacity: 0, yPercent: 20 });
+      gsap.set(socialLinks, { yPercent: 100 });
+      gsap.set(button, { color: ANIM.colorClosed });
+      gsap.set(cross, { rotation: 0 });
+      gsap.set(menuText, { yPercent: 0 });
+    }
+
     gsap.set(overlay, { xPercent: 100 });
     gsap.set(layers, { xPercent: 100 });
     gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
@@ -126,12 +146,7 @@ import { navLinks, socials } from "../config";
       onStart: () => {
         gsap.set([overlay, ...layers], { visibility: "visible" });
       },
-      onReverseComplete: () => {
-        gsap.set([overlay, ...layers], { visibility: "hidden" });
-        gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
-        gsap.set(socials, { opacity: 0, yPercent: 20 });
-        gsap.set(socialLinks, { yPercent: 100 });
-      },
+      onReverseComplete: () => setClosedState(),
     });
 
     tl.to(
@@ -219,16 +234,7 @@ import { navLinks, socials } from "../config";
       if (!isOpen) {
         document.body.style.overflow = "hidden";
         if (prefersReduced) {
-          gsap.set([overlay, ...layers], {
-            visibility: "visible",
-            xPercent: 0,
-          });
-          gsap.set(links, { yPercent: 0, rotate: 0 });
-          gsap.set(socials, { opacity: 1, yPercent: 0 });
-          gsap.set(socialLinks, { yPercent: 0 });
-          gsap.set(button, { color: ANIM.colorOpen });
-          gsap.set(cross, { rotation: ANIM.crossRotation });
-          gsap.set(menuText, { yPercent: -(mid * step) });
+          setOpenState();
         } else {
           tl.play(0);
           animateLinks();
@@ -237,16 +243,7 @@ import { navLinks, socials } from "../config";
       } else {
         document.body.style.overflow = "";
         if (prefersReduced) {
-          gsap.set([overlay, ...layers], {
-            visibility: "hidden",
-            xPercent: 100,
-          });
-          gsap.set(links, { yPercent: 100, rotate: ANIM.linkRotation });
-          gsap.set(socials, { opacity: 0, yPercent: 20 });
-          gsap.set(socialLinks, { yPercent: 100 });
-          gsap.set(button, { color: ANIM.colorClosed });
-          gsap.set(cross, { rotation: 0 });
-          gsap.set(menuText, { yPercent: 0 });
+          setClosedState();
         } else {
           tl.reverse();
           animateTextClose();

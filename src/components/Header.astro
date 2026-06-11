@@ -15,7 +15,10 @@ const slug = segments[0] || null;
     <a href="/" class="ease-in hover:text-teal-600">thibautlfr</a>
     {
       slug && (
-        <a href={`/${slug}`} class="ease-in hover:text-teal-600">
+        <a
+          href={`/${slug}`}
+          class="text-teal-600 ease-in md:text-inherit md:hover:text-teal-600"
+        >
           /{slug}
         </a>
       )
