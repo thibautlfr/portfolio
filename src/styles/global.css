@@ -18,6 +18,15 @@ h6 {
   font-family: var(--font-heading), sans-serif;
 }
 
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   font-size: var(--text-base);
   font-weight: 400;
