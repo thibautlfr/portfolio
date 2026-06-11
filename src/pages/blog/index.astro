@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogCard from "@components/BlogCard.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout pageTitle="Blog — Thibaut LEFRANCOIS" title="Blog">
+  <div class="flex flex-col divide-y divide-neutral-200">
+    {
+      posts.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.id}
+          draft={post.data.draft}
+        />
+      ))
+    }
+  </div>
+</BaseLayout>
