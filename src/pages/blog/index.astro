@@ -4,7 +4,7 @@ import BlogCard from "@components/BlogCard.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog"))
-  .filter((post) => !post.data.draft)
+  .filter((post) => import.meta.env.DEV || !post.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
