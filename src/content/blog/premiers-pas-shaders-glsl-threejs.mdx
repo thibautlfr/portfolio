@@ -1,0 +1,189 @@
+---
+title: "La trigonométrie du lycée m'a rattrapé — mes premiers shaders GLSL"
+description: "Retour d'expérience sur mes premiers pas avec les vertex et fragment shaders en GLSL, à travers un carousel 3D infini avec aberration chromatique dynamique."
+date: 2026-06-11
+tags: [threejs, glsl, shaders, creative-dev, retour-experience]
+project: 3d-carousel
+draft: false
+---
+
+Je ne pensais pas qu'un jour je serais content de revoir des sinus et des cosinus. Et pourtant, c'est exactement ce qui s'est passé quand j'ai commencé à écrire mes premiers shaders GLSL. Ces fonctions trigonométriques qu'on apprenait au lycée sans trop savoir à quoi elles serviraient "dans la vraie vie" — elles sont partout dans le développement créatif. Oscillations, déformations, animations périodiques : la trigo, c'est la base.
+
+Cet article, c'est un retour d'expérience. Je ne suis pas un expert en shaders. C'est mon premier projet en autonomie après m'être formé aux bases du GLSL via [Three.js Journey](https://threejs-journey.com/), la doc officielle et beaucoup d'exemples sur [Awwwards](https://www.awwwards.com/) et [Codrops](https://tympanus.net/codrops/). Mon approche : je me forme, puis je lance un truc pour tester ce que je viens d'apprendre. Pas besoin d'un brief client ou d'un projet ambitieux — juste une idée, une commande `npm create`, et c'est parti.
+
+Le résultat, c'est un carousel infini d'images en 3D, où chaque image réagit au scroll et à la souris grâce aux shaders. Voilà ce que ça donne :
+
+<iframe src="https://thibautlfr.github.io/3d-carousel/" class="w-full aspect-video rounded-lg border border-neutral-200" loading="lazy" />
+
+## Le setup : un boilerplate Three.js maison
+
+Avant de toucher aux shaders, il faut une base solide. J'ai construit mon propre boilerplate Three.js natif — une architecture modulaire avec gestion de la scène, caméra, renderer, ressources, boucle de rendu et outils de debug. Ça me permet de me concentrer directement sur le concret sans reconfigurer tout à chaque projet. Je ferai un article dédié là-dessus, mais en gros : une classe `Experience` en singleton orchestre tout, et chaque composant (caméra, monde, carousel) est autonome.
+
+Pour les shaders spécifiquement, j'utilise [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) qui permet d'importer les fichiers `.glsl` directement dans le TypeScript. Ça évite d'écrire du GLSL dans des template literals et ça donne le syntax highlighting dans l'IDE.
+
+## Le vertex shader : déformer la géométrie
+
+Le vertex shader, c'est le premier programme qui s'exécute dans le pipeline graphique. Il traite chaque **vertex** (sommet) de la géométrie et détermine sa position finale à l'écran via `gl_Position`.
+
+Dans mon cas, les images du carousel sont des `PlaneGeometry` avec une subdivision de 32×32 — soit plus de 1000 vertices par image. Assez pour que les déformations soient fluides.
+
+Voici le vertex shader complet :
+
+```glsl title="shaders/image/vertex.glsl"
+uniform vec2 uFrequency;
+uniform float uTime;
+
+varying vec2 vUv;
+varying float vElevation;
+
+void main() {
+  vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+
+  float elevation = sin(modelPosition.x * uFrequency.x) * 0.1;
+  elevation += sin(modelPosition.y * uFrequency.y) * 0.1;
+  modelPosition.z += elevation;
+
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectedPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectedPosition;
+
+  vUv = uv;
+  vElevation = elevation;
+}
+```
+
+Quelques notions clés ici :
+
+- Les **uniforms** (`uFrequency`, `uTime`) sont des valeurs envoyées depuis le JavaScript. Elles sont identiques pour tous les vertices d'un même mesh — d'où le nom "uniform"
+- Les **varyings** (`vUv`, `vElevation`) sont des valeurs calculées dans le vertex shader et transmises au fragment shader. Le GPU les interpole automatiquement entre les vertices, ce qui donne des transitions douces
+- La chaîne `modelMatrix → viewMatrix → projectionMatrix` transforme les coordonnées locales du vertex en coordonnées écran. C'est le pipeline standard de Three.js
+
+La déformation vient de ces deux lignes :
+
+```glsl
+float elevation = sin(modelPosition.x * uFrequency.x) * 0.1;
+elevation += sin(modelPosition.y * uFrequency.y) * 0.1;
+```
+
+`sin()` appliqué à la position X du vertex produit une onde le long de l'image. `uFrequency` contrôle la "densité" de cette onde. Avec `uFrequency.x = 3.5` et `uFrequency.y = 0`, on obtient une déformation horizontale subtile qui donne du relief aux images. Et c'est là que la trigonométrie du lycée refait surface : un simple sinus qui oscille entre -1 et 1, multiplié par 0.1 pour limiter l'amplitude. Pas de magie, juste des maths de base appliquées dans un contexte visuel.
+
+## Le fragment shader : contrôler chaque canal de couleur
+
+Le fragment shader intervient après le vertex shader. Pour chaque **fragment** (un fragment correspond grosso modo à un pixel à l'écran, mais avant les tests de profondeur et de blending), il détermine la couleur finale via `gl_FragColor`.
+
+C'est là que ça devient intéressant. Avec `texture2D(uTexture, vUv)`, on échantillonne la texture de l'image aux coordonnées UV interpolées depuis le vertex shader. Le résultat est un `vec4` — quatre composantes : rouge, vert, bleu, alpha. Et on peut manipuler chaque canal indépendamment.
+
+```glsl title="shaders/image/fragment.glsl"
+uniform sampler2D uTexture;
+uniform float uVignetteOffset;
+uniform float uVignetteDarkness;
+uniform vec2 uMouse;
+uniform vec2 uResolution;
+uniform float uStereoRadius;
+uniform float uStereoStrength;
+varying vec2 vUv;
+
+void main() {
+    vec2 screenUv = gl_FragCoord.xy / uResolution;
+
+    float aspect = uResolution.x / uResolution.y;
+    vec2 diff = screenUv - uMouse;
+    diff.x *= aspect;
+
+    float dist = length(diff);
+
+    float mask = smoothstep(uStereoRadius, 0.0, dist);
+
+    vec2 dir = dist > 0.001 ? normalize(diff) : vec2(0.0);
+
+    vec2 uvOffset = dir * uStereoStrength * mask;
+    uvOffset.x /= aspect;
+
+    float r = texture2D(uTexture, vUv + uvOffset).r;
+    float g = texture2D(uTexture, vUv).g;
+    float b = texture2D(uTexture, vUv - uvOffset).b;
+    float a = texture2D(uTexture, vUv).a;
+
+    vec4 color = vec4(r, g, b, a);
+
+    vec2 uv = (vUv - vec2(0.5)) * vec2(uVignetteOffset);
+    color.rgb *= 1.0 - dot(uv, uv) * uVignetteDarkness;
+
+    gl_FragColor = color;
+}
+```
+
+C'est plus dense que le vertex shader, mais la logique se décompose en deux effets distincts : l'aberration chromatique et le vignette.
+
+## L'aberration chromatique : un accident heureux
+
+L'aberration chromatique, c'est cet effet de décalage des couleurs qu'on retrouve souvent dans les jeux vidéo ou la photographie — quand les canaux rouge, vert et bleu ne sont plus parfaitement alignés. En optique réelle, c'est un défaut de lentille. En creative dev, c'est un effet qu'on reproduit volontairement parce que ça rend bien.
+
+Ce n'était pas prévu dans mon projet. En explorant le fragment shader, j'ai réalisé qu'on pouvait échantillonner la texture à des coordonnées UV **différentes** pour chaque canal. Le déclic : si je décale le rouge dans une direction et le bleu dans l'autre, tout en gardant le vert au centre, j'obtiens exactement cet effet de séparation chromatique.
+
+```glsl
+float r = texture2D(uTexture, vUv + uvOffset).r;
+float g = texture2D(uTexture, vUv).g;
+float b = texture2D(uTexture, vUv - uvOffset).b;
+```
+
+Trois appels à `texture2D`, trois coordonnées différentes. Le canal rouge est échantillonné "en avant" de l'offset, le vert au centre, le bleu "en arrière". C'est tout. Trois lignes pour un effet qui a l'air bien plus complexe qu'il ne l'est.
+
+### Le rendre dynamique avec la souris
+
+L'idée suivante était de ne pas avoir un effet statique mais de le relier à la position du curseur. Pour ça, j'envoie les coordonnées normalisées de la souris comme uniform `uMouse` depuis le JavaScript :
+
+```typescript title="carousel.ts"
+private handleMouseMove = (e: MouseEvent) => {
+    this.mouse.x = e.clientX / window.innerWidth;
+    this.mouse.y = 1.0 - e.clientY / window.innerHeight;
+};
+```
+
+Côté shader, je calcule la distance entre chaque fragment et la position de la souris à l'écran. `smoothstep` crée un masque radial : l'effet est maximal au centre du curseur et s'estompe progressivement.
+
+```glsl
+float dist = length(diff);
+float mask = smoothstep(uStereoRadius, 0.0, dist);
+```
+
+Le `uStereoRadius` contrôle la taille de la zone d'effet, `uStereoStrength` son intensité. En bougeant la souris sur le carousel, l'aberration suit le curseur comme une loupe de distorsion. C'est le genre de détail interactif qui rend une expérience web mémorable.
+
+### Le vignette en bonus
+
+Le vignette est plus simple : on assombrit les bords de chaque image en fonction de la distance au centre des UV.
+
+```glsl
+vec2 uv = (vUv - vec2(0.5)) * vec2(uVignetteOffset);
+color.rgb *= 1.0 - dot(uv, uv) * uVignetteDarkness;
+```
+
+`dot(uv, uv)` donne le carré de la distance au centre. Plus on s'éloigne du centre, plus la valeur augmente, plus les couleurs sont atténuées. Ça donne un cadrage naturel à chaque image du carousel.
+
+## Le carousel infini
+
+Le carousel lui-même est une affaire de disposition circulaire et de physique simple. Les images sont placées en cercle grâce à — encore de la trigo :
+
+```typescript title="carousel.ts"
+for (let i = 0; i < count; i++) {
+    const image = new Image(this.textures[i]);
+    const angle = (i / count) * Math.PI * 2;
+
+    image.mesh.position.x = Math.sin(angle) * radius;
+    image.mesh.position.z = Math.cos(angle) * radius;
+    image.mesh.lookAt(0, 0, 0);
+
+    this.group.add(image.mesh);
+}
+```
+
+Chaque image est positionnée sur le cercle avec `sin` et `cos`, puis orientée vers le centre avec `lookAt`. Le scroll (ou le swipe sur mobile) ajoute une vélocité à la rotation du groupe, freinée par un coefficient de friction. Quand on ne touche plus, le carousel continue de tourner doucement — une rotation automatique subtile qui garde l'expérience vivante.
+
+## Ce que j'en retiens
+
+Les shaders GLSL, c'est moins obscur que ça en a l'air. Le vertex shader transforme des positions, le fragment shader transforme des couleurs. Avec des uniforms pour passer des données depuis le JavaScript et des varyings pour communiquer entre les deux, on a tout ce qu'il faut pour créer des effets visuels sur mesure.
+
+Ce qui m'a le plus marqué, c'est de voir à quel point des concepts simples — un sinus, une distance, un produit scalaire — suffisent pour produire des résultats visuellement riches. L'aberration chromatique qui est sortie d'une simple expérimentation avec les canaux RGB en est la preuve.
+
+Si vous hésitez à vous lancer dans les shaders, commencez petit. Un `PlaneGeometry`, un `ShaderMaterial`, et un `sin()` dans le vertex shader. Déformez un truc, changez une couleur, ajoutez un uniform qui bouge avec le temps. C'est comme ça qu'on apprend — en cassant des pixels.
