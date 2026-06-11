@@ -23,19 +23,19 @@ const { Content, headings } = await render(post);
     <h1 class="text-3xl font-bold md:text-4xl">{post.data.title}</h1>
     {
       post.data.draft && (
-        <span class="rounded-full border border-neutral-300 px-2 text-xs text-neutral-500">
+        <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
           brouillon
         </span>
       )
     }
   </div>
   <div
-    class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm text-neutral-500"
+    class="text-sage-11 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm"
   >
     <div class="flex flex-wrap gap-2">
       {
         post.data.tags.map((tag: string) => (
-          <span class="rounded-lg border px-3 py-1">{tag.toUpperCase()}</span>
+          <span class="rounded-lg border px-3 py-1">{tag}</span>
         ))
       }
     </div>
@@ -56,7 +56,7 @@ const { Content, headings } = await render(post);
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 rounded-lg border bg-neutral-50 px-3 py-1 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100"
+              class="bg-sage-2 text-sage-12 hover:bg-sage-4 inline-flex items-center gap-1 rounded-lg border px-3 py-1 text-sm font-medium transition-colors"
             >
               {link.label}
               <svg

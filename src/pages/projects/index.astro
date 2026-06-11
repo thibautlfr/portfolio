@@ -11,7 +11,7 @@ const projects = (await getCollection("projects")).sort(
 ---
 
 <BaseLayout pageTitle="Projets — Thibaut LEFRANCOIS" title="Projets">
-  <div class="flex flex-col divide-y divide-neutral-200">
+  <div class="flex flex-col gap-6">
     {
       projects.map((project) => (
         <ProjectCard
@@ -20,8 +20,6 @@ const projects = (await getCollection("projects")).sort(
           date={project.data.date}
           status={project.data.status}
           stack={project.data.stack}
-          repository={project.data.repository}
-          live={project.data.live}
           slug={project.id}
         />
       ))

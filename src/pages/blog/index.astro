@@ -9,7 +9,7 @@ const posts = (await getCollection("blog"))
 ---
 
 <BaseLayout pageTitle="Blog — Thibaut LEFRANCOIS" title="Blog">
-  <div class="flex flex-col divide-y divide-neutral-200">
+  <div class="flex flex-col gap-6">
     {
       posts.map((post) => (
         <BlogCard

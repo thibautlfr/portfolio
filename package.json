@@ -15,6 +15,7 @@
   "dependencies": {
     "@astrojs/mdx": "^6.0.2",
     "@astrojs/ts-plugin": "^1.10.9",
+    "@radix-ui/colors": "^3.0.0",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.4.4",
     "gsap": "^3.15.0",

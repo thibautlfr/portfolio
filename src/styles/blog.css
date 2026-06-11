@@ -14,7 +14,7 @@
 
 .blog-content p {
   margin-bottom: 1rem;
-  color: var(--color-neutral-500);
+  color: var(--color-sage-11);
 }
 
 .blog-content ul,
@@ -33,7 +33,7 @@
 
 .blog-content li {
   margin-bottom: 0.25rem;
-  color: var(--color-neutral-500);
+  color: var(--color-sage-11);
 }
 
 .blog-content a {
@@ -41,14 +41,14 @@
 }
 
 .blog-content a:hover {
-  color: var(--color-neutral-400);
+  color: var(--color-sage-9);
 }
 
 .blog-content pre {
   margin-bottom: 1rem;
   overflow-x: auto;
   border-radius: 0.375rem;
-  background-color: var(--color-neutral-900);
+  background-color: var(--color-sage-12);
   padding: 1rem;
   font-size: var(--text-sm);
 }
@@ -63,9 +63,9 @@
 
 .blog-content blockquote {
   margin-bottom: 1rem;
-  border-left: 2px solid var(--color-neutral-700);
+  border-left: 2px solid var(--color-sage-8);
   padding-left: 1rem;
-  color: var(--color-neutral-400);
+  color: var(--color-sage-9);
 }
 
 .blog-content strong {

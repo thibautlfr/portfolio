@@ -4,16 +4,16 @@ import { navLinks, socials } from "../config";
 
 <!-- Invisible layers for opening effect-->
 <div
-  class="menu-layer invisible fixed top-0 right-0 bottom-0 z-40 w-full bg-teal-400 lg:w-[40%] xl:w-1/4"
+  class="menu-layer bg-teal-8 invisible fixed top-0 right-0 bottom-0 z-40 w-full lg:w-[40%] xl:w-1/4"
 >
 </div>
 <div
-  class="menu-layer invisible fixed top-0 right-0 bottom-0 z-40 w-full bg-teal-600 lg:w-[40%] xl:w-1/4"
+  class="menu-layer bg-teal-10 invisible fixed top-0 right-0 bottom-0 z-40 w-full lg:w-[40%] xl:w-1/4"
 >
 </div>
 
 <div
-  class="menu-overlay invisible fixed top-0 right-0 bottom-0 z-50 w-full bg-teal-900 px-8 pt-18 pb-8 text-teal-50 lg:w-[40%] xl:w-1/4"
+  class="menu-overlay bg-teal-12 invisible fixed top-0 right-0 bottom-0 z-50 w-full px-8 pt-18 pb-8 text-white lg:w-[40%] xl:w-1/4"
 >
   <nav id="main-nav" class="flex h-full flex-col justify-between">
     <!-- prettier-ignore -->
@@ -21,14 +21,14 @@ import { navLinks, socials } from "../config";
       {navLinks.map((link, i) => (
         <li class="overflow-hidden">
           <a class="block" href={link.href}>
-            {link.label}<sup class="text-base font-sans align-super text-teal-400 ml-1">{i + 1}</sup>
+            {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
           </a>
         </li>
       ))}
     </ul>
 
     <div class="menu-socials">
-      <p class="mb-3 font-sans text-sm tracking-widest text-teal-400 uppercase">
+      <p class="text-teal-9 mb-3 font-sans text-sm tracking-widest uppercase">
         Réseaux
       </p>
       <ul
@@ -100,8 +100,8 @@ import { navLinks, socials } from "../config";
       contentEase: "power3.out",
       layerStagger: 0.06,
       linkStagger: 0.07,
-      colorOpen: "#f0fdfa",
-      colorClosed: "#000000",
+      colorOpen: "#f3fbf9", // Radix --teal-2
+      colorClosed: "#1a211e", // Radix --sage-12
       linkRotation: 6,
       crossRotation: 405,
       overlayOffset: 0.12,
