@@ -19,6 +19,7 @@ h6 {
 }
 
 html {
+  scroll-padding-top: 6rem;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
