@@ -7,13 +7,19 @@ project: 3d-carousel
 draft: false
 ---
 
+import { Image } from 'astro:assets';
+import carouselResultat from '@assets/blog/carousel-3d-resultat.webp';
+
 Je ne pensais pas qu'un jour je serais content de revoir des sinus et des cosinus. Et pourtant, c'est exactement ce qui s'est passé quand j'ai commencé à écrire mes premiers shaders GLSL. Ces fonctions trigonométriques qu'on apprenait au lycée sans trop savoir à quoi elles serviraient "dans la vraie vie". Elles sont partout dans le développement créatif. Oscillations, déformations, animations périodiques : la trigo, c'est la base.
 
 Cet article, c'est un retour d'expérience. Je ne suis pas un expert en shaders. C'est mon premier projet en autonomie après m'être formé aux bases du GLSL via [Three.js Journey](https://threejs-journey.com/), la doc officielle et beaucoup d'exemples sur [Awwwards](https://www.awwwards.com/) et [Codrops](https://tympanus.net/codrops/). Mon approche : je me forme, puis je lance un truc pour tester ce que je viens d'apprendre. Pas besoin d'un brief client ou d'un projet ambitieux. Juste une idée, une commande `npm create`, et c'est parti.
 
 Le résultat, c'est un carousel infini d'images en 3D, où chaque image réagit au scroll et à la souris grâce aux shaders. Voilà ce que ça donne :
 
-<iframe src="https://thibautlfr.github.io/3d-carousel/" class="w-full aspect-video rounded-lg border border-neutral-200" loading="lazy" />
+<figure>
+  <Image src={carouselResultat} alt="Carousel 3D avec aberration chromatique : trois images animées disposées en arc de cercle avec un effet de séparation des canaux RGB au survol" loading="eager" class="rounded-lg border border-neutral-200" />
+  <figcaption class="text-xs text-neutral-500 mt-2 text-center">Le rendu final du carousel avec l'effet d'aberration chromatique</figcaption>
+</figure>
 
 ## Le setup : un boilerplate Three.js maison
 
@@ -187,3 +193,7 @@ Les shaders GLSL, c'est moins obscur que ça en a l'air. Le vertex shader transf
 Ce qui m'a le plus marqué, c'est de voir à quel point des concepts simples (un sinus, une distance, un produit scalaire) suffisent pour produire des résultats visuellement riches. L'aberration chromatique qui est sortie d'une simple expérimentation avec les canaux RGB en est la preuve.
 
 Si vous hésitez à vous lancer dans les shaders, commencez petit. Un `PlaneGeometry`, un `ShaderMaterial`, et un `sin()` dans le vertex shader. Déformez un truc, changez une couleur, ajoutez un uniform qui bouge avec le temps. C'est comme ça qu'on apprend. En cassant des pixels.
+
+## Essayez-le vous-même
+
+<iframe src="https://thibautlfr.github.io/3d-carousel/" class="w-full aspect-video rounded-lg border border-neutral-200" loading="lazy" title="Démo interactive du carousel 3D avec aberration chromatique" />
