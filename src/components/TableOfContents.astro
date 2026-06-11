@@ -1,0 +1,30 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const toc = headings;
+---
+
+{
+  toc.length > 0 && (
+    <aside class="order-1 mb-8 border-l pl-6 lg:order-10 lg:mb-0 lg:max-w-prose lg:shrink-0">
+      <nav aria-label="Table des matières" class="lg:sticky lg:top-30">
+        <h2 class="text-sm font-semibold tracking-wide uppercase">Sommaire</h2>
+        <ol class="mt-3 space-y-1.5 text-sm">
+          {toc.map((heading) => (
+            <li class={heading.depth === 3 ? "pl-4" : ""}>
+              <a
+                href={`#${heading.slug}`}
+                class="text-neutral-500 transition-colors hover:md:hover:text-teal-600"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </aside>
+  )
+}
