@@ -37,6 +37,40 @@ const { Content, headings } = await render(post);
         })
       }
     </span>
+    {
+      post.data.links.length > 0 && (
+        <div class="flex flex-wrap gap-2 sm:ml-auto">
+          {post.data.links.map((link: { label: string; url: string }) => (
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 rounded-lg border bg-neutral-50 px-3 py-1 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100"
+            >
+              {link.label}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+              <span class="sr-only">(ouvre dans un nouvel onglet)</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
   </div>
 
   <div class="relative mt-6 flex flex-col md:mt-8 lg:flex-row lg:gap-10">

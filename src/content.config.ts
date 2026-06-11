@@ -26,6 +26,14 @@ const blog = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     project: z.string().optional(),
+    links: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.url(),
+        }),
+      )
+      .default([]),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
   }),
