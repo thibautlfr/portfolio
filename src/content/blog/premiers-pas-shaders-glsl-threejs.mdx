@@ -1,5 +1,5 @@
 ---
-title: "La trigonométrie du lycée m'a rattrapé — mes premiers shaders GLSL"
+title: "La trigonométrie du lycée m'a rattrapé : mes premiers shaders GLSL"
 description: "Retour d'expérience sur mes premiers pas avec les vertex et fragment shaders en GLSL, à travers un carousel 3D infini avec aberration chromatique dynamique."
 date: 2026-06-11
 tags: [threejs, glsl, shaders, creative-dev, retour-experience]
@@ -7,9 +7,9 @@ project: 3d-carousel
 draft: false
 ---
 
-Je ne pensais pas qu'un jour je serais content de revoir des sinus et des cosinus. Et pourtant, c'est exactement ce qui s'est passé quand j'ai commencé à écrire mes premiers shaders GLSL. Ces fonctions trigonométriques qu'on apprenait au lycée sans trop savoir à quoi elles serviraient "dans la vraie vie" — elles sont partout dans le développement créatif. Oscillations, déformations, animations périodiques : la trigo, c'est la base.
+Je ne pensais pas qu'un jour je serais content de revoir des sinus et des cosinus. Et pourtant, c'est exactement ce qui s'est passé quand j'ai commencé à écrire mes premiers shaders GLSL. Ces fonctions trigonométriques qu'on apprenait au lycée sans trop savoir à quoi elles serviraient "dans la vraie vie". Elles sont partout dans le développement créatif. Oscillations, déformations, animations périodiques : la trigo, c'est la base.
 
-Cet article, c'est un retour d'expérience. Je ne suis pas un expert en shaders. C'est mon premier projet en autonomie après m'être formé aux bases du GLSL via [Three.js Journey](https://threejs-journey.com/), la doc officielle et beaucoup d'exemples sur [Awwwards](https://www.awwwards.com/) et [Codrops](https://tympanus.net/codrops/). Mon approche : je me forme, puis je lance un truc pour tester ce que je viens d'apprendre. Pas besoin d'un brief client ou d'un projet ambitieux — juste une idée, une commande `npm create`, et c'est parti.
+Cet article, c'est un retour d'expérience. Je ne suis pas un expert en shaders. C'est mon premier projet en autonomie après m'être formé aux bases du GLSL via [Three.js Journey](https://threejs-journey.com/), la doc officielle et beaucoup d'exemples sur [Awwwards](https://www.awwwards.com/) et [Codrops](https://tympanus.net/codrops/). Mon approche : je me forme, puis je lance un truc pour tester ce que je viens d'apprendre. Pas besoin d'un brief client ou d'un projet ambitieux. Juste une idée, une commande `npm create`, et c'est parti.
 
 Le résultat, c'est un carousel infini d'images en 3D, où chaque image réagit au scroll et à la souris grâce aux shaders. Voilà ce que ça donne :
 
@@ -17,7 +17,7 @@ Le résultat, c'est un carousel infini d'images en 3D, où chaque image réagit 
 
 ## Le setup : un boilerplate Three.js maison
 
-Avant de toucher aux shaders, il faut une base solide. J'ai construit mon propre boilerplate Three.js natif — une architecture modulaire avec gestion de la scène, caméra, renderer, ressources, boucle de rendu et outils de debug. Ça me permet de me concentrer directement sur le concret sans reconfigurer tout à chaque projet. Je ferai un article dédié là-dessus, mais en gros : une classe `Experience` en singleton orchestre tout, et chaque composant (caméra, monde, carousel) est autonome.
+Avant de toucher aux shaders, il faut une base solide. J'ai construit mon propre boilerplate Three.js natif : une architecture modulaire avec gestion de la scène, caméra, renderer, ressources, boucle de rendu et outils de debug. Ça me permet de me concentrer directement sur le concret sans reconfigurer tout à chaque projet. Je ferai un article dédié là-dessus, mais en gros : une classe `Experience` en singleton orchestre tout, et chaque composant (caméra, monde, carousel) est autonome.
 
 Pour les shaders spécifiquement, j'utilise [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) qui permet d'importer les fichiers `.glsl` directement dans le TypeScript. Ça évite d'écrire du GLSL dans des template literals et ça donne le syntax highlighting dans l'IDE.
 
@@ -25,7 +25,7 @@ Pour les shaders spécifiquement, j'utilise [vite-plugin-glsl](https://github.co
 
 Le vertex shader, c'est le premier programme qui s'exécute dans le pipeline graphique. Il traite chaque **vertex** (sommet) de la géométrie et détermine sa position finale à l'écran via `gl_Position`.
 
-Dans mon cas, les images du carousel sont des `PlaneGeometry` avec une subdivision de 32×32 — soit plus de 1000 vertices par image. Assez pour que les déformations soient fluides.
+Dans mon cas, les images du carousel sont des `PlaneGeometry` avec une subdivision de 32×32, soit plus de 1000 vertices par image. Assez pour que les déformations soient fluides.
 
 Voici le vertex shader complet :
 
@@ -55,7 +55,7 @@ void main() {
 
 Quelques notions clés ici :
 
-- Les **uniforms** (`uFrequency`, `uTime`) sont des valeurs envoyées depuis le JavaScript. Elles sont identiques pour tous les vertices d'un même mesh — d'où le nom "uniform"
+- Les **uniforms** (`uFrequency`, `uTime`) sont des valeurs envoyées depuis le JavaScript. Elles sont identiques pour tous les vertices d'un même mesh, d'où le nom "uniform"
 - Les **varyings** (`vUv`, `vElevation`) sont des valeurs calculées dans le vertex shader et transmises au fragment shader. Le GPU les interpole automatiquement entre les vertices, ce qui donne des transitions douces
 - La chaîne `modelMatrix → viewMatrix → projectionMatrix` transforme les coordonnées locales du vertex en coordonnées écran. C'est le pipeline standard de Three.js
 
@@ -72,7 +72,7 @@ elevation += sin(modelPosition.y * uFrequency.y) * 0.1;
 
 Le fragment shader intervient après le vertex shader. Pour chaque **fragment** (un fragment correspond grosso modo à un pixel à l'écran, mais avant les tests de profondeur et de blending), il détermine la couleur finale via `gl_FragColor`.
 
-C'est là que ça devient intéressant. Avec `texture2D(uTexture, vUv)`, on échantillonne la texture de l'image aux coordonnées UV interpolées depuis le vertex shader. Le résultat est un `vec4` — quatre composantes : rouge, vert, bleu, alpha. Et on peut manipuler chaque canal indépendamment.
+C'est là que ça devient intéressant. Avec `texture2D(uTexture, vUv)`, on échantillonne la texture de l'image aux coordonnées UV interpolées depuis le vertex shader. Le résultat est un `vec4` : quatre composantes : rouge, vert, bleu, alpha. Et on peut manipuler chaque canal indépendamment.
 
 ```glsl title="shaders/image/fragment.glsl"
 uniform sampler2D uTexture;
@@ -118,7 +118,7 @@ C'est plus dense que le vertex shader, mais la logique se décompose en deux eff
 
 ## L'aberration chromatique : un accident heureux
 
-L'aberration chromatique, c'est cet effet de décalage des couleurs qu'on retrouve souvent dans les jeux vidéo ou la photographie — quand les canaux rouge, vert et bleu ne sont plus parfaitement alignés. En optique réelle, c'est un défaut de lentille. En creative dev, c'est un effet qu'on reproduit volontairement parce que ça rend bien.
+L'aberration chromatique, c'est cet effet de décalage des couleurs qu'on retrouve souvent dans les jeux vidéo ou la photographie, quand les canaux rouge, vert et bleu ne sont plus parfaitement alignés. En optique réelle, c'est un défaut de lentille. En creative dev, c'est un effet qu'on reproduit volontairement parce que ça rend bien.
 
 Ce n'était pas prévu dans mon projet. En explorant le fragment shader, j'ai réalisé qu'on pouvait échantillonner la texture à des coordonnées UV **différentes** pour chaque canal. Le déclic : si je décale le rouge dans une direction et le bleu dans l'autre, tout en gardant le vert au centre, j'obtiens exactement cet effet de séparation chromatique.
 
@@ -163,7 +163,7 @@ color.rgb *= 1.0 - dot(uv, uv) * uVignetteDarkness;
 
 ## Le carousel infini
 
-Le carousel lui-même est une affaire de disposition circulaire et de physique simple. Les images sont placées en cercle grâce à — encore de la trigo :
+Le carousel lui-même est une affaire de disposition circulaire et de physique simple. Les images sont placées en cercle grâce à, encore et toujours, de la trigo :
 
 ```typescript title="carousel.ts"
 for (let i = 0; i < count; i++) {
@@ -178,12 +178,12 @@ for (let i = 0; i < count; i++) {
 }
 ```
 
-Chaque image est positionnée sur le cercle avec `sin` et `cos`, puis orientée vers le centre avec `lookAt`. Le scroll (ou le swipe sur mobile) ajoute une vélocité à la rotation du groupe, freinée par un coefficient de friction. Quand on ne touche plus, le carousel continue de tourner doucement — une rotation automatique subtile qui garde l'expérience vivante.
+Chaque image est positionnée sur le cercle avec `sin` et `cos`, puis orientée vers le centre avec `lookAt`. Le scroll (ou le swipe sur mobile) ajoute une vélocité à la rotation du groupe, freinée par un coefficient de friction. Quand on ne touche plus, le carousel continue de tourner doucement, une rotation automatique subtile qui garde l'expérience vivante.
 
 ## Ce que j'en retiens
 
 Les shaders GLSL, c'est moins obscur que ça en a l'air. Le vertex shader transforme des positions, le fragment shader transforme des couleurs. Avec des uniforms pour passer des données depuis le JavaScript et des varyings pour communiquer entre les deux, on a tout ce qu'il faut pour créer des effets visuels sur mesure.
 
-Ce qui m'a le plus marqué, c'est de voir à quel point des concepts simples — un sinus, une distance, un produit scalaire — suffisent pour produire des résultats visuellement riches. L'aberration chromatique qui est sortie d'une simple expérimentation avec les canaux RGB en est la preuve.
+Ce qui m'a le plus marqué, c'est de voir à quel point des concepts simples (un sinus, une distance, un produit scalaire) suffisent pour produire des résultats visuellement riches. L'aberration chromatique qui est sortie d'une simple expérimentation avec les canaux RGB en est la preuve.
 
-Si vous hésitez à vous lancer dans les shaders, commencez petit. Un `PlaneGeometry`, un `ShaderMaterial`, et un `sin()` dans le vertex shader. Déformez un truc, changez une couleur, ajoutez un uniform qui bouge avec le temps. C'est comme ça qu'on apprend — en cassant des pixels.
+Si vous hésitez à vous lancer dans les shaders, commencez petit. Un `PlaneGeometry`, un `ShaderMaterial`, et un `sin()` dans le vertex shader. Déformez un truc, changez une couleur, ajoutez un uniform qui bouge avec le temps. C'est comme ça qu'on apprend. En cassant des pixels.
