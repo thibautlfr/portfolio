@@ -12,10 +12,13 @@ const slug = segments[0] || null;
 >
   <div class="flex items-center text-xl leading-none font-bold md:text-3xl">
     <IconCube class="size-5 md:size-7.5" />
-    <a href="/" class="ease-in hover:text-teal-600">thibautlfr</a>
+    <a href="/" class="hover:underline">thibautlfr</a>
     {
       slug && (
-        <a href={`/${slug}`} class="ease-in hover:text-teal-600">
+        <a
+          href={`/${slug}`}
+          class="text-teal-600 underline md:no-underline md:hover:underline"
+        >
           /{slug}
         </a>
       )

@@ -20,7 +20,7 @@ const { title, description, date, status, stack, repository, live } =
     {
       status === "wip" && (
         <span class="rounded-full border border-neutral-300 px-2 text-xs text-neutral-500">
-          wip
+          en cours
         </span>
       )
     }
@@ -45,7 +45,8 @@ const { title, description, date, status, stack, repository, live } =
             rel="noopener noreferrer"
             class="text-neutral-500 underline hover:text-neutral-700"
           >
-            repository<span class="sr-only"> (opens in new tab)</span>
+            repository
+            <span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
           </a>
         )}
         {live && (
@@ -55,7 +56,7 @@ const { title, description, date, status, stack, repository, live } =
             rel="noopener noreferrer"
             class="text-neutral-500 underline hover:text-neutral-700"
           >
-            live<span class="sr-only"> (opens in new tab)</span>
+            demo<span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
           </a>
         )}
       </div>
