@@ -3,6 +3,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { getCollection, render } from "astro:content";
 import "../../styles/blog.css";
+import Link from "@components/icons/Link.astro";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog")).filter(
@@ -23,19 +24,19 @@ const { Content, headings } = await render(post);
     <h1 class="text-3xl font-bold md:text-4xl">{post.data.title}</h1>
     {
       post.data.draft && (
-        <span class="rounded-full border border-neutral-300 px-2 text-xs text-neutral-500">
+        <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
           brouillon
         </span>
       )
     }
   </div>
   <div
-    class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm text-neutral-500"
+    class="text-sage-11 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm"
   >
     <div class="flex flex-wrap gap-2">
       {
         post.data.tags.map((tag: string) => (
-          <span class="rounded-lg border px-3 py-1">{tag.toUpperCase()}</span>
+          <span class="rounded-lg border px-3 py-1">{tag}</span>
         ))
       }
     </div>
@@ -56,27 +57,10 @@ const { Content, headings } = await render(post);
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 rounded-lg border bg-neutral-50 px-3 py-1 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100"
+              class="bg-sage-2 text-sage-12 hover:bg-sage-4 inline-flex items-center gap-1 rounded-lg border px-3 py-1 text-sm font-medium transition-colors"
             >
               {link.label}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-              <span class="sr-only">(ouvre dans un nouvel onglet)</span>
+              <Link />
             </a>
           ))}
         </div>

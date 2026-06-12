@@ -1,0 +1,33 @@
+---
+title: "Ocean Heartbeat"
+description: "Une expérience web 3D immersive qui explore les parallèles entre le corps humain et l'océan, réalisée en une nuit pour la Nuit de l'Info 2024."
+date: 2024-12-05
+status: "finished"
+stack: ["React", "Three.js", "React Three Fiber", "GSAP", "Zustand", "Tailwind CSS", "Vite"]
+repository: "https://github.com/thibautlfr/ocean-heartbeat"
+live: "https://ocean-heartbeat.netlify.app"
+cover: ../../assets/projects/ocean-heartbeat/cover.webp
+featured: false
+---
+
+Une nuit, un thème, zéro modèle 3D sous la main, et l'envie de livrer quelque chose qui ressemble à un vrai projet. Ocean Heartbeat, c'est notre première expérience web 3D complète, construite avec Colin Demouge pour la Nuit de l'Info 2024 à Niort Tech.
+
+## Le projet
+
+Le défi national de cette édition demandait de **représenter les parallèles entre le corps humain et l'océan**. On a pris le parti d'en faire une expérience immersive plutôt qu'un site informatif classique : un environnement sous-marin en 3D où l'utilisateur explore des organes (coeur, cerveau, reins) intégrés dans un décor océanique. Rochers, algues, étoiles de mer, un poisson lanterne qui se balade.
+
+L'idée, c'était de **montrer ces connexions corps/océan de manière visuelle et sensorielle**, avec une ambiance sonore, des animations, et la possibilité de switcher entre les organes pour découvrir les détails de chaque parallèle.
+
+## La stack
+
+On sortait tout juste de **Three.js Journey** et c'était l'occasion parfaite de mettre en pratique ce qu'on avait appris sur un vrai projet sous contrainte. React Three Fiber pour la scène 3D, Drei pour les helpers, GSAP et Motion pour les animations d'interface, Zustand pour gérer l'état global (son, mode rétro, organe sélectionné).
+
+Pour les modèles, pas le temps de les créer en une nuit : tout vient de **Poly Pizza**, pratique pour les droits d'utilisation et surtout pour garder une **cohérence graphique low poly** sur l'ensemble de la scène. Le positionnement des éléments dans l'environnement s'est fait entre **Blender** et **Three.js Editor**, un workflow qu'on a trouvé assez efficace pour itérer vite.
+
+{/* cover: screenshot de l'expérience 3D, idéalement une vue de la scène sous-marine avec un organe visible */}
+
+## Ce que j'en retiens
+
+Le vrai défi d'un hackathon, c'est pas de coder des features. C'est de **livrer quelque chose qui fait fini**. On a passé du temps sur les détails qui comptent : un loader propre, une gestion du son soignée, des transitions fluides entre les vues. Et ça a payé : on a remporté le défi **"On veut du gros pixel"** avec notre mode rétro qui pixelise toute la scène 3D via le post-processing. Un ajout qui prenait quelques lignes de code mais qui donnait un effet immédiat.
+
+C'était surtout la confirmation que les compétences acquises sur Three.js Journey étaient **directement applicables** sur un projet concret, même sous la pression d'une nuit. Construire un environnement 3D complet — scène, éclairage, shaders, post-processing, interactions, en partant de zéro en quelques heures, ça donne confiance pour la suite.
