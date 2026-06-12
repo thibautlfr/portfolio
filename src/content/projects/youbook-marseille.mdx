@@ -43,7 +43,7 @@ Ce cache est central. Sans lui, chaque navigation déclencherait des appels dire
 
 Les microservices communiquent via **Apache Pulsar** : chaque étape du pipeline publie dans un topic, et les services en aval consomment les messages de manière asynchrone. Chaque client a ses propres topics, ce qui permet d'activer ou de désactiver un pipeline sans toucher les autres.
 
-<!-- schema: diagramme du flux ETL, de type CRON > providers > transformation OCTO > ElasticSearch -->
+{/* schema: diagramme du flux ETL, de type CRON > providers > transformation OCTO > ElasticSearch */}
 
 ## Les choix techniques
 
