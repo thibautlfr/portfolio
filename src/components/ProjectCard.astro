@@ -1,4 +1,8 @@
 ---
+import Link from "@components/icons/Link.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
 interface Props {
   title: string;
   description: string;
@@ -6,16 +10,17 @@ interface Props {
   status: "finished" | "wip";
   stack: string[];
   slug: string;
+  live?: string;
+  cover?: ImageMetadata;
 }
 
-const { title, description, date, status, stack, slug } = Astro.props;
+const { title, description, date, status, stack, slug, live, cover } =
+  Astro.props;
 ---
 
-<a href={`/projects/${slug}`} class="group block">
-  <article
-    class="border-sage-7 bg-sage-1 group-hover:border-sage-8 group-hover:bg-sage-2 rounded-xl border p-6 transition-colors"
-  >
-    <div class="flex items-baseline gap-3">
+<article class="flex flex-col gap-6 md:flex-row">
+  <div class="flex flex-col">
+    <div class="mb-2 flex items-center gap-3">
       <h3
         class="group-hover:text-teal-11 text-xl font-bold transition-colors md:text-2xl"
       >
@@ -29,20 +34,45 @@ const { title, description, date, status, stack, slug } = Astro.props;
         )
       }
     </div>
-
-    <p class="text-sage-11 mt-2 max-w-prose text-base">{description}</p>
-
-    <div
-      class="text-sage-11 mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
-    >
-      <div class="flex flex-wrap gap-2">
-        {
-          stack.map((tech: string) => (
-            <span class="rounded-lg border px-3 py-1">{tech}</span>
-          ))
-        }
+    <div class="flex h-full flex-col gap-3">
+      <div>
+        <p class="opacity-50">Date</p>
+        <p>{date.getFullYear()}</p>
       </div>
-      <span class="ml-auto text-xs">{date.getFullYear()}</span>
+      <div>
+        <p class="opacity-50">Description</p>
+        <p class="max-w-[50ch]">{description}</p>
+      </div>
+      {
+        live && (
+          <div class="md:mt-auto">
+            <p class="opacity-50">Démo</p>
+            <a
+              href={live}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 underline"
+            >
+              {live}
+              <Link />
+            </a>
+          </div>
+        )
+      }
     </div>
-  </article>
-</a>
+  </div>
+  {
+    cover && (
+      <a href={live} target="_blank" rel="noopener noreferrer">
+        <Image
+          src={cover}
+          alt={`Cover du projet ${title}`}
+          aria-hidden="true"
+          class="border-sage-6 aspect-video w-full border object-cover"
+          width={500}
+          height={300}
+        />
+      </a>
+    )
+  }
+</article>

@@ -3,6 +3,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { getCollection, render } from "astro:content";
 import "../../styles/blog.css";
+import Link from "@components/icons/Link.astro";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog")).filter(
@@ -59,24 +60,7 @@ const { Content, headings } = await render(post);
               class="bg-sage-2 text-sage-12 hover:bg-sage-4 inline-flex items-center gap-1 rounded-lg border px-3 py-1 text-sm font-medium transition-colors"
             >
               {link.label}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-              <span class="sr-only">(ouvre dans un nouvel onglet)</span>
+              <Link />
             </a>
           ))}
         </div>

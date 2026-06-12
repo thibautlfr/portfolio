@@ -11,17 +11,21 @@ const projects = (await getCollection("projects")).sort(
 ---
 
 <BaseLayout pageTitle="Projets — Thibaut LEFRANCOIS" title="Projets">
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col divide-y">
     {
       projects.map((project) => (
-        <ProjectCard
-          title={project.data.title}
-          description={project.data.description}
-          date={project.data.date}
-          status={project.data.status}
-          stack={project.data.stack}
-          slug={project.id}
-        />
+        <div class="py-6 first:pt-0 md:py-8">
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            date={project.data.date}
+            status={project.data.status}
+            stack={project.data.stack}
+            slug={project.id}
+            live={project.data.live}
+            cover={project.data.cover}
+          />
+        </div>
       ))
     }
   </div>
