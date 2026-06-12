@@ -23,6 +23,7 @@ const projects = (await getCollection("projects")).sort(
             stack={project.data.stack}
             slug={project.id}
             live={project.data.live}
+            repository={project.data.repository}
             cover={project.data.cover}
           />
         </div>

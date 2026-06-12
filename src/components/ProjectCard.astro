@@ -11,11 +11,21 @@ interface Props {
   stack: string[];
   slug: string;
   live?: string;
+  repository?: string;
   cover?: ImageMetadata;
 }
 
-const { title, description, date, status, stack, slug, live, cover } =
-  Astro.props;
+const {
+  title,
+  description,
+  date,
+  status,
+  stack,
+  slug,
+  live,
+  repository,
+  cover,
+} = Astro.props;
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
@@ -43,6 +53,18 @@ const { title, description, date, status, stack, slug, live, cover } =
         <p class="opacity-50">Description</p>
         <p class="max-w-[50ch]">{description}</p>
       </div>
+      <div>
+        <p class="opacity-50">Stack</p>
+        <div class="flex max-w-prose flex-wrap gap-2 text-xs">
+          {
+            stack.map((tech) => (
+              <span class="border-sage-7 rounded-sm border px-2 py-1">
+                {tech}
+              </span>
+            ))
+          }
+        </div>
+      </div>
       {
         live && (
           <div class="md:mt-auto">
@@ -51,11 +73,23 @@ const { title, description, date, status, stack, slug, live, cover } =
               href={live}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 underline"
+              class="hover:text-teal-9 inline-flex items-center gap-1 underline"
             >
               {live}
               <Link />
             </a>
+            <br />
+            {repository && (
+              <a
+                href={repository}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-teal-9 inline-flex items-center gap-1 underline"
+              >
+                {repository}
+                <Link />
+              </a>
+            )}
           </div>
         )
       }
@@ -68,9 +102,8 @@ const { title, description, date, status, stack, slug, live, cover } =
           src={cover}
           alt={`Cover du projet ${title}`}
           aria-hidden="true"
-          class="border-sage-6 aspect-video w-full border object-cover"
+          class="border-sage-6 aspect-video h-full w-full border object-cover"
           width={500}
-          height={300}
         />
       </a>
     )
