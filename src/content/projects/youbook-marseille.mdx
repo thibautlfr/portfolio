@@ -1,0 +1,70 @@
+---
+title: "Youbook - Marseille, FFV, STESF"
+description: "Plateforme de booking touristique qui agrège les offres de multiples providers en les normalisant selon la norme OCTO, pour proposer une expérience de navigation fluide et un front déployable chez n'importe quel client."
+date: 2025
+status: "wip"
+stack:
+  [
+    "Kotlin",
+    "Ktor",
+    "Exposed",
+    "JobRunr",
+    "ElasticSearch",
+    "Apache Pulsar",
+    "Temporal",
+    "Vue.js",
+    "Web Components",
+    "PostgreSQL",
+    "Kubernetes",
+    "Docker",
+    "GitLab CI/CD",
+  ]
+live: "https://www.marseille-tourisme.com/experience/"
+featured: false
+---
+
+{/* cover: src/assets/projects/youbook-marseille/cover.webp */}
+
+Un office de tourisme qui gère ses activités sur trois providers différents : chaque requête risque de déclencher trois appels API, trois formats de données, et trois conversions à la volée. Youbook résout ça. Une couche d'agrégation qui normalise tout en **OCTO** et sert les données depuis un cache ElasticSearch, pour que le front n'ait jamais à appeler un provider directement.
+
+## Le contexte
+
+Chez Raccourci Agency, on développe des solutions de booking touristique pour nos clients : offices de tourisme, fédérations sportives, destinations. Le problème commun : leurs produits sont répartis chez des providers comme Regiondo, Yoplanning ou Welogin, et chacun a son propre format, sa propre API, ses propres contraintes.
+
+Youbook est né de ce constat. Plutôt que de laisser le front naviguer en direct sur les APIs des providers, on centralise l'agrégation, on normalise selon la norme **OCTO** (le standard ouvert du secteur du tourisme), et on met en cache pour absorber la charge. Côté interface, des **web components** permettent de déployer le même Youbook chez n'importe quel client en changeant uniquement la palette de couleurs.
+
+Je suis arrivé sur ce projet en me concentrant sur l'ETL, la partie qui fait tenir tout le reste.
+
+## Comment ça marche
+
+Le flux commence par des **CRON Jobs** qui déclenchent des pipelines d'import. Pour chaque client, on interroge ses providers, on récupère les produits touristiques (activités, billets, séjours), et on les transforme au format OCTO. Le résultat est indexé dans **ElasticSearch** pour servir les requêtes du front.
+
+Ce cache est central. Sans lui, chaque navigation déclencherait des appels directs aux providers, avec les conversions de format qui vont avec, et une latence visible. Avec lui, le front lit depuis ElasticSearch et les providers ne sont interrogés qu'au moment des imports planifiés.
+
+Les microservices communiquent via **Apache Pulsar** : chaque étape du pipeline publie dans un topic, et les services en aval consomment les messages de manière asynchrone. Chaque client a ses propres topics, ce qui permet d'activer ou de désactiver un pipeline sans toucher les autres.
+
+<!-- schema: diagramme du flux ETL, de type CRON > providers > transformation OCTO > ElasticSearch -->
+
+## Les choix techniques
+
+**Kotlin + Ktor** pour les services backend : typage fort, coroutines pour gérer les appels concurrents aux providers, et des APIs HTTP légères sans la lourdeur de Spring.
+
+**JobRunr** pour la planification et le monitoring des jobs d'import. Il gère la persistance des jobs, les retries automatiques, et donne une interface pour suivre l'état des pipelines sans avoir à fouiller les logs.
+
+**ElasticSearch** comme couche de lecture : indexation rapide de données structurées, recherche full-text, filtres par date, lieu ou disponibilité. Le schéma flexible absorbe aussi les variations de format quand les providers font évoluer leur API.
+
+**Web components** côté front : sans framework imposé, les composants s'embarquent dans n'importe quel CMS ou site statique. Un nouveau client Youbook, c'est un nouveau thème CSS, pas une nouvelle codebase. Aujourd'hui, Youbook tourne pour plusieurs clients : Marseille Tourisme, la Fédération Française de Vol Libre, et d'autres en cours de déploiement.
+
+Une refonte du module de paiement est en cours pour s'affranchir des widgets des providers et reprendre la main sur l'expérience de réservation côté Youbook.
+
+## Les galères
+
+**La normalisation OCTO.** Chaque provider a ses propres concepts : une "session" chez l'un s'appelle "timeslot" chez l'autre, les disponibilités sont parfois calculées à la volée, parfois pré-calculées. Mapper tout ça de façon fiable, c'est autant de cas particuliers que de providers. La réponse : un adaptateur par provider, avec des tests d'intégration sur des fixtures capturées depuis les vraies APIs.
+
+**La fraîcheur des données.** Les produits changent en permanence : prix, disponibilités, descriptions. Trouver le bon équilibre entre fréquence d'import et charge sur les providers a demandé d'instrumenter les pipelines pour mesurer les deltas entre imports, et d'ajuster les fréquences provider par provider.
+
+**La scalabilité multi-client.** Chaque client a des providers différents, des configurations différentes, des langues différentes. L'ETL doit être générique, mais les pipelines doivent rester configurables finement. Le modèle de topics Pulsar par client isole bien les périmètres et évite qu'un import raté chez un client ne perturbe les autres.
+
+## Ce que j'en retiens
+
+Ce projet m'a confronté à la réalité de la donnée en production : les APIs des providers sont rarement fiables à 100%, les formats changent sans prévenir, et la transformation "simple" devient complexe à l'échelle. Ce qui m'a le plus appris, c'est l'importance de l'observabilité sur les pipelines. Sans métriques sur ce qui entre, ce qui sort, et ce qui échoue, on navigue à l'aveugle. Instrumenter avant d'optimiser est devenu un réflexe.

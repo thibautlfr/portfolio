@@ -6,20 +6,30 @@ import type { ImageMetadata } from "astro";
 interface Props {
   title: string;
   description: string;
-  date: Date;
+  date: number;
   status: "finished" | "wip";
   stack: string[];
   slug: string;
   live?: string;
+  repository?: string;
   cover?: ImageMetadata;
 }
 
-const { title, description, date, status, stack, slug, live, cover } =
-  Astro.props;
+const {
+  title,
+  description,
+  date,
+  status,
+  stack,
+  slug,
+  live,
+  repository,
+  cover,
+} = Astro.props;
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
-  <div class="flex flex-col">
+  <div class="flex flex-col md:min-w-2/4">
     <div class="mb-2 flex items-center gap-3">
       <h3
         class="group-hover:text-teal-11 text-xl font-bold transition-colors md:text-2xl"
@@ -37,11 +47,23 @@ const { title, description, date, status, stack, slug, live, cover } =
     <div class="flex h-full flex-col gap-3">
       <div>
         <p class="opacity-50">Date</p>
-        <p>{date.getFullYear()}</p>
+        <p>{date}</p>
       </div>
       <div>
         <p class="opacity-50">Description</p>
         <p class="max-w-[50ch]">{description}</p>
+      </div>
+      <div>
+        <p class="opacity-50">Stack</p>
+        <div class="flex max-w-prose flex-wrap gap-2 text-xs">
+          {
+            stack.map((tech) => (
+              <span class="border-sage-7 rounded-sm border px-2 py-1">
+                {tech}
+              </span>
+            ))
+          }
+        </div>
       </div>
       {
         live && (
@@ -51,11 +73,23 @@ const { title, description, date, status, stack, slug, live, cover } =
               href={live}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1 underline"
+              class="hover:text-teal-9 inline-flex items-center gap-1 underline"
             >
               {live}
               <Link />
             </a>
+            <br />
+            {repository && (
+              <a
+                href={repository}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-teal-9 inline-flex items-center gap-1 underline"
+              >
+                {repository}
+                <Link />
+              </a>
+            )}
           </div>
         )
       }
@@ -68,9 +102,10 @@ const { title, description, date, status, stack, slug, live, cover } =
           src={cover}
           alt={`Cover du projet ${title}`}
           aria-hidden="true"
-          class="border-sage-6 aspect-video w-full border object-cover"
-          width={500}
-          height={300}
+          class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
+          width={1200}
+          densities={[1, 2]}
+          quality={80}
         />
       </a>
     )
