@@ -46,15 +46,15 @@ const {
     </div>
     <div class="flex h-full flex-col gap-3">
       <div>
-        <p class="opacity-50">Date</p>
+        <p class="text-sage-11">Date</p>
         <p>{date}</p>
       </div>
       <div>
-        <p class="opacity-50">Description</p>
+        <p class="text-sage-11">Description</p>
         <p class="max-w-[50ch]">{description}</p>
       </div>
       <div>
-        <p class="opacity-50">Stack</p>
+        <p class="text-sage-11">Stack</p>
         <div class="flex max-w-prose flex-wrap gap-2 text-xs">
           {
             stack.map((tech) => (
@@ -68,7 +68,7 @@ const {
       {
         live && (
           <div class="md:mt-auto">
-            <p class="opacity-50">Démo</p>
+            <p class="text-sage-11">Démo</p>
             <a
               href={live}
               target="_blank"
