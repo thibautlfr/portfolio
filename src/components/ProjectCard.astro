@@ -6,7 +6,7 @@ import type { ImageMetadata } from "astro";
 interface Props {
   title: string;
   description: string;
-  date: Date;
+  date: number;
   status: "finished" | "wip";
   stack: string[];
   slug: string;
@@ -29,7 +29,7 @@ const {
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
-  <div class="flex flex-col">
+  <div class="flex flex-col md:min-w-2/4">
     <div class="mb-2 flex items-center gap-3">
       <h3
         class="group-hover:text-teal-11 text-xl font-bold transition-colors md:text-2xl"
@@ -47,7 +47,7 @@ const {
     <div class="flex h-full flex-col gap-3">
       <div>
         <p class="opacity-50">Date</p>
-        <p>{date.getFullYear()}</p>
+        <p>{date}</p>
       </div>
       <div>
         <p class="opacity-50">Description</p>
@@ -102,8 +102,10 @@ const {
           src={cover}
           alt={`Cover du projet ${title}`}
           aria-hidden="true"
-          class="border-sage-6 aspect-video h-full w-full border object-cover"
-          width={500}
+          class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
+          width={1200}
+          densities={[1, 2]}
+          quality={80}
         />
       </a>
     )

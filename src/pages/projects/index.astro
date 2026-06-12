@@ -2,16 +2,22 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import ProjectCard from "@components/ProjectCard.astro";
 import { getCollection } from "astro:content";
+import type { ImageMetadata } from "astro";
+
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/projects/*/cover.webp",
+  { eager: true },
+);
 
 const projects = (await getCollection("projects")).sort(
   (a, b) =>
     Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
-    b.data.date.getTime() - a.data.date.getTime(),
+    b.data.date - a.data.date,
 );
 ---
 
 <BaseLayout pageTitle="Projets — Thibaut LEFRANCOIS" title="Projets">
-  <div class="flex flex-col divide-y">
+  <div class="flex flex-col divide-y md:max-w-[60vw]">
     {
       projects.map((project) => (
         <div class="py-6 first:pt-0 md:py-8">
@@ -24,7 +30,9 @@ const projects = (await getCollection("projects")).sort(
             slug={project.id}
             live={project.data.live}
             repository={project.data.repository}
-            cover={project.data.cover}
+            cover={
+              covers[`/src/assets/projects/${project.id}/cover.webp`]?.default
+            }
           />
         </div>
       ))
