@@ -232,7 +232,8 @@ import { navLinks, socials } from "../config";
       });
     }
 
-    const contactLink = overlay.querySelector<HTMLAnchorElement>("[data-contact]");
+    const contactLink =
+      overlay.querySelector<HTMLAnchorElement>("[data-contact]");
     if (contactLink) {
       contactLink.addEventListener("click", (e) => {
         e.preventDefault();

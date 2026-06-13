@@ -5,15 +5,15 @@ import { z } from "astro/zod";
 const projects = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
   schema: z.object({
-      title: z.string(),
-      description: z.string(),
-      date: z.number().int(),
-      status: z.enum(["finished", "wip"]),
-      stack: z.array(z.string()),
-      repository: z.url().optional(),
-      live: z.url().optional(),
-      featured: z.boolean().default(false),
-    }),
+    title: z.string(),
+    description: z.string(),
+    date: z.number().int(),
+    status: z.enum(["finished", "wip"]),
+    stack: z.array(z.string()),
+    repository: z.url().optional(),
+    live: z.url().optional(),
+    featured: z.boolean().default(false),
+  }),
 });
 
 const blog = defineCollection({

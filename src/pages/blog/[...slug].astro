@@ -61,16 +61,8 @@ const tocLabel = post.data.lang === "fr" ? "Sommaire" : "Table of contents";
     {
       availableLangs.length > 1 && (
         <>
-          <link
-            rel="alternate"
-            hreflang="en"
-            href={`/blog/${postSlug}`}
-          />
-          <link
-            rel="alternate"
-            hreflang="fr"
-            href={`/blog/${postSlug}/fr`}
-          />
+          <link rel="alternate" hreflang="en" href={`/blog/${postSlug}`} />
+          <link rel="alternate" hreflang="fr" href={`/blog/${postSlug}/fr`} />
         </>
       )
     }

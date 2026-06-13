@@ -11,8 +11,8 @@ draft: false
 lang: en
 ---
 
-import { Image } from 'astro:assets';
-import carouselResultat from '@assets/blog/carousel-3d-resultat.webp';
+import { Image } from "astro:assets";
+import carouselResultat from "@assets/blog/carousel-3d-resultat.webp";
 
 I never thought I'd be glad to see sines and cosines again. Yet that's exactly what happened when I started writing my first GLSL shaders. Those trigonometric functions we learned in high school without really knowing what they'd be useful for "in real life." They're everywhere in creative development. Oscillations, deformations, periodic animations: trig is the foundation.
 
@@ -21,8 +21,15 @@ This article is a hands-on account. I'm not a shader expert. This is my first so
 The result is an infinite 3D image carousel, where each image reacts to scroll and mouse input through shaders. Here's what it looks like:
 
 <figure>
-  <Image src={carouselResultat} alt="3D carousel with chromatic aberration: three animated images arranged in an arc with an RGB channel separation effect on hover" loading="eager" class="rounded-lg border border-sage-6" />
-  <figcaption class="text-xs text-sage-11 mt-2 text-center">The final render of the carousel with the chromatic aberration effect</figcaption>
+  <Image
+    src={carouselResultat}
+    alt="3D carousel with chromatic aberration: three animated images arranged in an arc with an RGB channel separation effect on hover"
+    loading="eager"
+    class="border-sage-6 rounded-lg border"
+  />
+  <figcaption class="text-sage-11 mt-2 text-center text-xs">
+    The final render of the carousel with the chromatic aberration effect
+  </figcaption>
 </figure>
 
 ## The setup: a custom Three.js boilerplate
@@ -177,14 +184,14 @@ The carousel itself is a matter of circular layout and simple physics. Images ar
 
 ```typescript title="carousel.ts"
 for (let i = 0; i < count; i++) {
-    const image = new Image(this.textures[i]);
-    const angle = (i / count) * Math.PI * 2;
+  const image = new Image(this.textures[i]);
+  const angle = (i / count) * Math.PI * 2;
 
-    image.mesh.position.x = Math.sin(angle) * radius;
-    image.mesh.position.z = Math.cos(angle) * radius;
-    image.mesh.lookAt(0, 0, 0);
+  image.mesh.position.x = Math.sin(angle) * radius;
+  image.mesh.position.z = Math.cos(angle) * radius;
+  image.mesh.lookAt(0, 0, 0);
 
-    this.group.add(image.mesh);
+  this.group.add(image.mesh);
 }
 ```
 
@@ -200,4 +207,9 @@ If you're hesitating to get into shaders, start small. A `PlaneGeometry`, a `Sha
 
 ## Try it yourself
 
-<iframe src="https://thibautlfr.github.io/3d-carousel/" class="w-full aspect-video rounded-lg border border-sage-6" loading="lazy" title="Interactive demo of the 3D carousel with chromatic aberration" />
+<iframe
+  src="https://thibautlfr.github.io/3d-carousel/"
+  class="border-sage-6 aspect-video w-full rounded-lg border"
+  loading="lazy"
+  title="Interactive demo of the 3D carousel with chromatic aberration"
+/>

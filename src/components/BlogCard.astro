@@ -9,7 +9,15 @@ interface Props {
   langs?: ("en" | "fr")[];
 }
 
-const { title, description, date, tags, slug, draft = false, langs = [] } = Astro.props;
+const {
+  title,
+  description,
+  date,
+  tags,
+  slug,
+  draft = false,
+  langs = [],
+} = Astro.props;
 ---
 
 <a href={`/blog/${slug}`} class="group block">
