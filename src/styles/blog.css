@@ -55,10 +55,10 @@
 
 .blog-content code:not(pre code) {
   border-radius: 0.25rem;
-  background: #24282E;
+  background: #24282e;
   padding: 0.125rem 0.375rem;
   font-size: var(--text-sm);
-  color: #E1E4E8;
+  color: #e1e4e8;
 }
 
 .blog-content blockquote {

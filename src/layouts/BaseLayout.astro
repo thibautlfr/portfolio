@@ -11,19 +11,21 @@ interface Props {
   srOnlyTitle?: boolean;
   subtitle?: string;
   subtitleCount?: number;
+  lang?: string;
 }
 
 const {
   pageTitle = "Thibaut LEFRANCOIS - portfolio",
-  description = "Portfolio de Thibaut LEFRANCOIS, développeur web full-stack.",
+  description = "Portfolio of Thibaut LEFRANCOIS, full-stack and creative web developer.",
   title,
   srOnlyTitle = true,
   subtitle,
   subtitleCount,
+  lang = "en",
 } = Astro.props;
 ---
 
-<html lang="fr">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -31,15 +33,16 @@ const {
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
+    <slot name="head" />
     <ClientRouter />
   </head>
 
   <body class="flex min-h-dvh flex-col">
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded focus:bg-sage-1 focus:px-4 focus:py-2 focus:text-sage-12 focus:outline-2 focus:outline-offset-2 focus:outline-current"
+      class="focus:bg-sage-1 focus:text-sage-12 sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded focus:px-4 focus:py-2 focus:outline-2 focus:outline-offset-2 focus:outline-current"
     >
-      Aller au contenu
+      Skip to content
     </a>
     <PageTransition />
     <Header />
@@ -73,7 +76,7 @@ const {
       }
       <slot />
     </main>
-    <footer class="px-6 py-6 text-xs text-sage-11 md:px-10 lg:px-16">
+    <footer class="text-sage-11 px-6 py-6 text-xs md:px-10 lg:px-16">
       <p>&copy; {new Date().getFullYear()} Thibaut LEFRANCOIS</p>
     </footer>
   </body>

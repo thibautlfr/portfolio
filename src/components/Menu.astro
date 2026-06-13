@@ -20,7 +20,11 @@ import { navLinks, socials } from "../config";
     <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
       {navLinks.map((link, i) => (
         <li class="overflow-hidden">
-          <a class="block" href={link.href}>
+          <a
+            class="block"
+            href={link.href}
+            data-contact={link.label === "CONTACT" ? "" : undefined}
+          >
             {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
           </a>
         </li>
@@ -29,7 +33,7 @@ import { navLinks, socials } from "../config";
 
     <div class="menu-socials">
       <p class="text-teal-9 mb-3 font-sans text-sm tracking-widest uppercase">
-        Réseaux
+        Socials
       </p>
       <ul
         class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
@@ -44,7 +48,7 @@ import { navLinks, socials } from "../config";
                 rel="noopener noreferrer"
               >
                 {s.label}
-                <span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
+                <span class="sr-only"> (opens in new tab)</span>
               </a>
             </li>
           ))
@@ -225,6 +229,24 @@ import { navLinks, socials } from "../config";
         rotation: isOpen ? 0 : ANIM.crossRotation,
         duration: ANIM.slideDuration,
         ease: ANIM.contentEase,
+      });
+    }
+
+    const contactLink =
+      overlay.querySelector<HTMLAnchorElement>("[data-contact]");
+    if (contactLink) {
+      contactLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `mailto:${atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t")}`;
+        document.body.style.overflow = "";
+        if (prefersReduced) {
+          setClosedState();
+        } else {
+          tl.reverse();
+          animateTextClose();
+          animateCross();
+        }
+        isOpen = false;
       });
     }
 

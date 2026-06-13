@@ -1,9 +1,9 @@
 export const navLinks = [
-  { label: "ACCUEIL", href: "/" },
-  { label: "PROJETS", href: "/projects" },
+  { label: "HOME", href: "/" },
+  { label: "PROJECTS", href: "/projects" },
   { label: "BLOG", href: "/blog" },
-  { label: "À PROPOS", href: "/about" },
-  { label: "CONTACT", href: "/contact" },
+  { label: "ABOUT", href: "/about" },
+  { label: "CONTACT", href: "#" },
 ] as const;
 
 export const socials = [

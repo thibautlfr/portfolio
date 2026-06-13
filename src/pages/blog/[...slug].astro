@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import TableOfContents from "@components/TableOfContents.astro";
+import LanguageToggle from "@components/LanguageToggle.astro";
 import { getCollection, render } from "astro:content";
 import "../../styles/blog.css";
 import Link from "@components/icons/Link.astro";
@@ -9,27 +10,75 @@ export async function getStaticPaths() {
   const posts = (await getCollection("blog")).filter(
     (post) => import.meta.env.DEV || !post.data.draft,
   );
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: { post },
-  }));
+
+  const grouped = new Map<string, Record<string, (typeof posts)[0]>>();
+  for (const post of posts) {
+    const postSlug = post.id.split("/").slice(0, -1).join("/");
+    if (!grouped.has(postSlug)) grouped.set(postSlug, {});
+    grouped.get(postSlug)![post.data.lang] = post;
+  }
+
+  return [...grouped.entries()].flatMap(([postSlug, versions]) => {
+    const availableLangs = Object.keys(versions) as ("en" | "fr")[];
+    const paths = [];
+
+    if (versions.en) {
+      paths.push({
+        params: { slug: postSlug },
+        props: { post: versions.en, postSlug, availableLangs },
+      });
+    }
+
+    if (versions.fr) {
+      paths.push({
+        params: { slug: `${postSlug}/fr` },
+        props: { post: versions.fr, postSlug, availableLangs },
+      });
+    }
+
+    if (!versions.en && versions.fr) {
+      paths.push({
+        params: { slug: postSlug },
+        props: { post: versions.fr, postSlug, availableLangs },
+      });
+    }
+
+    return paths;
+  });
 }
 
-const { post } = Astro.props;
+const { post, postSlug, availableLangs } = Astro.props;
 const { Content, headings } = await render(post);
+const dateLocale = post.data.lang === "fr" ? "fr-FR" : "en-US";
+const tocLabel = post.data.lang === "fr" ? "Sommaire" : "Table of contents";
 ---
 
-<BaseLayout pageTitle={`${post.data.title} — Thibaut LEFRANCOIS`}>
+<BaseLayout
+  pageTitle={`${post.data.title} — Thibaut LEFRANCOIS`}
+  lang={post.data.lang}
+>
+  <Fragment slot="head">
+    {
+      availableLangs.length > 1 && (
+        <>
+          <link rel="alternate" hreflang="en" href={`/blog/${postSlug}`} />
+          <link rel="alternate" hreflang="fr" href={`/blog/${postSlug}/fr`} />
+        </>
+      )
+    }
+  </Fragment>
+
   <div class="flex items-baseline gap-3">
     <h1 class="text-3xl font-bold md:text-4xl">{post.data.title}</h1>
     {
       post.data.draft && (
         <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
-          brouillon
+          draft
         </span>
       )
     }
   </div>
+
   <div
     class="text-sage-11 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm"
   >
@@ -42,13 +91,18 @@ const { Content, headings } = await render(post);
     </div>
     <span class="font-medium">
       {
-        post.data.date.toLocaleDateString("fr-FR", {
+        post.data.date.toLocaleDateString(dateLocale, {
           year: "numeric",
           month: "long",
           day: "numeric",
         })
       }
     </span>
+    <LanguageToggle
+      currentLang={post.data.lang}
+      postSlug={postSlug}
+      availableLangs={availableLangs}
+    />
     {
       post.data.links.length > 0 && (
         <div class="flex flex-wrap gap-2 sm:ml-auto">
@@ -72,6 +126,6 @@ const { Content, headings } = await render(post);
     <div class="blog-content order-2 max-w-prose lg:order-1">
       <Content />
     </div>
-    <TableOfContents headings={headings} />
+    <TableOfContents headings={headings} label={tocLabel} />
   </div>
 </BaseLayout>
