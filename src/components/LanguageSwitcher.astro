@@ -1,0 +1,43 @@
+---
+import { getLocaleFromUrl, useTranslations, otherLocale } from "@i18n/utils";
+
+interface Props {
+  /** URL of the equivalent page in the other locale. If null/undefined, links to the other locale's home. */
+  altLocaleUrl?: string | null;
+}
+
+const { altLocaleUrl } = Astro.props;
+const locale = getLocaleFromUrl(Astro.url);
+const other = otherLocale(locale);
+const t = useTranslations(locale);
+
+// Fall back to the other locale's home if no translation is available
+const href = altLocaleUrl ?? (other === "en" ? "/en" : "/");
+---
+
+<a
+  href={href}
+  hreflang={other}
+  lang={other}
+  class="language-switcher text-teal-9 hover:text-teal-11 font-sans text-sm tracking-widest uppercase transition-colors"
+  data-lang-target={other}
+>
+  {t("switcher.label")}
+</a>
+
+<script>
+  // When the user clicks the language switcher, persist their choice so the
+  // auto-detection script in BaseLayout never overrides it again.
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLAnchorElement>(".language-switcher").forEach((el) => {
+      el.addEventListener("click", () => {
+        try {
+          const target = el.dataset.langTarget;
+          if (target) localStorage.setItem("lang-pref", target);
+        } catch (_) {
+          // localStorage not available — ignore
+        }
+      });
+    });
+  });
+</script>

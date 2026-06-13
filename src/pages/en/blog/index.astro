@@ -1,0 +1,35 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogCard from "@components/BlogCard.astro";
+import { getCollection } from "astro:content";
+import { resolveForLocale, bareSlug } from "@i18n/content";
+
+const locale = "en" as const;
+const allPosts = await getCollection("blog");
+const posts = resolveForLocale(allPosts, locale)
+  .filter(({ entry }) => import.meta.env.DEV || !entry.data.draft)
+  .sort((a, b) => b.entry.data.date.getTime() - a.entry.data.date.getTime());
+---
+
+<BaseLayout
+  pageTitle="Blog — Thibaut LEFRANCOIS"
+  title="Blog"
+  altLocaleUrl="/blog"
+>
+  <div class="flex flex-col gap-6">
+    {
+      posts.map(({ entry: post, isFallback }) => (
+        <BlogCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={bareSlug(post.id)}
+          draft={post.data.draft}
+          locale={locale}
+          isFallback={isFallback}
+        />
+      ))
+    }
+  </div>
+</BaseLayout>

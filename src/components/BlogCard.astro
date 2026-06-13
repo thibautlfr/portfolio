@@ -1,4 +1,7 @@
 ---
+import { useTranslations, dateLocale, localizedHref } from "@i18n/utils";
+import type { Locale } from "@i18n/utils";
+
 interface Props {
   title: string;
   description: string;
@@ -6,12 +9,26 @@ interface Props {
   tags: string[];
   slug: string;
   draft?: boolean;
+  locale?: Locale;
+  isFallback?: boolean;
 }
 
-const { title, description, date, tags, slug, draft = false } = Astro.props;
+const {
+  title,
+  description,
+  date,
+  tags,
+  slug,
+  draft = false,
+  locale = "fr",
+  isFallback = false,
+} = Astro.props;
+
+const t = useTranslations(locale);
+const href = localizedHref(`blog/${slug}`, locale);
 ---
 
-<a href={`/blog/${slug}`} class="group block">
+<a href={href} class="group block">
   <article
     class="border-sage-7 bg-sage-1 group-hover:border-sage-8 group-hover:bg-sage-2 rounded-xl border p-6 transition-colors"
   >
@@ -24,7 +41,14 @@ const { title, description, date, tags, slug, draft = false } = Astro.props;
       {
         draft && (
           <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
-            brouillon
+            {t("blog.draft")}
+          </span>
+        )
+      }
+      {
+        isFallback && (
+          <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
+            {t("content.frenchOnlyBadge")}
           </span>
         )
       }
@@ -44,7 +68,7 @@ const { title, description, date, tags, slug, draft = false } = Astro.props;
       </div>
       <span class="ml-auto text-xs"
         >{
-          date.toLocaleDateString("fr-FR", {
+          date.toLocaleDateString(dateLocale(locale), {
             year: "numeric",
             month: "long",
             day: "numeric",

@@ -3,9 +3,9 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import ProjectCard from "@components/ProjectCard.astro";
 import { getCollection } from "astro:content";
 import type { ImageMetadata } from "astro";
-import { filterByLocale, bareSlug } from "@i18n/content";
+import { resolveForLocale, bareSlug } from "@i18n/content";
 
-const locale = "fr" as const;
+const locale = "en" as const;
 
 const covers = import.meta.glob<{ default: ImageMetadata }>(
   "/src/assets/projects/*/cover.webp",
@@ -13,19 +13,22 @@ const covers = import.meta.glob<{ default: ImageMetadata }>(
 );
 
 const allProjects = await getCollection("projects");
-const projects = filterByLocale(allProjects, locale).sort(
+const projects = resolveForLocale(allProjects, locale).sort(
   (a, b) =>
-    Number(b.data.featured ?? false) - Number(a.data.featured ?? false) ||
-    b.data.date - a.data.date,
+    Number(b.entry.data.featured ?? false) -
+      Number(a.entry.data.featured ?? false) ||
+    b.entry.data.date - a.entry.data.date,
 );
-
-const altLocaleUrl = "/en/projects";
 ---
 
-<BaseLayout pageTitle="Projets — Thibaut LEFRANCOIS" title="Projets" altLocaleUrl={altLocaleUrl}>
+<BaseLayout
+  pageTitle="Projects — Thibaut LEFRANCOIS"
+  title="Projects"
+  altLocaleUrl="/projects"
+>
   <div class="flex flex-col divide-y md:max-w-[60vw]">
     {
-      projects.map((project) => (
+      projects.map(({ entry: project, isFallback }) => (
         <div class="py-6 first:pt-0 md:py-8">
           <ProjectCard
             title={project.data.title}
@@ -37,9 +40,11 @@ const altLocaleUrl = "/en/projects";
             live={project.data.live}
             repository={project.data.repository}
             cover={
-              covers[`/src/assets/projects/${bareSlug(project.id)}/cover.webp`]?.default
+              covers[`/src/assets/projects/${bareSlug(project.id)}/cover.webp`]
+                ?.default
             }
             locale={locale}
+            isFallback={isFallback}
           />
         </div>
       ))

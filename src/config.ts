@@ -1,10 +1,12 @@
-export const navLinks = [
-  { label: "ACCUEIL", href: "/" },
-  { label: "PROJETS", href: "/projects" },
-  { label: "BLOG", href: "/blog" },
-  { label: "À PROPOS", href: "/about" },
-  { label: "CONTACT", href: "/contact" },
-] as const;
+import type { UIKey } from "@i18n/ui";
+
+export const navLinks: { key: UIKey; href: string }[] = [
+  { key: "nav.home", href: "/" },
+  { key: "nav.projects", href: "/projects" },
+  { key: "nav.blog", href: "/blog" },
+  { key: "nav.about", href: "/about" },
+  { key: "nav.contact", href: "/contact" },
+];
 
 export const socials = [
   { label: "GitHub", href: "https://github.com/thibautlfr" },

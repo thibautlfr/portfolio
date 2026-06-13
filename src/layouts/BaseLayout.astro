@@ -3,6 +3,7 @@ import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import Header from "@components/Header.astro";
 import PageTransition from "@components/PageTransition.astro";
+import { getLocaleFromUrl, useTranslations, otherLocale } from "@i18n/utils";
 
 interface Props {
   pageTitle?: string;
@@ -11,19 +12,31 @@ interface Props {
   srOnlyTitle?: boolean;
   subtitle?: string;
   subtitleCount?: number;
+  /** URL of the equivalent page in the other locale, or null if none exists. */
+  altLocaleUrl?: string | null;
 }
 
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
+const other = otherLocale(locale);
+
 const {
-  pageTitle = "Thibaut LEFRANCOIS - portfolio",
-  description = "Portfolio de Thibaut LEFRANCOIS, développeur web full-stack.",
+  pageTitle = t("site.defaultTitle"),
+  description = t("site.defaultDescription"),
   title,
   srOnlyTitle = true,
   subtitle,
   subtitleCount,
+  altLocaleUrl,
 } = Astro.props;
+
+// Build absolute URLs for hreflang (Astro.site is set in astro.config.mjs)
+const site = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const canonical = `${site}${Astro.url.pathname}`;
+const altAbsolute = altLocaleUrl ? `${site}${altLocaleUrl}` : null;
 ---
 
-<html lang="fr">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -31,6 +44,53 @@ const {
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{pageTitle}</title>
+
+    <!-- Canonical & hreflang -->
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={locale} href={canonical} />
+    {altAbsolute && <link rel="alternate" hreflang={other} href={altAbsolute} />}
+    {
+      /* x-default points to the French (default locale) URL */
+      altAbsolute && (
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={locale === "fr" ? canonical : altAbsolute}
+        />
+      )
+    }
+
+    <!-- Open Graph locale -->
+    <meta
+      property="og:locale"
+      content={locale === "en" ? "en_US" : "fr_FR"}
+    />
+
+    <!--
+      Language auto-detection: on first visit, redirect to /en if the browser
+      language is not French. The preference is stored in localStorage so it
+      only runs once and respects manual switcher choices.
+    -->
+    <script is:inline>
+      (function () {
+        try {
+          const stored = localStorage.getItem("lang-pref");
+          if (stored) return; // User already made a choice — never override
+          const isEnPage = location.pathname.startsWith("/en");
+          if (isEnPage) return; // Already on EN, nothing to do
+          const lang = (navigator.language || "fr").toLowerCase();
+          if (!lang.startsWith("fr")) {
+            // Map current FR path to its EN equivalent
+            const enPath = "/en" + (location.pathname === "/" ? "" : location.pathname);
+            localStorage.setItem("lang-pref", "en");
+            location.replace(enPath);
+          }
+        } catch (_) {
+          // localStorage not available (private browsing etc.) — ignore silently
+        }
+      })();
+    </script>
+
     <ClientRouter />
   </head>
 
@@ -39,10 +99,10 @@ const {
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-100 focus:rounded focus:bg-sage-1 focus:px-4 focus:py-2 focus:text-sage-12 focus:outline-2 focus:outline-offset-2 focus:outline-current"
     >
-      Aller au contenu
+      {t("skip.toContent")}
     </a>
     <PageTransition />
-    <Header />
+    <Header altLocaleUrl={altLocaleUrl} />
     <main
       id="main-content"
       class="flex flex-1 flex-col px-6 py-6 md:px-10 md:py-10 lg:mx-auto lg:px-16"

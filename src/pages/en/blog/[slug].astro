@@ -2,44 +2,54 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import { getCollection, render } from "astro:content";
-import "../../styles/blog.css";
+import "../../../styles/blog.css";
 import Link from "@components/icons/Link.astro";
-import { filterByLocale, bareSlug, findTranslation } from "@i18n/content";
-import { dateLocale, localizedHref } from "@i18n/utils";
+import { resolveForLocale, bareSlug, findTranslation } from "@i18n/content";
+import { dateLocale, localizedHref, useTranslations } from "@i18n/utils";
 
-const locale = "fr" as const;
+const locale = "en" as const;
+const t = useTranslations(locale);
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
-  const posts = filterByLocale(allPosts, "fr").filter(
-    (post) => import.meta.env.DEV || !post.data.draft,
+  // Generate a route for every unique slug, using EN if available, FR as fallback
+  const resolved = resolveForLocale(allPosts, "en").filter(
+    ({ entry }) => import.meta.env.DEV || !entry.data.draft,
   );
-  return posts.map((post) => ({
+  return resolved.map(({ entry: post, isFallback }) => ({
     params: { slug: bareSlug(post.id) },
-    props: { post },
+    props: { post, isFallback },
   }));
 }
 
-const { post } = Astro.props;
+const { post, isFallback } = Astro.props;
 const { Content, headings } = await render(post);
 
+// Compute alternate URL (the FR canonical for this post)
 const allPosts = await getCollection("blog");
-const translation = findTranslation(allPosts, post, "en");
-const altLocaleUrl = translation
-  ? localizedHref(`blog/${bareSlug(translation.id)}`, "en")
-  : "/en/blog";
+const frEntry = findTranslation(allPosts, post, "fr") ?? post; // post itself if already FR
+const altLocaleUrl = `/${bareSlug(frEntry.id).replace(/^fr\//, "")}` === "/"
+  ? `/blog/${bareSlug(frEntry.id)}`
+  : `/blog/${bareSlug(frEntry.id)}`;
 ---
 
 <BaseLayout
   pageTitle={`${post.data.title} — Thibaut LEFRANCOIS`}
   altLocaleUrl={altLocaleUrl}
 >
+  {
+    isFallback && (
+      <div class="border-sage-6 bg-sage-2 text-sage-11 mb-6 rounded-lg border px-4 py-3 text-sm">
+        {t("content.frenchOnly")}
+      </div>
+    )
+  }
   <div class="flex items-baseline gap-3">
     <h1 class="text-3xl font-bold md:text-4xl">{post.data.title}</h1>
     {
       post.data.draft && (
         <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
-          brouillon
+          {t("blog.draft")}
         </span>
       )
     }
@@ -56,11 +66,14 @@ const altLocaleUrl = translation
     </div>
     <span class="font-medium">
       {
-        post.data.date.toLocaleDateString(dateLocale(locale), {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        post.data.date.toLocaleDateString(
+          isFallback ? "fr-FR" : dateLocale(locale),
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          },
+        )
       }
     </span>
     {
@@ -83,9 +96,16 @@ const altLocaleUrl = translation
   </div>
 
   <div class="relative mt-6 flex flex-col md:mt-8 lg:flex-row lg:gap-10">
-    <div class="blog-content order-2 max-w-prose lg:order-1">
+    <!--
+      When content is a fallback (FR only), declare lang="fr" on the content
+      wrapper so screen readers and search engines know the language.
+    -->
+    <div
+      class="blog-content order-2 max-w-prose lg:order-1"
+      lang={isFallback ? "fr" : undefined}
+    >
       <Content />
     </div>
-    <TableOfContents headings={headings} locale={locale} />
+    <TableOfContents headings={headings} locale={isFallback ? "fr" : locale} />
   </div>
 </BaseLayout>

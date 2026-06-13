@@ -2,6 +2,8 @@
 import Link from "@components/icons/Link.astro";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import { useTranslations } from "@i18n/utils";
+import type { Locale } from "@i18n/utils";
 
 interface Props {
   title: string;
@@ -13,6 +15,8 @@ interface Props {
   live?: string;
   repository?: string;
   cover?: ImageMetadata;
+  locale?: Locale;
+  isFallback?: boolean;
 }
 
 const {
@@ -25,7 +29,11 @@ const {
   live,
   repository,
   cover,
+  locale = "fr",
+  isFallback = false,
 } = Astro.props;
+
+const t = useTranslations(locale);
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
@@ -39,22 +47,29 @@ const {
       {
         status === "wip" && (
           <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
-            en cours
+            {t("project.wip")}
+          </span>
+        )
+      }
+      {
+        isFallback && (
+          <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
+            {t("content.frenchOnlyBadge")}
           </span>
         )
       }
     </div>
     <div class="flex h-full flex-col gap-3">
       <div>
-        <p class="text-sage-11">Date</p>
+        <p class="text-sage-11">{t("project.date")}</p>
         <p>{date}</p>
       </div>
       <div>
-        <p class="text-sage-11">Description</p>
+        <p class="text-sage-11">{t("project.description")}</p>
         <p class="max-w-[50ch]">{description}</p>
       </div>
       <div>
-        <p class="text-sage-11">Stack</p>
+        <p class="text-sage-11">{t("project.stack")}</p>
         <div class="flex max-w-prose flex-wrap gap-2 text-xs">
           {
             stack.map((tech) => (
@@ -68,7 +83,7 @@ const {
       {
         live && (
           <div class="md:mt-auto">
-            <p class="text-sage-11">Démo</p>
+            <p class="text-sage-11">{t("project.demo")}</p>
             <a
               href={live}
               target="_blank"
@@ -100,7 +115,7 @@ const {
       <a href={live} target="_blank" rel="noopener noreferrer">
         <Image
           src={cover}
-          alt={`Cover du projet ${title}`}
+          alt={`${t("project.coverAlt")} ${title}`}
           aria-hidden="true"
           class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
           width={1200}

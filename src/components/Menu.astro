@@ -1,5 +1,15 @@
 ---
 import { navLinks, socials } from "../config";
+import { getLocaleFromUrl, useTranslations, localizedHref } from "@i18n/utils";
+import LanguageSwitcher from "@components/LanguageSwitcher.astro";
+
+interface Props {
+  altLocaleUrl?: string | null;
+}
+
+const { altLocaleUrl } = Astro.props;
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
 ---
 
 <!-- Invisible layers for opening effect-->
@@ -20,43 +30,46 @@ import { navLinks, socials } from "../config";
     <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
       {navLinks.map((link, i) => (
         <li class="overflow-hidden">
-          <a class="block" href={link.href}>
-            {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
+          <a class="block" href={localizedHref(link.href, locale)}>
+            {t(link.key)}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
           </a>
         </li>
       ))}
     </ul>
 
-    <div class="menu-socials">
-      <p class="text-teal-9 mb-3 font-sans text-sm tracking-widest uppercase">
-        Réseaux
-      </p>
-      <ul
-        class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
-      >
-        {
-          socials.map((s) => (
-            <li class="overflow-hidden">
-              <a
-                class="social-link block"
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {s.label}
-                <span class="sr-only"> (s'ouvre dans un nouvel onglet)</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+    <div class="menu-socials flex flex-col gap-4">
+      <div>
+        <p class="text-teal-9 mb-3 font-sans text-sm tracking-widest uppercase">
+          {t("menu.socials")}
+        </p>
+        <ul
+          class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
+        >
+          {
+            socials.map((s) => (
+              <li class="overflow-hidden">
+                <a
+                  class="social-link block"
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {s.label}
+                  <span class="sr-only"> {t("menu.opensNewTab")}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <LanguageSwitcher altLocaleUrl={altLocaleUrl} />
     </div>
   </nav>
 </div>
 
 <button
   class="menu-button font-button relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
-  aria-label="Menu"
+  aria-label={t("menu.label")}
 >
   <span class="relative inline-block h-[1em] overflow-hidden whitespace-nowrap">
     <span class="menu-text flex flex-col leading-none">

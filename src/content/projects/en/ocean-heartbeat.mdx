@@ -1,0 +1,31 @@
+---
+title: "Ocean Heartbeat"
+description: "An immersive 3D web experience exploring the parallels between the human body and the ocean, built in a single night for the Nuit de l'Info 2024 hackathon."
+date: 2024
+status: "finished"
+stack: ["React", "Three.js", "React Three Fiber", "GSAP", "Zustand", "Tailwind CSS", "Vite"]
+repository: "https://github.com/thibautlfr/ocean-heartbeat"
+featured: false
+---
+
+One night, one theme, no 3D models at hand, and the urge to ship something that actually looks finished. Ocean Heartbeat is our first complete 3D web experience, built with Colin Demouge for the Nuit de l'Info 2024 at Niort Tech.
+
+## The project
+
+The national challenge for this edition asked participants to **represent the parallels between the human body and the ocean**. We chose to make it an immersive experience rather than a traditional informational site: an underwater 3D environment where users explore organs (heart, brain, kidneys) integrated into an oceanic setting. Rocks, seaweed, starfish, a lanternfish drifting by.
+
+The goal was to **show these body/ocean connections visually and sensorially**, with ambient sound, animations, and the ability to switch between organs to discover the details behind each parallel.
+
+## The stack
+
+We had just finished **Three.js Journey** and this was the perfect opportunity to apply what we had learned on a real constrained project. React Three Fiber for the 3D scene, Drei for the helpers, GSAP and Motion for UI animations, Zustand to manage global state (sound, retro mode, selected organ).
+
+For the models, there was no time to create them in a single night: everything came from **Poly Pizza**, practical for usage rights and especially for maintaining a **consistent low-poly aesthetic** across the whole scene. Positioning elements in the environment was done between **Blender** and **Three.js Editor**, a workflow we found quite efficient for iterating quickly.
+
+{/* cover: screenshot of the 3D experience, ideally a view of the underwater scene with a visible organ */}
+
+## What I took away
+
+The real challenge in a hackathon isn't coding features. It's **shipping something that feels finished**. We spent time on the details that matter: a clean loader, careful sound management, smooth transitions between views. And it paid off: we won the **"On veut du gros pixel"** challenge with our retro mode that pixelates the entire 3D scene via post-processing. An addition that took just a few lines of code but delivered an immediate effect.
+
+More than anything, it confirmed that the skills built through Three.js Journey were **directly applicable** on a real project, even under the pressure of a single night. Building a complete 3D environment — scene, lighting, shaders, post-processing, interactions — from scratch in a few hours gives you confidence for what comes next.

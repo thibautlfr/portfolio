@@ -1,10 +1,26 @@
 ---
 import IconCube from "@components/icons/IconCube.astro";
 import Menu from "@components/Menu.astro";
+import { getLocaleFromUrl, localizedHref } from "@i18n/utils";
+
+interface Props {
+  altLocaleUrl?: string | null;
+}
+
+const { altLocaleUrl } = Astro.props;
+const locale = getLocaleFromUrl(Astro.url);
+const homeHref = localizedHref("/", locale);
 
 const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 const segments = pathname.split("/").filter(Boolean);
-const slug = segments[0] || null;
+
+// Skip the locale prefix ("en") when building the breadcrumb segment
+const localePrefix = locale === "fr" ? null : locale;
+const contentSegments = localePrefix
+  ? segments.filter((s) => s !== localePrefix)
+  : segments;
+const slug = contentSegments[0] || null;
+const slugHref = slug ? localizedHref(`/${slug}`, locale) : null;
 ---
 
 <header
@@ -12,11 +28,11 @@ const slug = segments[0] || null;
 >
   <div class="flex items-center text-xl leading-none font-bold md:text-3xl">
     <IconCube class="size-5 md:size-7.5" />
-    <a href="/" class="hover:underline">thibautlfr</a>
+    <a href={homeHref} class="hover:underline">thibautlfr</a>
     {
-      slug && (
+      slug && slugHref && (
         <a
-          href={`/${slug}`}
+          href={slugHref}
           class="text-teal-11 underline md:no-underline md:hover:underline"
         >
           /{slug}
@@ -24,5 +40,5 @@ const slug = segments[0] || null;
       )
     }
   </div>
-  <Menu />
+  <Menu altLocaleUrl={altLocaleUrl} />
 </header>
