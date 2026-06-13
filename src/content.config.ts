@@ -34,6 +34,7 @@ const blog = defineCollection({
       .default([]),
     draft: z.boolean().default(false),
     featured: z.boolean().default(false),
+    lang: z.enum(["en", "fr"]).default("en"),
   }),
 });
 

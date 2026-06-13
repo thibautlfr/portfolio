@@ -3,22 +3,45 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BlogCard from "@components/BlogCard.astro";
 import { getCollection } from "astro:content";
 
-const posts = (await getCollection("blog"))
-  .filter((post) => import.meta.env.DEV || !post.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allPosts = (await getCollection("blog")).filter(
+  (post) => import.meta.env.DEV || !post.data.draft,
+);
+
+const grouped = new Map<string, Record<string, (typeof allPosts)[0]>>();
+for (const post of allPosts) {
+  const postSlug = post.id.split("/").slice(0, -1).join("/");
+  if (!grouped.has(postSlug)) grouped.set(postSlug, {});
+  grouped.get(postSlug)![post.data.lang] = post;
+}
+
+const displayPosts = [...grouped.entries()]
+  .map(([postSlug, versions]) => {
+    const primary = versions.en ?? versions.fr;
+    return {
+      postSlug,
+      title: primary.data.title,
+      description: primary.data.description,
+      date: primary.data.date,
+      tags: primary.data.tags,
+      draft: primary.data.draft,
+      langs: Object.keys(versions) as ("en" | "fr")[],
+    };
+  })
+  .sort((a, b) => b.date.getTime() - a.date.getTime());
 ---
 
 <BaseLayout pageTitle="Blog — Thibaut LEFRANCOIS" title="Blog">
   <div class="flex flex-col gap-6">
     {
-      posts.map((post) => (
+      displayPosts.map((post) => (
         <BlogCard
-          title={post.data.title}
-          description={post.data.description}
-          date={post.data.date}
-          tags={post.data.tags}
-          slug={post.id}
-          draft={post.data.draft}
+          title={post.title}
+          description={post.description}
+          date={post.date}
+          tags={post.tags}
+          slug={post.postSlug}
+          draft={post.draft}
+          langs={post.langs}
         />
       ))
     }

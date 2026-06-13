@@ -1,6 +1,6 @@
 ---
 title: "Ocean Heartbeat"
-description: "Une expérience web 3D immersive qui explore les parallèles entre le corps humain et l'océan, réalisée en une nuit pour la Nuit de l'Info 2024."
+description: "An immersive 3D web experience exploring the parallels between the human body and the ocean, built in a single night for Nuit de l'Info 2024."
 date: 2024
 status: "finished"
 stack: ["React", "Three.js", "React Three Fiber", "GSAP", "Zustand", "Tailwind CSS", "Vite"]
@@ -9,24 +9,24 @@ live: "https://ocean-heartbeat.netlify.app"
 featured: false
 ---
 
-Une nuit, un thème, zéro modèle 3D sous la main, et l'envie de livrer quelque chose qui ressemble à un vrai projet. Ocean Heartbeat, c'est notre première expérience web 3D complète, construite avec Colin Demouge pour la Nuit de l'Info 2024 à Niort Tech.
+One night, one theme, zero 3D models on hand, and the drive to ship something that looks like a real project. Ocean Heartbeat is our first complete 3D web experience, built with Colin Demouge for Nuit de l'Info 2024 at Niort Tech.
 
-## Le projet
+## The project
 
-Le défi national de cette édition demandait de **représenter les parallèles entre le corps humain et l'océan**. On a pris le parti d'en faire une expérience immersive plutôt qu'un site informatif classique : un environnement sous-marin en 3D où l'utilisateur explore des organes (coeur, cerveau, reins) intégrés dans un décor océanique. Rochers, algues, étoiles de mer, un poisson lanterne qui se balade.
+The national challenge for this edition asked teams to **represent the parallels between the human body and the ocean**. We chose to turn it into an immersive experience rather than a standard informational website: an underwater 3D environment where the user explores organs (heart, brain, kidneys) embedded in an oceanic scene. Rocks, seaweed, starfish, and a lanternfish swimming around.
 
-L'idée, c'était de **montrer ces connexions corps/océan de manière visuelle et sensorielle**, avec une ambiance sonore, des animations, et la possibilité de switcher entre les organes pour découvrir les détails de chaque parallèle.
+The idea was to **show those body/ocean connections in a visual and sensory way**, with ambient sound, animations, and the ability to switch between organs to discover the details of each parallel.
 
-## La stack
+## The stack
 
-On sortait tout juste de **Three.js Journey** et c'était l'occasion parfaite de mettre en pratique ce qu'on avait appris sur un vrai projet sous contrainte. React Three Fiber pour la scène 3D, Drei pour les helpers, GSAP et Motion pour les animations d'interface, Zustand pour gérer l'état global (son, mode rétro, organe sélectionné).
+We had just finished **Three.js Journey** and this was the perfect opportunity to put what we learned into practice on a real project under time pressure. React Three Fiber for the 3D scene, Drei for helpers, GSAP and Motion for UI animations, Zustand for global state management (sound, retro mode, selected organ).
 
-Pour les modèles, pas le temps de les créer en une nuit : tout vient de **Poly Pizza**, pratique pour les droits d'utilisation et surtout pour garder une **cohérence graphique low poly** sur l'ensemble de la scène. Le positionnement des éléments dans l'environnement s'est fait entre **Blender** et **Three.js Editor**, un workflow qu'on a trouvé assez efficace pour itérer vite.
+For the models, no time to create them in a single night: everything came from **Poly Pizza**, convenient for licensing and especially to maintain a **consistent low-poly art style** across the entire scene. Positioning elements in the environment was done between **Blender** and **Three.js Editor**, a workflow we found quite efficient for fast iteration.
 
-{/* cover: screenshot de l'expérience 3D, idéalement une vue de la scène sous-marine avec un organe visible */}
+{/* cover: screenshot of the 3D experience, ideally a view of the underwater scene with a visible organ */}
 
-## Ce que j'en retiens
+## What I took away
 
-Le vrai défi d'un hackathon, c'est pas de coder des features. C'est de **livrer quelque chose qui fait fini**. On a passé du temps sur les détails qui comptent : un loader propre, une gestion du son soignée, des transitions fluides entre les vues. Et ça a payé : on a remporté le défi **"On veut du gros pixel"** avec notre mode rétro qui pixelise toute la scène 3D via le post-processing. Un ajout qui prenait quelques lignes de code mais qui donnait un effet immédiat.
+The real challenge of a hackathon is not coding features. It's **shipping something that feels finished**. We spent time on the details that matter: a clean loader, polished sound management, smooth transitions between views. And it paid off: we won the **"On veut du gros pixel"** challenge with our retro mode that pixelates the entire 3D scene through post-processing. An addition that took a few lines of code but delivered an immediate effect.
 
-C'était surtout la confirmation que les compétences acquises sur Three.js Journey étaient **directement applicables** sur un projet concret, même sous la pression d'une nuit. Construire un environnement 3D complet — scène, éclairage, shaders, post-processing, interactions, en partant de zéro en quelques heures, ça donne confiance pour la suite.
+Most importantly, it confirmed that the skills we picked up from Three.js Journey were **directly applicable** to a real project, even under the pressure of a single night. Building a complete 3D environment from scratch in a few hours (scene, lighting, shaders, post-processing, interactions) gives you confidence for what comes next.
