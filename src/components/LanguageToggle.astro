@@ -1,0 +1,38 @@
+---
+interface Props {
+  currentLang: "en" | "fr";
+  postSlug: string;
+  availableLangs: ("en" | "fr")[];
+}
+
+const { currentLang, postSlug, availableLangs } = Astro.props;
+
+function langUrl(lang: "en" | "fr") {
+  return lang === "en" ? `/blog/${postSlug}` : `/blog/${postSlug}/${lang}`;
+}
+---
+
+{
+  availableLangs.length > 1 && (
+    <div
+      class="flex gap-1 rounded-lg border border-sage-6 p-0.5 text-sm"
+      role="group"
+      aria-label="Language"
+    >
+      {availableLangs.map((lang) => (
+        <a
+          href={langUrl(lang)}
+          class:list={[
+            "rounded-md px-3 py-1 font-medium uppercase transition-colors",
+            lang === currentLang
+              ? "bg-teal-9 text-white"
+              : "text-sage-11 hover:bg-sage-3",
+          ]}
+          aria-current={lang === currentLang ? "page" : undefined}
+        >
+          {lang}
+        </a>
+      ))}
+    </div>
+  )
+}

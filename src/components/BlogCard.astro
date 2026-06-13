@@ -6,9 +6,10 @@ interface Props {
   tags: string[];
   slug: string;
   draft?: boolean;
+  langs?: ("en" | "fr")[];
 }
 
-const { title, description, date, tags, slug, draft = false } = Astro.props;
+const { title, description, date, tags, slug, draft = false, langs = [] } = Astro.props;
 ---
 
 <a href={`/blog/${slug}`} class="group block">
@@ -24,8 +25,19 @@ const { title, description, date, tags, slug, draft = false } = Astro.props;
       {
         draft && (
           <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
-            brouillon
+            draft
           </span>
+        )
+      }
+      {
+        langs.length > 0 && (
+          <div class="flex gap-1">
+            {langs.map((lang) => (
+              <span class="bg-teal-3 text-teal-11 border-teal-6 rounded-full border px-2 text-xs font-medium uppercase">
+                {lang}
+              </span>
+            ))}
+          </div>
         )
       }
     </div>
@@ -44,7 +56,7 @@ const { title, description, date, tags, slug, draft = false } = Astro.props;
       </div>
       <span class="ml-auto text-xs"
         >{
-          date.toLocaleDateString("fr-FR", {
+          date.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
