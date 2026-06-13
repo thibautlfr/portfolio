@@ -3,7 +3,7 @@ export const navLinks = [
   { label: "PROJECTS", href: "/projects" },
   { label: "BLOG", href: "/blog" },
   { label: "ABOUT", href: "/about" },
-  { label: "CONTACT", href: "/contact" },
+  { label: "CONTACT", href: "#" },
 ] as const;
 
 export const socials = [

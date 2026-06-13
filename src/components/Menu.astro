@@ -20,7 +20,11 @@ import { navLinks, socials } from "../config";
     <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
       {navLinks.map((link, i) => (
         <li class="overflow-hidden">
-          <a class="block" href={link.href}>
+          <a
+            class="block"
+            href={link.href}
+            data-contact={link.label === "CONTACT" ? "" : undefined}
+          >
             {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
           </a>
         </li>
@@ -225,6 +229,23 @@ import { navLinks, socials } from "../config";
         rotation: isOpen ? 0 : ANIM.crossRotation,
         duration: ANIM.slideDuration,
         ease: ANIM.contentEase,
+      });
+    }
+
+    const contactLink = overlay.querySelector<HTMLAnchorElement>("[data-contact]");
+    if (contactLink) {
+      contactLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `mailto:${atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t")}`;
+        document.body.style.overflow = "";
+        if (prefersReduced) {
+          setClosedState();
+        } else {
+          tl.reverse();
+          animateTextClose();
+          animateCross();
+        }
+        isOpen = false;
       });
     }
 
