@@ -8,20 +8,23 @@ const labs = (await getCollection("labs")).sort(
 );
 ---
 
-<BaseLayout pageTitle="Labs — Thibaut LEFRANCOIS" title="Labs">
-  <div class="flex flex-col divide-y">
+<BaseLayout
+  pageTitle="Labs — Thibaut LEFRANCOIS"
+  title="Labs"
+  isCenteredContent={false}
+>
+  <div class="flex flex-col">
     {
-      labs.map((r) => (
-        <div class="py-6 first:pt-0 md:py-8">
-          <LabCard
-            title={r.data.title}
-            description={r.data.description}
-            date={r.data.date}
-            tags={r.data.tags}
-            demo={r.data.demo}
-            repository={r.data.repository}
-          />
-        </div>
+      labs.map((r, i) => (
+        <LabCard
+          id={i.toString()}
+          title={r.data.title}
+          description={r.data.description}
+          date={r.data.date}
+          tags={r.data.tags}
+          demo={r.data.demo}
+          repository={r.data.repository}
+        />
       ))
     }
   </div>

@@ -2,6 +2,7 @@
 import Link from "@components/icons/Link.astro";
 
 interface Props {
+  id: string;
   title: string;
   description: string;
   date: number;
@@ -10,74 +11,65 @@ interface Props {
   repository?: string;
 }
 
-const { title, description, date, tags, demo, repository } = Astro.props;
+const { id, title, description, date, tags, demo, repository } = Astro.props;
+const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
 ---
 
-<article>
-  <div class="flex flex-wrap items-baseline gap-3">
-    {
-      demo ? (
-        <a
-          href={demo}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="hover:text-teal-11 text-lg font-semibold transition-colors"
-        >
-          {title}
-          <span class="sr-only">(ouvre un nouvel onglet)</span>
-        </a>
-      ) : (
-        <p class="text-lg font-semibold">{title}</p>
-      )
-    }
-    <div class="flex flex-wrap gap-2">
-      {
-        tags.map((tag) => (
-          <span class="border-sage-7 rounded-sm border px-2 py-0.5 text-xs">
-            {tag}
-          </span>
-        ))
-      }
+<article
+  class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10"
+>
+  <div class="flex w-1/2 items-center gap-10">
+    <div class="text-sm md:text-base">{expId}</div>
+    <div class="hidden md:block">{date}</div>
+    <div
+      class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
+    >
+      {title}
     </div>
   </div>
-
-  <p class="text-sage-11 mt-2 max-w-prose text-base">{description}</p>
-
-  <div
-    class="text-sage-11 mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
-  >
-    {
-      (demo || repository) && (
-        <div class="flex flex-wrap gap-x-4 gap-y-1">
-          {demo && (
-            <a
-              href={demo}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-teal-9 inline-flex items-center gap-1 underline"
-            >
-              Demo
-              <Link />
-            </a>
-          )}
-          {repository && (
-            <a
-              href={repository}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-teal-9 inline-flex items-center gap-1 underline"
-            >
-              Repository
-              <Link />
-            </a>
-          )}
-        </div>
-      )
-    }
-    <span class="ml-auto text-xs">
-      {
-  date
-      }
-    </span>
+  <div class="hidden md:block">
+    {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
   </div>
+  <div>button</div>
 </article>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
+
+  gsap.registerPlugin(ScrambleTextPlugin);
+
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  document.querySelectorAll<HTMLElement>(".lab-card").forEach((card) => {
+    const titleEl = card.querySelector<HTMLElement>(".lab-card-title");
+    if (!titleEl) return;
+
+    const originalText = titleEl.textContent ?? "";
+    let tween: gsap.core.Tween | null = null;
+
+    card.addEventListener("mouseenter", () => {
+      if (prefersReduced) return;
+      tween?.kill();
+      titleEl.style.width = `${titleEl.offsetWidth}px`;
+      tween = gsap.to(titleEl, {
+        scrambleText: {
+          text: originalText,
+          chars: "!@#$%^&*()",
+          tweenLength: false,
+        },
+        onComplete: () => {
+          titleEl.style.width = "";
+        },
+      });
+    });
+
+    card.addEventListener("mouseleave", () => {
+      tween?.kill();
+      gsap.set(titleEl, { scrambleText: originalText });
+      titleEl.style.width = "";
+    });
+  });
+</script>
