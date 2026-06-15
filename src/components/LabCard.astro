@@ -1,5 +1,7 @@
 ---
 import Link from "@components/icons/Link.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
   id: string;
@@ -9,9 +11,10 @@ interface Props {
   tags: string[];
   demo?: string;
   repository?: string;
+  image?: ImageMetadata;
 }
 
-const { id, title, description, date, tags, demo, repository } = Astro.props;
+const { id, title, description, date, tags, demo, repository, image } = Astro.props;
 const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
 const href = demo || repository;
 ---
@@ -32,9 +35,20 @@ const href = demo || repository;
         {title}
       </div>
     </div>
+
     <div class="hidden md:block">
       {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
     </div>
+
+    { image && (
+      <Image
+        src={image}
+        alt={`${title} project cover`}
+        aria-hidden="true"
+        class="image-hover aspect-video rounded-md border w-1/4 object-cover z-1000"
+        quality={80}
+      />
+    )}
   </a>
 ) : (
   <article
@@ -67,12 +81,23 @@ const href = demo || repository;
 
   document.querySelectorAll<HTMLElement>(".lab-card").forEach((card) => {
     const titleEl = card.querySelector<HTMLElement>(".lab-card-title");
-    if (!titleEl) return;
+    const image = card.querySelector<HTMLElement>(".image-hover");
+    if (!titleEl || !image) return;
 
     const originalText = titleEl.textContent ?? "";
     let tween: gsap.core.Tween | null = null;
+    let tweenImage: gsap.core.Tween | null = null;
 
-    card.addEventListener("mouseenter", () => {
+    gsap.set(image, {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      pointerEvents: "none",
+      opacity: 0,
+      willChange: "transform, opacity",
+    });
+
+    card.addEventListener("mouseenter", (e) => {
       if (prefersReduced) return;
       tween?.kill();
       titleEl.style.width = `${titleEl.offsetWidth}px`;
@@ -86,12 +111,38 @@ const href = demo || repository;
           titleEl.style.width = "";
         },
       });
+
+      gsap.killTweensOf(image);
+      gsap.set(image, { x: e.clientX, y: e.clientY });
+      tweenImage = gsap.to(image, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.2,
+        ease: "power2.out",
+      });
+    });
+
+    card.addEventListener("mousemove", (e) => {
+      if (prefersReduced || !tweenImage) return;
+      gsap.to(image, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.1,
+        ease: "none"
+      });
     });
 
     card.addEventListener("mouseleave", () => {
       tween?.kill();
       gsap.set(titleEl, { scrambleText: originalText });
       titleEl.style.width = "";
+
+      gsap.to(image, {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.2,
+        ease: "power2.in",
+      });
     });
   });
 </script>

@@ -25,6 +25,7 @@ const labs = defineCollection({
     tags: z.array(z.string()).default([]),
     demo: z.url().optional(),
     repository: z.url().optional(),
+    image: z.string().optional(),
   }),
 });
 
