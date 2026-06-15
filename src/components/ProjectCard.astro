@@ -29,7 +29,7 @@ const {
 ---
 
 <article class="flex flex-col gap-6 md:flex-row">
-  <div class="flex flex-col md:min-w-2/4">
+  <div class="flex w-full flex-col justify-between">
     <div class="mb-2 flex items-center gap-3">
       <h3
         class="group-hover:text-teal-11 text-xl font-bold transition-colors md:text-2xl"
@@ -44,18 +44,18 @@ const {
         )
       }
     </div>
-    <div class="flex h-full flex-col gap-3">
+    <div class="flex h-full max-w-prose flex-col gap-3">
       <div>
         <p class="text-sage-11">Date</p>
         <p>{date}</p>
       </div>
       <div>
         <p class="text-sage-11">Description</p>
-        <p class="max-w-[50ch]">{description}</p>
+        <p>{description}</p>
       </div>
       <div>
         <p class="text-sage-11">Stack</p>
-        <div class="flex max-w-prose flex-wrap gap-2 text-xs">
+        <div class="flex flex-wrap gap-2 text-xs">
           {
             stack.map((tech) => (
               <span class="border-sage-7 rounded-sm border px-2 py-1">
@@ -97,7 +97,7 @@ const {
   </div>
   {
     cover && (
-      <a href={live} target="_blank" rel="noopener noreferrer">
+      <a href={live} class="md:w-2/3" target="_blank" rel="noopener noreferrer">
         <Image
           src={cover}
           alt={`${title} project cover`}
