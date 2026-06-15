@@ -1,33 +1,30 @@
 ---
-import Link from "@components/icons/Link.astro";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
 interface Props {
-  id: string;
+  id: number;
   title: string;
-  description: string;
-  date: number;
+  date: Date;
   tags: string[];
   demo: string;
-  repository?: string;
   image?: ImageMetadata;
 }
 
-const { id, title, description, date, tags, demo, repository, image } =
-  Astro.props;
-const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
+const { id, title, date, tags, demo, image } = Astro.props;
+const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
 ---
 
 <a
   href={demo}
-  class="lab-card relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10"
+  class="lab-card border-sage-6 relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10"
   target="_blank"
   rel="noopener noreferrer"
 >
+  <span class="sr-only">(s'ouvre dans un nouvel onglet)</span>
   <div class="flex items-center gap-10">
     <div class="text-sm md:text-base">{expId}</div>
-    <div class="hidden md:block">{date}</div>
+    <div class="hidden md:block">{date.getFullYear()}</div>
     <div
       class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
     >
@@ -43,13 +40,17 @@ const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
     image && (
       <Image
         src={image}
-        alt={`${title} project cover`}
+        alt={`Image for ${title}`}
         aria-hidden="true"
         class="image-hover z-1000 aspect-video w-1/4 rounded-md object-cover shadow-2xl"
         quality={80}
       />
     )
   }
+  <div
+    class="lab-card-border-line bg-sage-12 absolute bottom-0 left-0 h-px w-full origin-left"
+  >
+  </div>
 </a>
 
 <script>
@@ -58,73 +59,106 @@ const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
 
   gsap.registerPlugin(ScrambleTextPlugin);
 
-  const prefersReduced = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  document.addEventListener("astro:page-load", () => {
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
-  document.querySelectorAll<HTMLElement>(".lab-card").forEach((card) => {
-    const titleEl = card.querySelector<HTMLElement>(".lab-card-title");
-    const image = card.querySelector<HTMLElement>(".image-hover");
-    if (!titleEl || !image) return;
+    document.querySelectorAll<HTMLElement>(".lab-card").forEach((card) => {
+      const titleEl = card.querySelector<HTMLElement>(".lab-card-title");
+      const image = card.querySelector<HTMLElement>(".image-hover");
+      const borderLine = card.querySelector<HTMLElement>(
+        ".lab-card-border-line",
+      );
+      if (!titleEl) return;
 
-    const originalText = titleEl.textContent ?? "";
-    let tween: gsap.core.Tween | null = null;
-    let tweenImage: gsap.core.Tween | null = null;
+      if (borderLine) {
+        gsap.set(borderLine, { scaleX: 0 });
+      }
 
-    gsap.set(image, {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      pointerEvents: "none",
-      opacity: 0,
-      willChange: "transform, opacity",
-    });
+      const originalText = titleEl.textContent ?? "";
+      let tween: gsap.core.Tween | null = null;
 
-    card.addEventListener("mouseenter", (e) => {
-      if (prefersReduced) return;
-      tween?.kill();
-      titleEl.style.width = `${titleEl.offsetWidth}px`;
-      tween = gsap.to(titleEl, {
-        scrambleText: {
-          text: originalText,
-          chars: "!@#$%^&*()",
-          tweenLength: false,
-        },
-        onComplete: () => {
-          titleEl.style.width = "";
-        },
+      if (image) {
+        gsap.set(image, {
+          position: "fixed",
+          top: 0,
+          left: 0,
+          pointerEvents: "none",
+          opacity: 0,
+          scale: 0.8,
+          willChange: "transform, opacity",
+        });
+      }
+
+      card.addEventListener("mouseenter", (e) => {
+        if (prefersReduced) return;
+        tween?.kill();
+        titleEl.style.width = `${titleEl.offsetWidth}px`;
+        tween = gsap.to(titleEl, {
+          scrambleText: {
+            text: originalText,
+            chars: "!@#$%^&*()",
+            tweenLength: false,
+          },
+          onComplete: () => {
+            titleEl.style.width = "";
+          },
+        });
+
+        if (borderLine) {
+          gsap.killTweensOf(borderLine);
+          gsap.to(borderLine, {
+            scaleX: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+
+        if (image) {
+          gsap.killTweensOf(image);
+          gsap.set(image, { x: e.clientX, y: e.clientY });
+          gsap.to(image, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.2,
+            ease: "power2.out",
+          });
+        }
       });
 
-      gsap.killTweensOf(image);
-      gsap.set(image, { x: e.clientX, y: e.clientY });
-      tweenImage = gsap.to(image, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.2,
-        ease: "power2.out",
+      card.addEventListener("mousemove", (e) => {
+        if (prefersReduced || !image) return;
+        gsap.to(image, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.1,
+          ease: "none",
+        });
       });
-    });
 
-    card.addEventListener("mousemove", (e) => {
-      if (prefersReduced || !tweenImage) return;
-      gsap.to(image, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.1,
-        ease: "none",
-      });
-    });
+      card.addEventListener("mouseleave", () => {
+        tween?.kill();
+        titleEl.textContent = originalText;
+        titleEl.style.width = "";
 
-    card.addEventListener("mouseleave", () => {
-      tween?.kill();
-      gsap.set(titleEl, { scrambleText: originalText });
-      titleEl.style.width = "";
+        if (borderLine) {
+          gsap.killTweensOf(borderLine);
+          gsap.to(borderLine, {
+            scaleX: 0,
+            duration: 0.3,
+            ease: "power2.in",
+          });
+        }
 
-      gsap.to(image, {
-        opacity: 0,
-        scale: 0.8,
-        duration: 0.2,
-        ease: "power2.in",
+        if (image) {
+          gsap.to(image, {
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.2,
+            ease: "power2.in",
+          });
+        }
       });
     });
   });
