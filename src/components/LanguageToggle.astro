@@ -1,4 +1,6 @@
 ---
+import { blogPostUrl } from "../lib/blog";
+
 interface Props {
   currentLang: "en" | "fr";
   postSlug: string;
@@ -6,10 +8,6 @@ interface Props {
 }
 
 const { currentLang, postSlug, availableLangs } = Astro.props;
-
-function langUrl(lang: "en" | "fr") {
-  return lang === "en" ? `/blog/${postSlug}` : `/blog/${postSlug}/${lang}`;
-}
 ---
 
 {
@@ -21,7 +19,7 @@ function langUrl(lang: "en" | "fr") {
     >
       {availableLangs.map((lang) => (
         <a
-          href={langUrl(lang)}
+          href={blogPostUrl(postSlug, lang)}
           class:list={[
             "rounded-md px-3 py-1 font-medium uppercase transition-colors",
             lang === currentLang
