@@ -21,11 +21,10 @@ const labs = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    date: z.number().int(),
+    date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     demo: z.url(),
     repository: z.url().optional(),
-    image: z.string().optional(),
   }),
 });
 
