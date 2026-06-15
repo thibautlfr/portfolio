@@ -16,8 +16,12 @@ const projects = (await getCollection("projects")).sort(
 );
 ---
 
-<BaseLayout pageTitle="Projects — Thibaut LEFRANCOIS" title="Projects">
-  <div class="flex flex-col divide-y md:max-w-[60vw]">
+<BaseLayout
+  pageTitle="Projects — Thibaut LEFRANCOIS"
+  title="Projects"
+  isCenteredContent={false}
+>
+  <div class="flex w-full flex-col divide-y">
     {
       projects.map((project) => (
         <div class="py-6 first:pt-0 md:py-8">

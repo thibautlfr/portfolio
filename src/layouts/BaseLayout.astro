@@ -12,6 +12,7 @@ interface Props {
   subtitle?: string;
   subtitleCount?: number;
   lang?: string;
+  isCenteredContent?: boolean;
 }
 
 const {
@@ -22,6 +23,7 @@ const {
   subtitle,
   subtitleCount,
   lang = "en",
+  isCenteredContent = true,
 } = Astro.props;
 ---
 
@@ -48,7 +50,10 @@ const {
     <Header />
     <main
       id="main-content"
-      class="flex flex-1 flex-col px-6 py-6 md:px-10 md:py-10 lg:mx-auto lg:px-16"
+      class:list={[
+        "flex flex-1 flex-col px-6 py-6 md:px-10 md:py-10 lg:px-16",
+        isCenteredContent && "lg:mx-auto",
+      ]}
     >
       {
         title && !srOnlyTitle && (
@@ -76,8 +81,13 @@ const {
       }
       <slot />
     </main>
-    <footer class="text-sage-11 px-6 py-6 text-xs md:px-10 lg:px-16">
+    <footer
+      class="text-sage-11 flex items-center justify-between px-6 py-6 text-xs md:px-10 lg:px-16"
+    >
       <p>&copy; {new Date().getFullYear()} Thibaut LEFRANCOIS</p>
+      <a href="/legal-notice" class="hover:text-sage-12 transition-colors"
+        >Legal notice</a
+      >
     </footer>
   </body>
 </html>

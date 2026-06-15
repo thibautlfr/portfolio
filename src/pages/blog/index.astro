@@ -2,19 +2,13 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import BlogCard from "@components/BlogCard.astro";
 import { getCollection } from "astro:content";
+import { groupPostsBySlug } from "../../lib/blog";
 
 const allPosts = (await getCollection("blog")).filter(
   (post) => import.meta.env.DEV || !post.data.draft,
 );
 
-const grouped = new Map<string, Record<string, (typeof allPosts)[0]>>();
-for (const post of allPosts) {
-  const postSlug = post.id.split("/").slice(0, -1).join("/");
-  if (!grouped.has(postSlug)) grouped.set(postSlug, {});
-  grouped.get(postSlug)![post.data.lang] = post;
-}
-
-const displayPosts = [...grouped.entries()]
+const displayPosts = [...groupPostsBySlug(allPosts).entries()]
   .map(([postSlug, versions]) => {
     const primary = versions.en ?? versions.fr;
     return {

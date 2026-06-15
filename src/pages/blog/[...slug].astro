@@ -5,46 +5,40 @@ import LanguageToggle from "@components/LanguageToggle.astro";
 import { getCollection, render } from "astro:content";
 import "../../styles/blog.css";
 import Link from "@components/icons/Link.astro";
+import { groupPostsBySlug, blogPostUrl } from "../../lib/blog";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog")).filter(
     (post) => import.meta.env.DEV || !post.data.draft,
   );
 
-  const grouped = new Map<string, Record<string, (typeof posts)[0]>>();
-  for (const post of posts) {
-    const postSlug = post.id.split("/").slice(0, -1).join("/");
-    if (!grouped.has(postSlug)) grouped.set(postSlug, {});
-    grouped.get(postSlug)![post.data.lang] = post;
-  }
+  return [...groupPostsBySlug(posts).entries()].flatMap(
+    ([postSlug, versions]) => {
+      const availableLangs = Object.keys(versions) as ("en" | "fr")[];
+      const paths = [];
 
-  return [...grouped.entries()].flatMap(([postSlug, versions]) => {
-    const availableLangs = Object.keys(versions) as ("en" | "fr")[];
-    const paths = [];
+      if (versions.en) {
+        paths.push({
+          params: { slug: postSlug },
+          props: { post: versions.en, postSlug, availableLangs },
+        });
+      } else if (versions.fr) {
+        paths.push({
+          params: { slug: postSlug },
+          props: { post: versions.fr, postSlug, availableLangs },
+        });
+      }
 
-    if (versions.en) {
-      paths.push({
-        params: { slug: postSlug },
-        props: { post: versions.en, postSlug, availableLangs },
-      });
-    }
+      if (versions.fr) {
+        paths.push({
+          params: { slug: `${postSlug}/fr` },
+          props: { post: versions.fr, postSlug, availableLangs },
+        });
+      }
 
-    if (versions.fr) {
-      paths.push({
-        params: { slug: `${postSlug}/fr` },
-        props: { post: versions.fr, postSlug, availableLangs },
-      });
-    }
-
-    if (!versions.en && versions.fr) {
-      paths.push({
-        params: { slug: postSlug },
-        props: { post: versions.fr, postSlug, availableLangs },
-      });
-    }
-
-    return paths;
-  });
+      return paths;
+    },
+  );
 }
 
 const { post, postSlug, availableLangs } = Astro.props;
@@ -61,8 +55,13 @@ const tocLabel = post.data.lang === "fr" ? "Sommaire" : "Table of contents";
     {
       availableLangs.length > 1 && (
         <>
-          <link rel="alternate" hreflang="en" href={`/blog/${postSlug}`} />
-          <link rel="alternate" hreflang="fr" href={`/blog/${postSlug}/fr`} />
+          {availableLangs.map((lang) => (
+            <link
+              rel="alternate"
+              hreflang={lang}
+              href={blogPostUrl(postSlug, lang)}
+            />
+          ))}
         </>
       )
     }
