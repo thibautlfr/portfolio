@@ -2,26 +2,37 @@
 import LabCard from "@components/LabCard.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import type { ImageMetadata } from "astro";
 
 const labs = (await getCollection("labs")).sort(
-  (a, b) => b.data.date - a.data.date,
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const covers = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/labs/*.webp",
+  { eager: true },
 );
 ---
 
-<BaseLayout pageTitle="Labs — Thibaut LEFRANCOIS" title="Labs">
-  <div class="flex flex-col divide-y">
+<BaseLayout
+  pageTitle="Labs — Thibaut LEFRANCOIS"
+  title="Labs"
+  isCenteredContent={false}
+>
+  <div
+    class="flex flex-col [&:hover>.lab-card]:opacity-20 [&:hover>.lab-card:hover]:opacity-100 [&>.lab-card]:transition-opacity [&>.lab-card]:duration-300"
+  >
     {
-      labs.map((r) => (
-        <div class="py-6 first:pt-0 md:py-8">
-          <LabCard
-            title={r.data.title}
-            description={r.data.description}
-            date={r.data.date}
-            tags={r.data.tags}
-            demo={r.data.demo}
-            repository={r.data.repository}
-          />
-        </div>
+      labs.map((lab, i) => (
+        <LabCard
+          id={labs.length - 1 - i}
+          title={lab.data.title}
+          date={lab.data.date}
+          tags={lab.data.tags}
+          demo={lab.data.demo}
+          repository={lab.data.repository}
+          image={covers[`/src/assets/labs/${lab.id}.webp`]?.default}
+        />
       ))
     }
   </div>
