@@ -23,7 +23,7 @@ const labs = defineCollection({
     description: z.string(),
     date: z.number().int(),
     tags: z.array(z.string()).default([]),
-    demo: z.url().optional(),
+    demo: z.url(),
     repository: z.url().optional(),
     image: z.string().optional(),
   }),

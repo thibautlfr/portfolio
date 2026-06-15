@@ -9,65 +9,48 @@ interface Props {
   description: string;
   date: number;
   tags: string[];
-  demo?: string;
+  demo: string;
   repository?: string;
   image?: ImageMetadata;
 }
 
-const { id, title, description, date, tags, demo, repository, image } = Astro.props;
+const { id, title, description, date, tags, demo, repository, image } =
+  Astro.props;
 const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
-const href = demo || repository;
 ---
 
-{href ? (
-  <a
-    href={href}
-    class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10 cursor-pointer"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    <div class="flex w-1/2 items-center gap-10">
-      <div class="text-sm md:text-base">{expId}</div>
-      <div class="hidden md:block">{date}</div>
-      <div
-        class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
-      >
-        {title}
-      </div>
+<a
+  href={demo}
+  class="lab-card relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <div class="flex items-center gap-10">
+    <div class="text-sm md:text-base">{expId}</div>
+    <div class="hidden md:block">{date}</div>
+    <div
+      class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
+    >
+      {title}
     </div>
+  </div>
 
-    <div class="hidden md:block">
-      {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
-    </div>
+  <div class="hidden md:block">
+    {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
+  </div>
 
-    { image && (
+  {
+    image && (
       <Image
         src={image}
         alt={`${title} project cover`}
         aria-hidden="true"
-        class="image-hover aspect-video rounded-md border w-1/4 object-cover z-1000"
+        class="image-hover z-1000 aspect-video w-1/4 rounded-md object-cover shadow-2xl"
         quality={80}
       />
-    )}
-  </a>
-) : (
-  <article
-    class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10"
-  >
-    <div class="flex w-1/2 items-center gap-10">
-      <div class="text-sm md:text-base">{expId}</div>
-      <div class="hidden md:block">{date}</div>
-      <div
-        class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
-      >
-        {title}
-      </div>
-    </div>
-    <div class="hidden md:block">
-      {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
-    </div>
-  </article>
-)}
+    )
+  }
+</a>
 
 <script>
   import { gsap } from "gsap";
@@ -128,7 +111,7 @@ const href = demo || repository;
         x: e.clientX,
         y: e.clientY,
         duration: 0.1,
-        ease: "none"
+        ease: "none",
       });
     });
 

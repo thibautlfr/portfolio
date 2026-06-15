@@ -19,7 +19,9 @@ const covers = import.meta.glob<{ default: ImageMetadata }>(
   title="Labs"
   isCenteredContent={false}
 >
-  <div class="flex flex-col">
+  <div
+    class="flex flex-col [&:hover>a]:opacity-20 [&:hover>a:hover]:opacity-100 [&>a]:transition-opacity [&>a]:duration-300"
+  >
     {
       labs.map((lab, i) => (
         <LabCard
@@ -30,9 +32,7 @@ const covers = import.meta.glob<{ default: ImageMetadata }>(
           tags={lab.data.tags}
           demo={lab.data.demo}
           repository={lab.data.repository}
-          image={
-            covers[`/src/assets/labs/${lab.id}.webp`]?.default
-          }
+          image={covers[`/src/assets/labs/${lab.id}.webp`]?.default}
         />
       ))
     }
