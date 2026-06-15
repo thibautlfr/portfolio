@@ -5,7 +5,7 @@ import { getCollection } from "astro:content";
 import type { ImageMetadata } from "astro";
 
 const covers = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/projects/*/3d-carousel.webp",
+  "/src/assets/projects/*/cover.webp",
   { eager: true },
 );
 
