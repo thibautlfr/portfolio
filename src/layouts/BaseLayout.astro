@@ -81,8 +81,13 @@ const {
       }
       <slot />
     </main>
-    <footer class="text-sage-11 px-6 py-6 text-xs md:px-10 lg:px-16">
+    <footer
+      class="text-sage-11 flex items-center justify-between px-6 py-6 text-xs md:px-10 lg:px-16"
+    >
       <p>&copy; {new Date().getFullYear()} Thibaut LEFRANCOIS</p>
+      <a href="/legal-notice" class="hover:text-sage-12 transition-colors"
+        >Legal notice</a
+      >
     </footer>
   </body>
 </html>

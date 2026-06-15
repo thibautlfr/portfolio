@@ -1,0 +1,102 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout pageTitle="Legal Notice — Thibaut LEFRANCOIS" title="Legal notice">
+  <div
+    class="text-sage-11 flex max-w-prose flex-col gap-5 text-base leading-relaxed md:gap-6"
+  >
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Publisher</h2>
+      <div class="mt-3 flex flex-col gap-1">
+        <p>Thibaut LEFRANCOIS</p>
+        <p>Individual</p>
+        <p>
+          Contact: <a
+            data-email
+            class="text-sage-12 cursor-pointer underline"></a
+          >
+        </p>
+      </div>
+      <p class="mt-3 text-sm">
+        In accordance with article 6-III-2 of French law no. 2004-575 of 21 June
+        2004 (LCEN), an individual publisher is not required to disclose their
+        personal address. This information has been communicated to the hosting
+        provider.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Hosting</h2>
+      <div class="mt-3 flex flex-col gap-1">
+        <p>Netlify, Inc.</p>
+        <p>512 2nd Street, Suite 200</p>
+        <p>San Francisco, CA 94107, United States</p>
+        <p>
+          <a
+            href="https://www.netlify.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sage-12 underline"
+            >www.netlify.com<span class="sr-only"> (opens in new tab)</span></a
+          >
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
+        Intellectual property
+      </h2>
+      <p class="mt-3">
+        All content on this website (text, images, source code, graphic
+        elements) is the property of Thibaut LEFRANCOIS unless otherwise stated.
+        Any reproduction, representation, or distribution, in whole or in part,
+        without prior authorization is prohibited.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
+        Personal data
+      </h2>
+      <p class="mt-3">
+        This website does not collect any personal data. No cookies, trackers,
+        or analytics tools are used.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Liability</h2>
+      <p class="mt-3">
+        The publisher strives to provide information that is as accurate as
+        possible. However, they cannot be held responsible for omissions,
+        inaccuracies, or outcomes resulting from the misuse of this information.
+      </p>
+      <p class="mt-3">
+        This website may contain links to third-party sites. The publisher
+        accepts no responsibility for the content of these external websites.
+      </p>
+    </section>
+
+    <section>
+      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
+        Applicable law
+      </h2>
+      <p class="mt-3">
+        This legal notice is governed by French law. In the event of a dispute,
+        French courts shall have exclusive jurisdiction.
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const link = document.querySelector<HTMLAnchorElement>("[data-email]");
+    if (!link) return;
+    const email = atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t");
+    link.textContent = email;
+    link.href = `mailto:${email}`;
+  });
+</script>
