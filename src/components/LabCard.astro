@@ -13,25 +13,47 @@ interface Props {
 
 const { id, title, description, date, tags, demo, repository } = Astro.props;
 const expId = `EXP ${String(Number(id) + 1).padStart(3, "0")}`;
+const href = demo || repository;
 ---
 
-<article
-  class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10"
->
-  <div class="flex w-1/2 items-center gap-10">
-    <div class="text-sm md:text-base">{expId}</div>
-    <div class="hidden md:block">{date}</div>
-    <div
-      class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
-    >
-      {title}
+{href ? (
+  <a
+    href={href}
+    class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10 cursor-pointer"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <div class="flex w-1/2 items-center gap-10">
+      <div class="text-sm md:text-base">{expId}</div>
+      <div class="hidden md:block">{date}</div>
+      <div
+        class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
+      >
+        {title}
+      </div>
     </div>
-  </div>
-  <div class="hidden md:block">
-    {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
-  </div>
-  <div>button</div>
-</article>
+    <div class="hidden md:block">
+      {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
+    </div>
+  </a>
+) : (
+  <article
+    class="lab-card relative flex flex-1 items-center justify-between border-b py-6 md:py-10"
+  >
+    <div class="flex w-1/2 items-center gap-10">
+      <div class="text-sm md:text-base">{expId}</div>
+      <div class="hidden md:block">{date}</div>
+      <div
+        class="lab-card-title overflow-hidden text-xl whitespace-nowrap md:text-2xl"
+      >
+        {title}
+      </div>
+    </div>
+    <div class="hidden md:block">
+      {tags.map((tag) => <span class="pl-2 first:pl-0">{tag}</span>)}
+    </div>
+  </article>
+)}
 
 <script>
   import { gsap } from "gsap";
