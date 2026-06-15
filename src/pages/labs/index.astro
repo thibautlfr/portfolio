@@ -20,7 +20,7 @@ const covers = import.meta.glob<{ default: ImageMetadata }>(
   isCenteredContent={false}
 >
   <div
-    class="flex flex-col [&:hover>.lab-card]:opacity-20 [&:hover>.lab-card:hover]:opacity-100 [&>.lab-card]:transition-opacity [&>.lab-card]:duration-300"
+    class="flex flex-col [&:hover>.lab-card]:opacity-20 [&:hover>.lab-card:hover]:opacity-100 [&:focus-within>.lab-card]:opacity-20 [&:focus-within>.lab-card:focus-within]:opacity-100 [&>.lab-card]:transition-opacity [&>.lab-card]:duration-300"
   >
     {
       labs.map((lab, i) => (

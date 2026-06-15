@@ -18,11 +18,11 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
 ---
 
 <div
-  class="lab-card border-sage-6 relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10"
+  class="lab-card border-sage-6 relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10 focus-within:outline focus-within:outline-2 focus-within:outline-current focus-within:outline-offset-2"
 >
   <a
     href={demo}
-    class="absolute inset-0 z-0"
+    class="absolute inset-0 z-0 outline-none"
     target="_blank"
     rel="noopener noreferrer"
   >
@@ -131,33 +131,61 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
         });
       }
 
+      const handleEnter = () => {
+        if (prefersReduced) return;
+        tween?.kill();
+        titleEl.style.width = `${titleEl.offsetWidth}px`;
+        tween = gsap.to(titleEl, {
+          scrambleText: {
+            text: originalText,
+            chars: "!@#$%^&*()",
+            tweenLength: false,
+          },
+          onComplete: () => {
+            titleEl.style.width = "";
+          },
+        });
+
+        if (borderLine) {
+          gsap.killTweensOf(borderLine);
+          gsap.to(borderLine, {
+            scaleX: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+      };
+
+      const handleLeave = () => {
+        tween?.kill();
+        titleEl.textContent = originalText;
+        titleEl.style.width = "";
+
+        if (borderLine) {
+          gsap.killTweensOf(borderLine);
+          gsap.to(borderLine, {
+            scaleX: 0,
+            duration: 0.3,
+            ease: "power2.in",
+          });
+        }
+
+        if (image) {
+          gsap.to(image, {
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.2,
+            ease: "power2.in",
+          });
+        }
+      };
+
       card.addEventListener(
         "mouseenter",
         (e) => {
-          if (prefersReduced) return;
-          tween?.kill();
-          titleEl.style.width = `${titleEl.offsetWidth}px`;
-          tween = gsap.to(titleEl, {
-            scrambleText: {
-              text: originalText,
-              chars: "!@#$%^&*()",
-              tweenLength: false,
-            },
-            onComplete: () => {
-              titleEl.style.width = "";
-            },
-          });
+          handleEnter();
 
-          if (borderLine) {
-            gsap.killTweensOf(borderLine);
-            gsap.to(borderLine, {
-              scaleX: 1,
-              duration: 0.5,
-              ease: "power2.out",
-            });
-          }
-
-          if (image) {
+          if (image && !prefersReduced) {
             gsap.killTweensOf(image);
             gsap.set(image, { x: e.clientX, y: e.clientY });
             gsap.to(image, {
@@ -185,33 +213,10 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
         { signal },
       );
 
-      card.addEventListener(
-        "mouseleave",
-        () => {
-          tween?.kill();
-          titleEl.textContent = originalText;
-          titleEl.style.width = "";
+      card.addEventListener("mouseleave", handleLeave, { signal });
 
-          if (borderLine) {
-            gsap.killTweensOf(borderLine);
-            gsap.to(borderLine, {
-              scaleX: 0,
-              duration: 0.3,
-              ease: "power2.in",
-            });
-          }
-
-          if (image) {
-            gsap.to(image, {
-              opacity: 0,
-              scale: 0.8,
-              duration: 0.2,
-              ease: "power2.in",
-            });
-          }
-        },
-        { signal },
-      );
+      card.addEventListener("focusin", handleEnter, { signal });
+      card.addEventListener("focusout", handleLeave, { signal });
     });
   });
 </script>
