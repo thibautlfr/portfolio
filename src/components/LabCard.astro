@@ -18,7 +18,7 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
 ---
 
 <div
-  class="lab-card border-sage-6 relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 md:py-10 focus-within:outline focus-within:outline-2 focus-within:outline-current focus-within:outline-offset-2"
+  class="lab-card border-sage-6 relative flex flex-1 cursor-pointer items-center justify-between border-b py-6 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-current md:py-10"
 >
   <a
     href={demo}
@@ -73,6 +73,7 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
         alt={`Image for ${title}`}
         aria-hidden="true"
         class="image-hover z-1000 aspect-video w-1/4 rounded-md object-cover shadow-2xl"
+        style="display:none"
         quality={80}
       />
     )
@@ -121,11 +122,12 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
 
       if (image) {
         gsap.set(image, {
+          display: "block",
           position: "fixed",
           top: 0,
           left: 0,
           pointerEvents: "none",
-          opacity: 0,
+          autoAlpha: 0,
           scale: 0.8,
           willChange: "transform, opacity",
         });
@@ -172,7 +174,7 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
 
         if (image) {
           gsap.to(image, {
-            opacity: 0,
+            autoAlpha: 0,
             scale: 0.8,
             duration: 0.2,
             ease: "power2.in",
@@ -189,7 +191,7 @@ const expId = `EXP ${String(id + 1).padStart(3, "0")}`;
             gsap.killTweensOf(image);
             gsap.set(image, { x: e.clientX, y: e.clientY });
             gsap.to(image, {
-              opacity: 1,
+              autoAlpha: 1,
               scale: 1,
               duration: 0.2,
               ease: "power2.out",
