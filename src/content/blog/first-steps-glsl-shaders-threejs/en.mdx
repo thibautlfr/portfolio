@@ -16,7 +16,7 @@ import carouselResultat from "@assets/blog/carousel-3d-resultat.webp";
 
 I never thought I'd be glad to see sines and cosines again. Yet that's exactly what happened when I started writing my first GLSL shaders. Those trigonometric functions we learned in high school without really knowing what they'd be useful for "in real life." They're everywhere in creative development. Oscillations, deformations, periodic animations: trig is the foundation.
 
-This article is a hands-on account. I'm not a shader expert. This is my first solo project after learning the basics of GLSL through [Three.js Journey](https://threejs-journey.com/), the official docs, and plenty of examples on [Awwwards](https://www.awwwards.com/) and [Codrops](https://tympanus.net/codrops/). My approach: learn something, then build something to test what I just learned. No client brief, no ambitious project needed. Just an idea, an `npm create` command, and off we go.
+This article is a hands-on account. I'm not a shader expert. This is my first solo project after learning the basics of GLSL through <a href="https://threejs-journey.com/" target="_blank" rel="noopener noreferrer">Three.js Journey</a>, the official docs, and plenty of examples on <a href="https://www.awwwards.com/" target="_blank" rel="noopener noreferrer">Awwwards</a> and <a href="https://tympanus.net/codrops/" target="_blank" rel="noopener noreferrer">Codrops</a>. My approach: learn something, then build something to test what I just learned. No client brief, no ambitious project needed. Just an idea, an `npm create` command, and off we go.
 
 The result is an infinite 3D image carousel, where each image reacts to scroll and mouse input through shaders. Here's what it looks like:
 
@@ -36,7 +36,7 @@ The result is an infinite 3D image carousel, where each image reacts to scroll a
 
 Before touching shaders, you need a solid foundation. I built my own native Three.js boilerplate: a modular architecture with scene, camera, renderer, resource management, render loop, and debug tools. It lets me focus directly on the actual work without reconfiguring everything for each project. I'll write a dedicated article about it, but in short: an `Experience` singleton class orchestrates everything, and each component (camera, world, carousel) is self-contained.
 
-For shaders specifically, I use [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) which allows importing `.glsl` files directly into TypeScript. It avoids writing GLSL in template literals and gives you syntax highlighting in the IDE.
+For shaders specifically, I use <a href="https://github.com/UstymUkhman/vite-plugin-glsl" target="_blank" rel="noopener noreferrer">vite-plugin-glsl</a> which allows importing `.glsl` files directly into TypeScript. It avoids writing GLSL in template literals and gives you syntax highlighting in the IDE.
 
 ## The vertex shader: deforming geometry
 
