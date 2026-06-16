@@ -1,0 +1,146 @@
+---
+title: "I just wanted a portfolio. I ended up rethinking the whole stack."
+description: "How a closing platform, a failed React experiment, and a content management headache led me to Astro for my developer portfolio."
+date: 2026-06-16
+tags: [astro, frontend, retrospective]
+links:
+  - label: "View the source code"
+    url: "https://github.com/thibautlfr/portfolio"
+draft: false
+lang: en
+---
+
+I wanted something simple: a portfolio site, no backend, where I could easily add projects and write blog posts without touching code every time. Sounds trivial. It took me three attempts and two framework discoveries to get there.
+
+This is the story of how I went from a hosted page on bento.me, through a custom React grid that fell apart under its own complexity, to a full rebuild with <a href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a> that finally matches how I actually work.
+
+## When bento.me shut down
+
+For a while, I had a page on bento.me. It worked fine as a showcase: a grid of cards, links to my socials, a quick overview of what I do. Zero maintenance, zero code. Then the platform announced it was closing.
+
+I needed a replacement fast. My first instinct was to rebuild something similar myself. A bento-style grid, custom-made, that I could host anywhere. I spun up a React + TypeScript project and got to work. The <a href="https://my-bento-chi.vercel.app/" target="_blank" rel="noopener noreferrer">result</a> looked decent. The <a href="https://github.com/thibautlfr/my-bento" target="_blank" rel="noopener noreferrer">code</a> was clean enough for a first pass.
+
+But I quickly realized that a static grid wasn't going to cut it. I wanted to add content over time without diving back into components and JSX every time. So I started a new branch with an idea: what if I could drive the whole grid from a JSON config file?
+
+## The JSON config trap
+
+The concept was appealing. A single JSON file that describes every card in the grid: its type, its content, its size, its position. Import the config, map over it, render the right component for each card type. Adding a new project would mean adding a few lines of JSON, not writing React code.
+
+In practice, it turned into a nightmare.
+
+The project was pure React + TypeScript, with no libraries beyond the basics. No Zod for validation, no content framework, no schema layer. Every card type needed its own mapping logic. Every config field needed type guards. The more card types I added, the more brittle the system became. A typo in the JSON would silently break a card. A missing field would crash the grid. I was spending more time writing type-safe config interpreters than actually building the site.
+
+I slowed down, then stopped. The tool was fighting me instead of helping me.
+
+## Discovering the right tools
+
+I shared my frustrations with colleagues. One of them mentioned <a href="https://content.nuxt.com/" target="_blank" rel="noopener noreferrer">Nuxt Content</a>. Another pointed me to <a href="https://astro.build/" target="_blank" rel="noopener noreferrer">Astro</a>. Both frameworks had a content layer built in: you write files in a structured format, define a schema, and the framework handles validation, typing, and querying. Exactly what I had been trying to build by hand.
+
+I was immediately excited. After weeks of fighting with manual config parsing, seeing a framework that just does this out of the box felt like discovering that the wheel already exists while you're busy carving one from a tree trunk.
+
+But now I had to choose between the two.
+
+## Why Astro over Nuxt Content
+
+I spent some time researching both options. Here's what tipped the scale toward Astro:
+
+- **Lighter by design.** Astro ships zero JavaScript by default. HTML, CSS, and JS only when you need it. For a portfolio that's mostly static content, this is exactly right. Nuxt, even with its static mode, carries the Vue runtime overhead
+- **Framework freedom.** Astro doesn't lock you into a single UI library. You can use React, Vue, Svelte, or plain HTML in the same project. Nuxt is Vue-only. For someone who works across different stacks, that flexibility matters
+- **Maturity and ecosystem.** Astro was already well-established with a large community and solid documentation. Nuxt Content, while promising, was still relatively new and evolving
+- **Performance focus.** Astro's architecture is built around shipping the minimum amount of client-side code. For a portfolio, where first impressions and loading speed matter, that aligned perfectly with what I wanted
+
+The deciding factor was the philosophy: Astro lets you use the strict minimum for maximum performance. It doesn't assume you need a SPA. It doesn't assume you need client-side routing. It gives you HTML and gets out of the way.
+
+## How Astro solves the content problem
+
+The pain point with my-bento was managing structured content without proper tooling. Astro's content collections solve this completely.
+
+Here's how my content is structured. I define schemas in a single configuration file:
+
+```typescript title="src/content.config.ts"
+const blog = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+    project: z.string().optional(),
+    links: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.url(),
+        }),
+      )
+      .default([]),
+    draft: z.boolean().default(false),
+    lang: z.enum(["en", "fr"]).default("en"),
+  }),
+});
+```
+
+This is the blog collection. Every `.mdx` file in `src/content/blog/` is validated against this schema at build time. A missing title? Build error. A malformed URL in the links? Build error. No more silent failures, no more manual type guards. Zod handles it all, and Astro gives me full TypeScript inference on the result.
+
+The same pattern applies to projects and labs:
+
+```
+src/
+├── content/
+│   ├── blog/
+│   │   └── first-steps-glsl-shaders-threejs/
+│   │       ├── en.mdx
+│   │       └── fr.mdx
+│   ├── projects/
+│   │   ├── ocean-heartbeat.mdx
+│   │   └── youbook-marseille.mdx
+│   └── labs/
+│       ├── 3d-carousel.mdx
+│       ├── 3d-text.mdx
+│       └── galaxy-configurator.mdx
+├── components/
+├── layouts/
+├── pages/
+└── config.ts
+```
+
+Each content type has its own folder, its own schema, and its own set of `.mdx` files. Adding a new blog post means creating a new `.mdx` file with the right frontmatter. No component to write, no config to update, no mapping logic to maintain.
+
+Here's what a blog post looks like in practice:
+
+```yaml title="src/content/blog/first-steps-glsl-shaders-threejs/en.mdx"
+---
+title: "High school trigonometry came back for me: my first GLSL shaders"
+description: "A walkthrough of my first steps with vertex and fragment shaders in GLSL."
+date: 2026-06-11
+tags: [threejs, glsl, shaders, creative-dev]
+project: 3d-carousel
+links:
+  - label: "View the demo"
+    url: "https://thibautlfr.github.io/3d-carousel/"
+draft: false
+lang: en
+---
+```
+
+Clean, declarative, validated. Compare this with writing JSON configs and type guards by hand. The difference is night and day.
+
+## Islands Architecture: the blog game-changer
+
+Choosing Astro wasn't just about the portfolio pages. A big motivation was building a blog where I could share my research in creative development. And for a creative dev blog, static text and code blocks aren't always enough. Sometimes you want the reader to interact with the thing you're explaining.
+
+This is where Astro's <a href="https://docs.astro.build/en/concepts/islands/" target="_blank" rel="noopener noreferrer">Islands Architecture</a> becomes a superpower. The concept: your page is static HTML by default, but you can drop in interactive components (React, Vue, Svelte, anything) that hydrate independently. The rest of the page stays zero-JS.
+
+For my blog, this means I can write a post explaining a shader technique, and embed a live, interactive Three.js demo right in the article. Or a Vue component that lets the reader tweak parameters and see the result. The component hydrates on its own; the surrounding text never ships a single byte of JavaScript.
+
+The `client:visible` directive is particularly elegant: the component only hydrates when it scrolls into view. For a long article with a demo at the bottom, the reader doesn't pay the loading cost until they actually reach it.
+
+This is exactly the kind of blog I had in mind: technical writing with interactive proof-of-concepts baked in. And the fact that I can mix frameworks (a React component here, a Vue component there) means I'm never limited by a single ecosystem. If I build a demo in React for one project and a Vue component for another, both can live in the same blog post.
+
+## Still a work in progress
+
+The portfolio isn't finished as I write this. The design is still evolving. Some pages are more polished than others. But the foundation is solid, and more importantly, the content workflow works exactly as I wanted.
+
+I can write a new blog post by creating an `.mdx` file. I can add a project by writing a few lines of frontmatter. I can embed interactive demos without hacking around the framework. Astro doesn't get in the way; it just does what I need and ships the leanest possible output.
+
+Looking back, the detour through my-bento wasn't wasted time. It taught me precisely what I needed from a content framework, and why trying to build one from scratch in raw React is the wrong approach. Sometimes you need to hit the wall before you appreciate the door right next to it.
