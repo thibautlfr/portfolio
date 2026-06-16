@@ -1,0 +1,43 @@
+---
+title: "Portfolio"
+description: "My personal portfolio and creative dev blog, built with Astro, MDX content collections, Tailwind CSS v4, and GSAP animations. Designed for performance, content flexibility, and interactive blog posts through Islands Architecture."
+date: 2026
+status: "wip"
+stack:
+  [
+    "Astro",
+    "MDX",
+    "TypeScript",
+    "Tailwind CSS",
+    "GSAP",
+  ]
+repository: "https://github.com/thibautlfr/portfolio"
+live: "https://thibaut-lefrancois.com"
+featured: false
+---
+
+A static portfolio that feels dynamic. No backend, no CMS, no database. Just `.mdx` files, typed schemas, and a framework that ships zero JavaScript by default.
+
+## Why I built it
+
+I needed a place to showcase my projects and, more importantly, to write about my creative development research. The previous solution was a bento-style grid built in React + TypeScript, but managing content through JSON configs became unmanageable without a proper content layer. Astro solved that entirely.
+
+The full story behind this choice is told in a dedicated blog post.
+
+## How content works
+
+Everything revolves around Astro's content collections. Three collections (projects, labs, blog), each with a Zod schema that validates frontmatter at build time. Adding content means creating an `.mdx` file with the right fields. No component to write, no config to update.
+
+Blog posts support bilingual content (English and French) through a folder-based structure with `en.mdx` and `fr.mdx` files. The schema enforces a `lang` field, and the routing layer handles language switching.
+
+## The blog angle
+
+The blog is the real motivation behind this portfolio. I wanted a space to document my creative development experiments: shaders, 3D, generative art. Static text and code blocks are a good start, but sometimes the reader needs to interact with what's being explained.
+
+Astro's Islands Architecture makes this possible. Interactive components (Three.js demos, parameter tweakers, live previews) hydrate independently inside otherwise static pages. The `client:visible` directive delays hydration until the component scrolls into view, so the reader never pays for something they haven't reached yet.
+
+The ability to mix frameworks (React, Vue, Svelte) in the same article means I'm never locked into one ecosystem for demos.
+
+## Design and animations
+
+The visual direction is minimalist but intentional. Radix UI Colors for a consistent palette, Cabinet Grotesk and Satoshi for typography, and GSAP for the menu and page transition animations. The goal is to keep the design clean enough that the content stays front and center, while leaving room for creative expression on lab and project pages.
