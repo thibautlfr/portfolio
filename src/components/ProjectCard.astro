@@ -3,6 +3,11 @@ import Link from "@components/icons/Link.astro";
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
+interface Deployment {
+  name: string;
+  url: string;
+}
+
 interface Props {
   title: string;
   description: string;
@@ -11,6 +16,7 @@ interface Props {
   stack: string[];
   slug: string;
   live?: string;
+  deployments?: Deployment[];
   repository?: string;
   cover?: ImageMetadata;
 }
@@ -23,6 +29,7 @@ const {
   stack,
   slug,
   live,
+  deployments,
   repository,
   cover,
 } = Astro.props;
@@ -66,29 +73,41 @@ const {
         </div>
       </div>
       {
-        live && (
-          <div class="md:mt-auto">
-            <p class="text-sage-11">Demo</p>
-            <a
-              href={live}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-teal-9 inline-flex items-center gap-1 underline"
-            >
-              {live}
-              <Link />
-            </a>
-            <br />
+        (deployments || repository) && (
+          <div class="md:mt-auto flex flex-col gap-3">
+            {deployments && deployments.length > 0 && (
+              <div>
+                <p class="text-sage-11">Deployments</p>
+                <ul class="mt-1 flex flex-col gap-1">
+                  {deployments.map((d) => (
+                    <li>
+                      <a
+                        href={d.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hover:text-teal-9 inline-flex items-center gap-1 text-sm underline"
+                      >
+                        {d.name}
+                        <Link />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {repository && (
-              <a
-                href={repository}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover:text-teal-9 inline-flex items-center gap-1 underline"
-              >
-                {repository}
-                <Link />
-              </a>
+              <div>
+                <p class="text-sage-11">Code Source</p>
+                <a
+                  href={repository}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover:text-teal-9 inline-flex items-center gap-1 text-sm underline"
+                >
+                  {repository}
+                  <Link />
+                </a>
+              </div>
             )}
           </div>
         )
