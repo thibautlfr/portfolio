@@ -32,7 +32,6 @@ const projects = (await getCollection("projects")).sort(
             status={project.data.status}
             stack={project.data.stack}
             slug={project.id}
-            live={project.data.live}
             deployments={project.data.deployments}
             repository={project.data.repository}
             cover={

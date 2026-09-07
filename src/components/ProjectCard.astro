@@ -15,7 +15,6 @@ interface Props {
   status: "finished" | "wip";
   stack: string[];
   slug: string;
-  live?: string;
   deployments?: Deployment[];
   repository?: string;
   cover?: ImageMetadata;
@@ -28,7 +27,6 @@ const {
   status,
   stack,
   slug,
-  live,
   deployments,
   repository,
   cover,
@@ -115,18 +113,32 @@ const {
     </div>
   </div>
   {
-    cover && (
-      <a href={live} class="md:w-2/3" target="_blank" rel="noopener noreferrer">
-        <Image
-          src={cover}
-          alt={`${title} project cover`}
-          aria-hidden="true"
-          class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
-          width={1200}
-          densities={[1, 2]}
-          quality={80}
-        />
-      </a>
-    )
+    cover && (() => {
+      const href = deployments?.[0]?.url;
+      return href ? (
+        <a href={href} class="md:w-2/3" target="_blank" rel="noopener noreferrer">
+          <Image
+            src={cover}
+            alt={`${title} project cover`}
+            aria-hidden="true"
+            class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
+            width={1200}
+            densities={[1, 2]}
+            quality={80}
+          />
+        </a>
+      ) : (
+        <div class="md:w-2/3">
+          <Image
+            src={cover}
+            alt={`${title} project cover`}
+            class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
+            width={1200}
+            densities={[1, 2]}
+            quality={80}
+          />
+        </div>
+      );
+    })()
   }
 </article>

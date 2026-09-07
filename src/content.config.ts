@@ -11,7 +11,6 @@ const projects = defineCollection({
     status: z.enum(["finished", "wip"]),
     stack: z.array(z.string()),
     repository: z.url().optional(),
-    live: z.url().optional(),
     deployments: z
       .array(
         z.object({
