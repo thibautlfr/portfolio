@@ -1,61 +1,82 @@
 ---
-title: "Youbook - Marseille, FFV, STESF"
-description: "A tourism booking platform that aggregates offers from multiple providers, normalizing them according to the OCTO standard, to deliver a smooth browsing experience and a front-end deployable for any client."
-date: 2025
+title: "Youbook"
+description: "A multi-client SaaS booking platform for tourism, built on a microservices architecture. Aggregates offers from multiple providers, normalizes them to the OCTO standard, and delivers embeddable booking widgets deployed across several destinations in France."
+date: 2024
 status: "wip"
 stack:
   [
     "Kotlin",
     "Ktor",
-    "Exposed",
-    "JobRunr",
-    "ElasticSearch",
+    "Java",
+    "Vue 3",
+    "Web Components",
+    "Pinia",
+    "PostgreSQL",
+    "OpenSearch",
     "Apache Pulsar",
     "Temporal",
-    "Vue.js",
-    "Web Components",
-    "PostgreSQL",
-    "Kubernetes",
+    "Stripe",
+    "Payzen",
     "Docker",
+    "Kubernetes",
+    "Helm",
     "GitLab CI/CD",
+    "Jenkins",
+    "Grafana",
+    "Prometheus",
+    "Loki",
   ]
-live: "https://www.marseille-tourisme.com/experience/"
-featured: false
+deployments:
+  - name: "Marseille Tourisme"
+    url: "https://www.marseille-tourisme.com/experience/"
+  - name: "Terres de Seine"
+    url: "https://experiences.terres-de-seine.fr"
+  - name: "Semaines Tourisme Economique Bretagne"
+    url: "https://semaines-tourisme-economique.bzh"
+  - name: "Explore Millau"
+    url: "https://www.explore-millau.com/reserver/"
+  - name: "Anjou Tourisme"
+    url: "https://www.anjou-tourisme.com/experiences/"
+  - name: "Destination Voile"
+    url: "https://www.destinationvoile.com"
+featured: true
 ---
 
 {/* cover: src/assets/projects/youbook-marseille/cover.webp */}
 
-A tourism office managing its activities across three different providers: every request risks triggering three API calls, three data formats, and three on-the-fly conversions. Youbook solves that. An aggregation layer that normalizes everything into **OCTO** and serves the data from an ElasticSearch cache, so the front-end never has to call a provider directly.
+A tourism office managing its activities across three different providers: every request risks triggering three API calls, three data formats, and three on-the-fly conversions. Youbook solves that. An aggregation layer that normalizes everything into **OCTO** and serves the data from an OpenSearch cache, so the front-end never has to call a provider directly.
 
 ## Context
 
 At Raccourci Agency, we build tourism booking solutions for our clients: tourism offices, sports federations, destinations. The common problem: their products are spread across providers like Regiondo, Yoplanning, or Welogin, and each one has its own format, its own API, its own constraints.
 
-Youbook was born from that observation. Rather than letting the front-end call provider APIs directly, we centralize the aggregation, normalize according to the **OCTO** standard (the open standard for the tourism industry), and cache to absorb the load. On the interface side, **web components** allow deploying the same Youbook for any client by only changing the color palette.
+Youbook was born from that observation. Rather than letting the front-end call provider APIs directly, we centralize the aggregation, normalize according to the **OCTO** standard (the open standard for the tourism industry), and cache to absorb the load. On the interface side, **Vue 3 web components** allow deploying the same Youbook for any client by only changing the color palette. Today, Youbook is live on six client websites and more are being deployed.
 
-I joined this project focusing on the ETL, the part that holds everything else together.
+I joined this project as lead developer, responsible for designing, developing and deploying the entire stack across 6 microservices.
 
 ## How it works
 
-The flow starts with **CRON jobs** that trigger import pipelines. For each client, we query their providers, fetch tourism products (activities, tickets, stays), and transform them into the OCTO format. The result is indexed into **ElasticSearch** to serve front-end queries.
+The flow starts with import pipelines. For each client, we query their providers, fetch tourism products (activities, tickets, stays), and transform them into the OCTO format. The result is indexed into **OpenSearch** to serve front-end queries with geospatial search and full-text capabilities.
 
-This cache is central. Without it, every page navigation would trigger direct calls to the providers, with format conversions on top, and noticeable latency. With it, the front-end reads from ElasticSearch and providers are only queried during scheduled imports.
+This cache is central. Without it, every page navigation would trigger direct calls to the providers, with format conversions on top, and noticeable latency. With it, the front-end reads from OpenSearch and providers are only queried during scheduled imports.
 
-Microservices communicate via **Apache Pulsar**: each pipeline step publishes to a topic, and downstream services consume messages asynchronously. Each client has its own topics, which makes it possible to enable or disable a pipeline without affecting the others.
+Microservices communicate via **Apache Pulsar**: each pipeline step publishes to a topic, and downstream services consume messages asynchronously with concurrent pipelines and backpressure. Each client has its own topics, which makes it possible to enable or disable a pipeline without affecting the others.
 
-{/* schema: ETL flow diagram, CRON > providers > OCTO transformation > ElasticSearch */}
+**Temporal** orchestrates the transaction lifecycle: parallel booking confirmation across providers, partial payment capture with **Stripe** and **Payzen**, and real-time communication through SSE.
+
+{/* schema: ETL flow diagram, CRON > providers > OCTO transformation > OpenSearch */}
 
 ## Technical choices
 
-**Kotlin + Ktor** for backend services: strong typing, coroutines for handling concurrent provider calls, and lightweight HTTP APIs without the overhead of Spring.
+**Kotlin + Ktor 3** for backend services: strong typing, coroutines for handling concurrent provider calls, and lightweight HTTP APIs without the overhead of Spring. **Java 21** for services that benefit from the broader ecosystem.
 
-**JobRunr** for scheduling and monitoring import jobs. It handles job persistence, automatic retries, and provides a dashboard to track pipeline status without digging through logs.
+**OpenSearch** as the read layer: fast indexing of structured data, full-text search, geospatial queries for the interactive map mode, and filters by date, location, or availability.
 
-**ElasticSearch** as the read layer: fast indexing of structured data, full-text search, filters by date, location, or availability. Its flexible schema also absorbs format variations when providers update their APIs.
+**Vue 3 Web Components** on the front-end: a library of ten+ components built with Shadow DOM, **Pinia** for state management, and i18n in 5 languages. Framework-agnostic, the components can be embedded in any CMS or static site. A new Youbook client means a new CSS theme, not a new codebase.
 
-**Web components** on the front-end: framework-agnostic, the components can be embedded in any CMS or static site. A new Youbook client means a new CSS theme, not a new codebase. Today, Youbook runs for several clients: Marseille Tourisme, the French Free Flight Federation, and more being deployed.
+**Stripe and Payzen** for payment orchestration, replacing the previous approach of relying on provider payment widgets. This gives full control over the booking experience on Youbook's side.
 
-A payment module overhaul is underway to move away from provider widgets and take back control of the booking experience on Youbook's side.
+Infrastructure is deployed on **Kubernetes** via **Helm** charts, with **GitLab CI/CD** pipelines and **Jenkins** for automated deployment of all 6 services. Monitoring covers **Grafana** dashboards, **Prometheus** metrics, and **Loki** for centralized logs.
 
 ## Challenges
 
