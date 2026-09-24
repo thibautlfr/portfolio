@@ -40,7 +40,7 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
       {navLinks.map((link) => (
         <li class="overflow-hidden">
           <a
-            class="block py-2"
+            class="block py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current"
             href={link.href}
             data-contact={link.label === "CONTACT" ? "" : undefined}
           >
@@ -63,7 +63,7 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
           socials.map((s) => (
             <li class="overflow-hidden">
               <a
-                class="social-link block px-3"
+                class="social-link block px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current"
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -82,6 +82,8 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
 <button
   class="menu-button font-sans relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
   aria-label="Menu"
+  aria-expanded="false"
+  aria-controls="main-nav"
 >
   <span class="relative inline-block h-[1em] overflow-hidden whitespace-nowrap">
     <span class="menu-text flex flex-col leading-none">
@@ -105,14 +107,16 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
   import { gsap } from "gsap";
 
   document.addEventListener("astro:page-load", () => {
-    const button = document.querySelector(".menu-button")!;
+    const button = document.querySelector<HTMLButtonElement>(".menu-button")!;
     const menuText = button.querySelector(".menu-text")!;
     const cross = button.querySelector(".cross")!;
     const overlay = document.querySelector(".menu-overlay")!;
     const layers = document.querySelectorAll(".menu-layer");
-    const links = document.querySelectorAll(".menu-links a");
+    const links = document.querySelectorAll<HTMLAnchorElement>(".menu-links a");
     const socials = document.querySelector(".menu-socials")!;
-    const socialLinks = document.querySelectorAll(".social-link");
+    const socialLinks =
+      document.querySelectorAll<HTMLAnchorElement>(".social-link");
+    const focusableElements = [...links, ...socialLinks, button];
 
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -253,21 +257,43 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
       });
     }
 
+    function openMenu() {
+      document.body.style.overflow = "hidden";
+      gsap.set([overlay, ...layers], { visibility: "visible" });
+      if (prefersReduced) {
+        setOpenState();
+      } else {
+        tl.play(0);
+        animateLinks();
+        animateTextOpen();
+        animateCross();
+      }
+      isOpen = true;
+      button.setAttribute("aria-expanded", "true");
+      links[0]?.focus({ preventScroll: true });
+    }
+
+    function closeMenu() {
+      document.body.style.overflow = "";
+      if (prefersReduced) {
+        setClosedState();
+      } else {
+        tl.reverse();
+        animateTextClose();
+        animateCross();
+      }
+      isOpen = false;
+      button.setAttribute("aria-expanded", "false");
+      button.focus();
+    }
+
     const contactLink =
       overlay.querySelector<HTMLAnchorElement>("[data-contact]");
     if (contactLink) {
       contactLink.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = `mailto:${atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t")}`;
-        document.body.style.overflow = "";
-        if (prefersReduced) {
-          setClosedState();
-        } else {
-          tl.reverse();
-          animateTextClose();
-          animateCross();
-        }
-        isOpen = false;
+        closeMenu();
       });
     }
 
@@ -275,26 +301,33 @@ const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
       if (!prefersReduced && (tl.isActive() || textTween?.isActive())) return;
 
       if (!isOpen) {
-        document.body.style.overflow = "hidden";
-        if (prefersReduced) {
-          setOpenState();
-        } else {
-          tl.play(0);
-          animateLinks();
-          animateTextOpen();
-        }
+        openMenu();
       } else {
-        document.body.style.overflow = "";
-        if (prefersReduced) {
-          setClosedState();
-        } else {
-          tl.reverse();
-          animateTextClose();
-        }
+        closeMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!isOpen) return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMenu();
+        return;
       }
 
-      if (!prefersReduced) animateCross();
-      isOpen = !isOpen;
+      if (e.key !== "Tab") return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
   });
 </script>
