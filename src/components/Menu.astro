@@ -1,5 +1,24 @@
 ---
 import { navLinks, socials } from "../config";
+import { getCollection } from "astro:content";
+import { groupPostsBySlug } from "../lib/blog";
+
+const [projects, labs, blogPosts] = await Promise.all([
+  getCollection("projects"),
+  getCollection("labs"),
+  getCollection("blog"),
+]);
+
+const publishedBlogPosts = blogPosts.filter(
+  (post) => import.meta.env.DEV || !post.data.draft,
+);
+
+const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
+  {
+    PROJECTS: projects.length,
+    LABS: labs.length,
+    BLOG: groupPostsBySlug(publishedBlogPosts).size,
+  };
 ---
 
 <!-- Invisible layers for opening effect-->
@@ -17,15 +36,17 @@ import { navLinks, socials } from "../config";
 >
   <nav id="main-nav" class="flex h-full flex-col justify-between">
     <!-- prettier-ignore -->
-    <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
-      {navLinks.map((link, i) => (
+    <ul class="menu-links flex flex-col text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100 [&>li:first-child>a]:pt-0 [&>li:last-child>a]:pb-0">
+      {navLinks.map((link) => (
         <li class="overflow-hidden">
           <a
-            class="block"
+            class="block py-2"
             href={link.href}
             data-contact={link.label === "CONTACT" ? "" : undefined}
           >
-            {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
+            {link.label}{navCounts[link.label] !== undefined && (
+              <sup class="text-base font-sans align-super text-teal-9 ml-1">{navCounts[link.label]}</sup>
+            )}
           </a>
         </li>
       ))}
@@ -36,13 +57,13 @@ import { navLinks, socials } from "../config";
         Socials
       </p>
       <ul
-        class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
+        class="flex font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300 [&>li:first-child>a]:pl-0 [&>li:last-child>a]:pr-0"
       >
         {
           socials.map((s) => (
             <li class="overflow-hidden">
               <a
-                class="social-link block"
+                class="social-link block px-3"
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -59,7 +80,7 @@ import { navLinks, socials } from "../config";
 </div>
 
 <button
-  class="menu-button font-button relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
+  class="menu-button font-sans relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
   aria-label="Menu"
 >
   <span class="relative inline-block h-[1em] overflow-hidden whitespace-nowrap">
