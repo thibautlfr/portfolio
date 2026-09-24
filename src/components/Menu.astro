@@ -1,5 +1,24 @@
 ---
 import { navLinks, socials } from "../config";
+import { getCollection } from "astro:content";
+import { groupPostsBySlug } from "../lib/blog";
+
+const [projects, labs, blogPosts] = await Promise.all([
+  getCollection("projects"),
+  getCollection("labs"),
+  getCollection("blog"),
+]);
+
+const publishedBlogPosts = blogPosts.filter(
+  (post) => import.meta.env.DEV || !post.data.draft,
+);
+
+const navCounts: Partial<Record<(typeof navLinks)[number]["label"], number>> =
+  {
+    PROJECTS: projects.length,
+    LABS: labs.length,
+    BLOG: groupPostsBySlug(publishedBlogPosts).size,
+  };
 ---
 
 <!-- Invisible layers for opening effect-->
@@ -17,15 +36,17 @@ import { navLinks, socials } from "../config";
 >
   <nav id="main-nav" class="flex h-full flex-col justify-between">
     <!-- prettier-ignore -->
-    <ul class="menu-links flex flex-col gap-4 text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100">
-      {navLinks.map((link, i) => (
+    <ul class="menu-links flex flex-col text-5xl font-heading font-extrabold [&:hover>li]:opacity-50 [&>li]:transition-opacity [&>li]:duration-300 [&:hover>li:hover]:opacity-100 [&>li:first-child>a]:pt-0 [&>li:last-child>a]:pb-0">
+      {navLinks.map((link) => (
         <li class="overflow-hidden">
           <a
-            class="block"
+            class="block py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current"
             href={link.href}
             data-contact={link.label === "CONTACT" ? "" : undefined}
           >
-            {link.label}<sup class="text-base font-sans align-super text-teal-9 ml-1">{i + 1}</sup>
+            {link.label}{navCounts[link.label] !== undefined && (
+              <sup class="text-base font-sans align-super text-teal-9 ml-1">{navCounts[link.label]}</sup>
+            )}
           </a>
         </li>
       ))}
@@ -36,13 +57,13 @@ import { navLinks, socials } from "../config";
         Socials
       </p>
       <ul
-        class="flex gap-6 font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300"
+        class="flex font-sans text-base [&:hover>li]:opacity-50 [&:hover>li:hover]:opacity-100 [&>li]:transition-opacity [&>li]:duration-300 [&>li:first-child>a]:pl-0 [&>li:last-child>a]:pr-0"
       >
         {
           socials.map((s) => (
             <li class="overflow-hidden">
               <a
-                class="social-link block"
+                class="social-link block px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current"
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -59,8 +80,10 @@ import { navLinks, socials } from "../config";
 </div>
 
 <button
-  class="menu-button font-button relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
+  class="menu-button font-sans relative z-60 flex w-fit cursor-pointer items-center gap-[0.3rem] overflow-visible rounded-full border px-3 py-1.5 text-xl leading-none md:text-2xl"
   aria-label="Menu"
+  aria-expanded="false"
+  aria-controls="main-nav"
 >
   <span class="relative inline-block h-[1em] overflow-hidden whitespace-nowrap">
     <span class="menu-text flex flex-col leading-none">
@@ -84,14 +107,16 @@ import { navLinks, socials } from "../config";
   import { gsap } from "gsap";
 
   document.addEventListener("astro:page-load", () => {
-    const button = document.querySelector(".menu-button")!;
+    const button = document.querySelector<HTMLButtonElement>(".menu-button")!;
     const menuText = button.querySelector(".menu-text")!;
     const cross = button.querySelector(".cross")!;
     const overlay = document.querySelector(".menu-overlay")!;
     const layers = document.querySelectorAll(".menu-layer");
-    const links = document.querySelectorAll(".menu-links a");
+    const links = document.querySelectorAll<HTMLAnchorElement>(".menu-links a");
     const socials = document.querySelector(".menu-socials")!;
-    const socialLinks = document.querySelectorAll(".social-link");
+    const socialLinks =
+      document.querySelectorAll<HTMLAnchorElement>(".social-link");
+    const focusableElements = [...links, ...socialLinks, button];
 
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -232,21 +257,43 @@ import { navLinks, socials } from "../config";
       });
     }
 
+    function openMenu() {
+      document.body.style.overflow = "hidden";
+      gsap.set([overlay, ...layers], { visibility: "visible" });
+      if (prefersReduced) {
+        setOpenState();
+      } else {
+        tl.play(0);
+        animateLinks();
+        animateTextOpen();
+        animateCross();
+      }
+      isOpen = true;
+      button.setAttribute("aria-expanded", "true");
+      links[0]?.focus({ preventScroll: true });
+    }
+
+    function closeMenu() {
+      document.body.style.overflow = "";
+      if (prefersReduced) {
+        setClosedState();
+      } else {
+        tl.reverse();
+        animateTextClose();
+        animateCross();
+      }
+      isOpen = false;
+      button.setAttribute("aria-expanded", "false");
+      button.focus();
+    }
+
     const contactLink =
       overlay.querySelector<HTMLAnchorElement>("[data-contact]");
     if (contactLink) {
       contactLink.addEventListener("click", (e) => {
         e.preventDefault();
         window.location.href = `mailto:${atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t")}`;
-        document.body.style.overflow = "";
-        if (prefersReduced) {
-          setClosedState();
-        } else {
-          tl.reverse();
-          animateTextClose();
-          animateCross();
-        }
-        isOpen = false;
+        closeMenu();
       });
     }
 
@@ -254,26 +301,33 @@ import { navLinks, socials } from "../config";
       if (!prefersReduced && (tl.isActive() || textTween?.isActive())) return;
 
       if (!isOpen) {
-        document.body.style.overflow = "hidden";
-        if (prefersReduced) {
-          setOpenState();
-        } else {
-          tl.play(0);
-          animateLinks();
-          animateTextOpen();
-        }
+        openMenu();
       } else {
-        document.body.style.overflow = "";
-        if (prefersReduced) {
-          setClosedState();
-        } else {
-          tl.reverse();
-          animateTextClose();
-        }
+        closeMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (!isOpen) return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeMenu();
+        return;
       }
 
-      if (!prefersReduced) animateCross();
-      isOpen = !isOpen;
+      if (e.key !== "Tab") return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     });
   });
 </script>
