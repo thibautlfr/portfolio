@@ -1,0 +1,101 @@
+---
+title: "Steerkit"
+description: "Craig Reynolds' steering behaviors as small, typed, engine-agnostic functions. seek, arrive, wander and keepAway by name, no allocation per frame, with interactive demos and an optional Three.js adapter."
+date: 2026
+status: "finished"
+stack:
+  [
+    "TypeScript",
+    "Three.js",
+    "Vite",
+    "Vitest",
+    "fast-check",
+    "Canvas 2D",
+    "tsdown",
+    "Biome",
+    "pnpm",
+    "GitHub Actions",
+  ]
+repository: "https://github.com/thibautlfr/steerkit"
+deployments:
+  - name: "steerkit.thibaut-lefrancois.com"
+    url: "https://steerkit.thibaut-lefrancois.com"
+  - name: "npm"
+    url: "https://www.npmjs.com/package/steerkit"
+featured: true
+---
+
+{/* cover: src/assets/projects/steerkit/cover.webp, screenshot of a demo with the forces drawn */}
+
+Every game with moving characters ends up with the same vector maths copy-pasted from one project to the next: some `desired - velocity`, a clamp, a mysterious constant. **steerkit** gives these a name. `arrive`, `keepAway`, `wander`, `followPath`, as typed functions that work on your own objects.
+
+## Context
+
+The library comes out of the fairies of my [Ocarina](https://ocarina.thibaut-lefrancois.com) project. Their flight code had grown into a small steering module that I kept wanting to reuse, so I extracted it, generalized it and published it.
+
+The reference is Craig Reynolds' 1999 GDC paper, which splits a character's motion into three layers: **action selection** (where to go), **steering** (how to get there) and **locomotion** (how it looks). steerkit only does the middle one. It never touches your meshes, your animations or your game loop.
+
+What I care about most is **readability**. A steering rule should read like what it does:
+
+```ts
+blend(force,
+	[arrive(fairy, target, { slowingDistance: 1.2 }, goal), 1],
+	[keepAway(fairy, camera, { radius: 1 }, away), 2],
+);
+step(fairy, force, dt);
+```
+
+Go to the target, stay out of the camera's way, with the camera twice as important. No anonymous vector maths to decode.
+
+## How it works
+
+An agent is Reynolds' point mass: `position`, `velocity`, `maxSpeed`, `maxForce`, and an optional `mass`. Each behavior turns a goal into a steering force. Forces are combined with `blend` or `prioritize`, then `step` applies the result for `dt` seconds, bounded by `maxForce` and `maxSpeed`.
+
+The library covers the classic set: seek, flee, arrive, pursue, evade, wander, separation, alignment, cohesion, leader following, obstacle avoidance, path following and flow fields. Each one has its own demo on the site, with the forces drawn and a slider for every parameter. 
+
+{/* screenshot: a demo page, forces drawn and parameter sliders */}
+
+Every demo also has a **Copy prompt** button. It asks a coding agent to bring that behavior into your project, and the site publishes an `llms.txt` generated from the library's own sources, so the documentation can't drift from the code.
+
+## Technical choices
+
+**Structural vectors.** A vector is any `{ x, y, z }`. A plain object works, and so does `THREE.Vector3` as it is. This is what keeps the library engine-agnostic with zero runtime dependency. Three.js lives only in the optional `steerkit/three` subpath, which turns, instances and debugs models. The core never imports it.
+
+**Pure functions writing into `out`.** `out` is always the last argument and is returned. Every input is read before `out` is written, so `out` can alias any input, which is tested.
+
+**Small and tree-shakable.** ESM only, `sideEffects: false`, about 4 kB for everything. `seek` alone is a few hundred bytes. A size budget runs in CI, so a behavior that bloats the bundle fails the build.
+
+**Property tests.** Degenerate inputs must stay finite. fast-check throws random and extreme values at every function: denormals, zero speeds, negative radii. This found more bugs than the unit tests ever did.
+
+## The pain points (and how I got out)
+
+### Zero allocation per frame, and V8 boxing numbers
+
+The promise sounds simple: no object, array or closure created in a behavior. Allocation per frame means garbage collection, and garbage collection means dropped frames in a crowd of a thousand agents.
+
+I wrote an allocation test that measures V8's `total_allocated_bytes`. The code was clean, no `new`, no literals. And it still allocated.
+
+The culprit: **V8 boxes a number** (a heap allocation) when it crosses a call it didn't inline. Its inlining budget runs out in a big frame, so a perfectly innocent helper called in a per-neighbor loop turned into thousands of tiny heap numbers per frame. The same boxing hid in a ternary picking between a field and a computed value.
+
+The fixes are a bit ugly, but documented:
+
+- no helper call with numbers inside a per-neighbor loop, one function with a `kind` switch and everything in locals
+- no module-level scratch vectors
+- no `Infinity` mixed into a computed value
+- `norm()` instead of `Math.hypot`, which allocates in V8
+
+Only the smallest helpers are always inlined. Everything else, `keepAway` included, computes in locals and writes once.
+
+### Measuring honestly
+
+Two measurement traps cost me days. Micro-benchmarks under Vitest are skewed, because its module runner wraps imports in getters. And the JIT optimizes shared functions for whichever variant runs first. So the benchmark is a plain Node script, one variant per process, 1,000 agents, with the default flags: disabling concurrent recompilation hides the allocation entirely, which is exactly the kind of result I wanted to avoid fooling myself with.
+
+### Behaviors that look right but feel wrong
+
+Cohesion was the surprising one. Written as a canonical steering force, flocks collapsed into tight blobs. Separation did not fade with distance, so agents jittered. The fix for 0.4 was to fade separation and make cohesion a pull, which I validated on the aquarium demo, a Three.js scene with schools of fish that panic and regroup.
+
+## What I would do differently
+
+I would write the allocation test first, before the behaviors. I discovered the boxing problem after the API was designed, and it forced a few uglier internals than I would have liked. The public API stayed clean, but the inside is full of comments that start with "this looks silly, but".
+
+I would also keep the scope tighter from the start. The value of the library is not the number of behaviors, it's reading `keepAway` and knowing what it does. A behavior only gets in when it serves a real use.
