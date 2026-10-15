@@ -14,33 +14,31 @@ interface Props {
   date: number;
   status: "finished" | "wip";
   stack: string[];
-  slug: string;
   deployments?: Deployment[];
   repository?: string;
   cover?: ImageMetadata;
 }
 
-const {
-  title,
-  description,
-  date,
-  status,
-  stack,
-  slug,
-  deployments,
-  repository,
-  cover,
-} = Astro.props;
+const { title, description, date, status, stack, deployments, repository, cover } =
+  Astro.props;
+
+const coverHref = deployments?.[0]?.url;
+const linkClass =
+  "hover:text-teal-9 inline-flex items-center gap-1 text-sm underline";
+const coverClass =
+  "border-sage-6 aspect-video w-full rounded-md border object-cover";
 ---
 
-<article class="flex flex-col gap-6 md:flex-row">
-  <div class="flex w-full flex-col justify-between">
-    <div class="mb-2 flex items-center gap-3">
-      <h3
-        class="group-hover:text-teal-11 text-xl font-bold transition-colors md:text-2xl"
-      >
-        {title}
-      </h3>
+<article
+  class:list={[
+    "grid gap-6",
+    cover &&
+      "md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,40rem)]",
+  ]}
+>
+  <div class="flex flex-col gap-3">
+    <div class="flex items-center gap-3">
+      <h3 class="text-xl font-bold md:text-2xl">{title}</h3>
       {
         status === "wip" && (
           <span class="border-sage-7 text-sage-11 rounded-full border px-2 text-xs">
@@ -49,96 +47,94 @@ const {
         )
       }
     </div>
-    <div class="flex h-full max-w-prose flex-col gap-3">
-      <div>
-        <p class="text-sage-11">Date</p>
-        <p>{date}</p>
-      </div>
-      <div>
-        <p class="text-sage-11">Description</p>
-        <p>{description}</p>
-      </div>
-      <div>
-        <p class="text-sage-11">Stack</p>
-        <div class="flex flex-wrap gap-2 text-xs">
-          {
-            stack.map((tech) => (
-              <span class="border-sage-7 rounded-sm border px-2 py-1">
-                {tech}
-              </span>
-            ))
-          }
-        </div>
-      </div>
-      {
-        (deployments || repository) && (
-          <div class="md:mt-auto flex flex-col gap-3">
-            {deployments && deployments.length > 0 && (
-              <div>
-                <p class="text-sage-11">Deployments</p>
-                <ul class="mt-1 flex flex-col gap-1">
-                  {deployments.map((d) => (
-                    <li>
-                      <a
-                        href={d.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="hover:text-teal-9 inline-flex items-center gap-1 text-sm underline"
-                      >
-                        {d.name}
-                        <Link />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {repository && (
-              <div>
-                <p class="text-sage-11">Code Source</p>
+
+    <div>
+      <p class="text-sage-11">Date</p>
+      <p>{date}</p>
+    </div>
+
+    <div class="max-w-prose">
+      <p class="text-sage-11">Description</p>
+      <p>{description}</p>
+    </div>
+
+    <div>
+      <p class="text-sage-11">Stack</p>
+      <ul class="flex flex-wrap gap-2 text-xs">
+        {
+          stack.map((tech) => (
+            <li class="border-sage-7 rounded-sm border px-2 py-1">{tech}</li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {
+      deployments && deployments.length > 0 && (
+        <div>
+          <p class="text-sage-11">Deployments</p>
+          <ul class="mt-1 flex flex-col gap-1">
+            {deployments.map((d) => (
+              <li>
                 <a
-                  href={repository}
+                  href={d.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="hover:text-teal-9 inline-flex items-center gap-1 text-sm underline"
+                  class={linkClass}
                 >
-                  {repository}
+                  {d.name}
                   <Link />
                 </a>
-              </div>
-            )}
-          </div>
-        )
-      }
-    </div>
-  </div>
-  {
-    cover && (() => {
-      const href = deployments?.[0]?.url;
-      return href ? (
-        <a href={href} class="md:w-2/3" target="_blank" rel="noopener noreferrer">
-          <Image
-            src={cover}
-            alt={`${title} project cover`}
-            aria-hidden="true"
-            class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
-            width={1200}
-            densities={[1, 2]}
-            quality={80}
-          />
-        </a>
-      ) : (
-        <div class="md:w-2/3">
-          <Image
-            src={cover}
-            alt={`${title} project cover`}
-            class="border-sage-6 aspect-video h-full w-full rounded-md border object-cover"
-            width={1200}
-            densities={[1, 2]}
-            quality={80}
-          />
+              </li>
+            ))}
+          </ul>
         </div>
-      );
-    })()
+      )
+    }
+
+    {
+      repository && (
+        <div>
+          <p class="text-sage-11">Code Source</p>
+          <a
+            href={repository}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={linkClass}
+          >
+            {repository}
+            <Link />
+          </a>
+        </div>
+      )
+    }
+  </div>
+
+  {
+    cover && (
+      <div class="md:self-start">
+        {coverHref ? (
+          <a href={coverHref} target="_blank" rel="noopener noreferrer">
+            <Image
+              src={cover}
+              alt={`${title} project cover`}
+              class={coverClass}
+              width={1200}
+              densities={[1, 2]}
+              quality={80}
+            />
+          </a>
+        ) : (
+          <Image
+            src={cover}
+            alt={`${title} project cover`}
+            class={coverClass}
+            width={1200}
+            densities={[1, 2]}
+            quality={80}
+          />
+        )}
+      </div>
+    )
   }
 </article>
