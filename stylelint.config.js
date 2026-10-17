@@ -25,6 +25,8 @@ export default {
         disableFix: true,
       },
     ],
+    // Astro's escape hatch from scoped styles.
+    "selector-pseudo-class-no-unknown": [true, { ignorePseudoClasses: ["global"] }],
     // Token files group custom properties by role with blank lines.
     "custom-property-empty-line-before": null,
     // Vite resolves bare package paths in string imports.
