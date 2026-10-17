@@ -2,11 +2,11 @@ import type { APIRoute, GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
 import { profile } from "@/data/profile";
-import { selectFeatured, selectLatest } from "@/lib/content";
+import { selectLatest, selectPublished } from "@/lib/content";
 import { renderOgImage, type OgCard } from "@/lib/og";
 
 export const getStaticPaths = (async () => {
-  const projects = selectFeatured(await getCollection("projects", ({ data }) => !data.draft));
+  const projects = selectPublished(await getCollection("projects"));
   const notes = selectLatest(await getCollection("notes"));
   const author = profile.name;
   return [

@@ -10,12 +10,12 @@ import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
-import { selectFeatured } from "@/lib/content";
+import { selectPublished } from "@/lib/content";
 import { formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
-  const projects = selectFeatured(await getCollection("projects", ({ data }) => !data.draft));
+  const projects = selectPublished(await getCollection("projects"));
   return projects.map((project, index) => ({
     params: { slug: project.id },
     props: { project, next: projects[(index + 1) % projects.length] },
