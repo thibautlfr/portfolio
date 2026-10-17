@@ -1,0 +1,108 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+import Figure from "@/components/mdx/Figure.astro";
+import Video from "@/components/mdx/Video.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+import { selectLatest } from "@/lib/content";
+import { formatDate, isoDate } from "@/lib/format";
+import { blogPosting, breadcrumbs } from "@/lib/seo/json-ld";
+
+export async function getStaticPaths() {
+  const notes = selectLatest(await getCollection("notes"));
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+
+interface Props {
+  note: CollectionEntry<"notes">;
+}
+
+const { note } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, source } = note.data;
+const { Content } = await render(note);
+
+const site = Astro.site ?? Astro.url;
+const url = new URL(`/notes/${note.id}/`, site).href;
+const platforms = { x: "X", linkedin: "LinkedIn" };
+---
+
+<BaseLayout
+  title={`${title} · ${profile.name}`}
+  {description}
+  ogImage={`/og/notes/${note.id}.png`}
+  type="article"
+  jsonLd={[
+    blogPosting({
+      headline: title,
+      description,
+      url,
+      authorUrl: site.href,
+      datePublished: isoDate(pubDate),
+      ...(updatedDate && { dateModified: isoDate(updatedDate) }),
+      keywords: tags,
+    }),
+    breadcrumbs([
+      { name: profile.name, url: site.href },
+      { name: "Notes", url: new URL("/notes/", site).href },
+      { name: title, url },
+    ]),
+  ]}
+>
+  <article class="page">
+    <Sheet as="div">
+      <Cell>
+        <Breadcrumbs
+          items={[{ label: profile.name, href: "/" }, { label: "Notes", href: "/notes/" }, { label: title }]}
+        />
+      </Cell>
+      <Cell as="header" class="title-block">
+        <h1>{title}</h1>
+        <p class="meta">
+          <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+          {source && (
+            <>
+              {" · "}
+              <a href={source.url}>Originally posted on {platforms[source.platform]}</a>
+            </>
+          )}
+        </p>
+      </Cell>
+      <Cell class="body">
+        <div class="prose">
+          <Content components={{ Figure, Video }} />
+        </div>
+      </Cell>
+    </Sheet>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    max-inline-size: 20ch;
+    font-size: var(--font-size-step-3);
+  }
+
+  .meta {
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .body {
+    padding-block: var(--space-8) var(--space-16);
+  }
+</style>
