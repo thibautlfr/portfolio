@@ -54,7 +54,22 @@ Every collection has these three, which drive the home page without touching cod
 4. `## Engineering notes`: the interesting technical detail (types, architecture, performance numbers that can be shared).
 5. `## Outcome`: what shipped and what it changed. No invented metrics.
 
-The body may use `<Figure>` and `<Video>` (Phase 3) for captioned media. Client work under NDA shows no code, no source links, no figures and no competitor names.
+Client work under NDA shows no code, no source links, no figures and no competitor names.
+
+The body is MDX and can show captioned media next to the text. Import the files placed in the entry's folder, then use the two components, which are available without importing them:
+
+```mdx
+import pipeline from "./pipeline.png";
+import demo from "./demo.mp4";
+
+<Figure src={pipeline} alt="Providers normalised into one OCTO schema." caption="The ingestion pipeline." />
+
+<Video
+  src={demo}
+  label="An agent arriving on the cursor and slowing down."
+  caption="arrive(), with a 120 px slowing radius."
+/>
+```
 
 ## Playground
 
