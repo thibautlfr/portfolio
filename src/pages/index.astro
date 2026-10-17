@@ -1,9 +1,15 @@
 ---
-// Temporary home until Phase 3: enough to check the fonts in place.
+// Temporary home until Phase 3: checks that fonts and collections load.
+import { getCollection } from "astro:content";
+
 import Cell from "@/components/ui/Cell.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
+import { selectFeatured, selectLatest } from "@/lib/content";
+
+const projects = selectFeatured(await getCollection("projects"));
+const notes = selectLatest(await getCollection("notes"), 3);
 ---
 
 <BaseLayout title={profile.name} description={`${profile.name}, ${profile.role}.`} preloadWordmark>
@@ -21,11 +27,29 @@ import { profile } from "@/data/profile";
         </a>
       </Cell>
     </Sheet>
+    <Sheet aria-label="Content check">
+      <Cell span={6}>
+        <ul>
+          {projects.map((project) => (
+            <li>{project.data.title}</li>
+          ))}
+        </ul>
+      </Cell>
+      <Cell span={6}>
+        <ul>
+          {notes.map((note) => (
+            <li>{note.data.title}</li>
+          ))}
+        </ul>
+      </Cell>
+    </Sheet>
   </div>
 </BaseLayout>
 
 <style>
   .page {
+    display: grid;
+    gap: var(--space-12);
     padding-block-start: var(--layout-gutter);
   }
 
