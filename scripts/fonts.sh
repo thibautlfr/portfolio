@@ -1,0 +1,47 @@
+#!/bin/sh
+# Rebuilds src/assets/fonts/ from the upstream OFL sources (Fontsource CDN,
+# pinned versions). The upstream files are variable and carry axes and
+# glyphs the site never uses, so each one is subset, then pinned to the
+# axis values the design uses. Run it again after changing a version, a
+# weight or one of the two fixed strings below.
+#
+# Needs python3 and curl; fonttools is installed in a throwaway venv.
+set -eu
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+OUT="$ROOT/src/assets/fonts"
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+
+CDN="https://cdn.jsdelivr.net/fontsource/fonts"
+VERSION="5.3.0"
+LATIN="U+0020-007E,U+00A0-017F,U+2013,U+2018-201F,U+2022,U+2026,U+20AC"
+# Strings set in a single face: their files only need these glyphs.
+WORDMARK="Thibaut Lefrançois"
+EMAIL="hello@thibaut-lefrancois.com"
+
+python3 -m venv "$WORK/venv"
+"$WORK/venv/bin/pip" install --quiet fonttools brotli
+FONTTOOLS="$WORK/venv/bin/fonttools"
+
+# build <source path on the CDN> <output name> <subset option> [axis=value ...]
+build() {
+  source=$1 name=$2 glyphs=$3
+  shift 3
+  curl -fsSL "$CDN/$source" -o "$WORK/$name.source.woff2"
+  "$FONTTOOLS" subset "$WORK/$name.source.woff2" "$glyphs" \
+    --layout-features="kern,liga,calt,tnum,lnum,case" --output-file="$WORK/$name.subset.ttf"
+  if [ "$#" -gt 0 ]; then
+    "$FONTTOOLS" varLib.instancer "$WORK/$name.subset.ttf" "$@" --output="$WORK/$name.ttf" --quiet
+  else
+    mv "$WORK/$name.subset.ttf" "$WORK/$name.ttf"
+  fi
+  "$FONTTOOLS" ttLib "$WORK/$name.ttf" --flavor woff2 -o "$OUT/$name.woff2"
+  printf '%-32s %6s bytes\n' "$name.woff2" "$(wc -c < "$OUT/$name.woff2" | tr -d ' ')"
+}
+
+build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WORDMARK" wght=800 wdth=125
+build "stack-sans-notch:vf@$VERSION/latin-wght-normal.woff2" stack-sans-notch-email "--text=$EMAIL" wght=700
+build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
+build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400:500
+build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$LATIN"
