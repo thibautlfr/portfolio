@@ -1,0 +1,16 @@
+/* The sheet: twelve columns on wide screens, cells bounded by hairlines.
+   Media queries cannot read custom properties; the one breakpoint, 60rem,
+   is repeated where it is used. */
+@layer tokens {
+  :root {
+    --layout-columns: 12;
+    --layout-gutter: clamp(0.75rem, 0.4rem + 1.8vw, 2rem);
+    --layout-measure: 36rem;
+    --border-hairline: 1px solid var(--color-line);
+    --focus-ring: 2px solid var(--color-focus);
+    --focus-offset: 2px;
+
+    /* Stacking: the skip link is the only element that overlaps the page. */
+    --layer-skip-link: 10;
+  }
+}

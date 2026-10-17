@@ -1,0 +1,9 @@
+dist/
+.astro/
+pnpm-lock.yaml
+src/assets/fonts/
+# Local agent tooling, not part of the site
+skills-lock.json
+.mcp.json
+docs/v2-planning-prompt.md
+PRODUCT.md
