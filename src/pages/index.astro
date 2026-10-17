@@ -1,44 +1,310 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import HeroShader from "@components/home/HeroShader.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import type { ImageMetadata } from "astro";
+import { blogPostUrl, groupPostsBySlug } from "../lib/blog";
+import { socials } from "../config";
+
+const projectCovers = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/projects/*/cover.webp",
+  { eager: true },
+);
+const labCovers = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/labs/*.webp",
+  { eager: true },
+);
+
+const projects = (await getCollection("projects"))
+  .filter((project) => project.id !== "portfolio")
+  .sort(
+    (a, b) =>
+      Number(b.data.featured) - Number(a.data.featured) ||
+      b.data.date - a.data.date,
+  )
+  .slice(0, 4);
+
+const labs = (await getCollection("labs")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const posts = [
+  ...groupPostsBySlug(
+    await getCollection("blog", ({ data }) => !data.draft),
+  ).entries(),
+]
+  .map(([slug, versions]) => ({ slug, post: versions.en ?? versions.fr! }))
+  .sort((a, b) => b.post.data.date.getTime() - a.post.data.date.getTime());
+
+const formatDate = (date: Date) =>
+  date.toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+const index = (i: number) => String(i + 1).padStart(2, "0");
 ---
 
-<BaseLayout title="Thibaut LEFRANCOIS">
-  <h2 class="pb-6 text-xl font-semibold italic md:text-2xl">
-    full-stack and creative developer
-  </h2>
-  <div
-    class="text-sage-11 flex max-w-prose flex-col gap-5 text-base leading-relaxed md:gap-6"
-  >
-    <p>
-      This portfolio was published way too early, intentionally. I wanted a
-      place to write, and Astro was the tool I had picked for both the blog and
-      the portfolio, so I shipped what I had.
-    </p>
-    <p>
-      The <a href="/projects" class="text-sage-12 underline">projects</a> page gathers
-      the larger things I've built, while
-      <a href="/labs" class="text-sage-12 underline">labs</a> is where I keep shorter
-      creative experiments: shaders, 3D scenes, visual prototypes. The <a
-        href="/blog"
-        class="text-sage-12 underline">blog</a
-      > documents what I learn along the way. If you want to know more about me, there's
-      an
-      <a href="/about" class="text-sage-12 underline">about page</a> for that.
-    </p>
-    <p>
-      Eventually, these projects will be showcased here in a more creative way.
-      For now, I'm still practicing to get there.
-    </p>
-    <p>
-      <a
-        href="https://drive.google.com/file/d/1MUc2HIg5t0PNbOLgWoNSbB64vOiBXfUA/view?usp=sharing"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-sage-12 underline"
-        >View my resume &rarr;<span class="sr-only">
-          (opens in new tab)</span
-        ></a
+<BaseLayout
+  pageTitle="Thibaut LEFRANCOIS, creative developer"
+  isCenteredContent={false}
+>
+  <section class="flex flex-col gap-6 md:gap-8" aria-labelledby="hero-title">
+    <div
+      class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+    >
+      <h1
+        id="hero-title"
+        class="hero-name font-display text-sage-12 text-6xl font-normal leading-[0.9] tracking-tight md:text-[9vw]"
       >
-    </p>
-  </div>
+        <span class="block overflow-hidden"><span class="block">Thibaut</span></span>
+        <span class="block overflow-hidden"
+          ><span class="block italic">Lefrancois</span></span
+        >
+      </h1>
+      <p class="text-sage-11 max-w-xs text-base md:pb-3 md:text-right">
+        Full-stack and creative developer. I build interfaces, shaders and small
+        worlds for the web, freelance under Arko.
+      </p>
+    </div>
+
+    <figure class="flex flex-col gap-3">
+      <div
+        class="bg-sage-12 aspect-4/5 w-full overflow-hidden rounded-sm sm:aspect-video md:aspect-21/9"
+      >
+        <HeroShader />
+      </div>
+      <figcaption
+        class="text-sage-11 flex justify-between gap-3 text-xs tracking-wide uppercase"
+      >
+        <span>Exp. 000, Domain warp</span>
+        <span>GLSL, live, follows your cursor</span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="mt-20 md:mt-32" aria-labelledby="work-title">
+    <header
+      class="border-sage-12 reveal flex items-baseline justify-between border-b pb-4"
+    >
+      <h2
+        id="work-title"
+        class="font-display text-sage-12 text-3xl font-normal md:text-5xl"
+      >
+        <span class="text-sage-11 mr-3 align-top font-sans text-sm">01</span
+        >Selected work
+      </h2>
+      <a href="/projects" class="text-sage-11 hover:text-sage-12 text-sm"
+        >All projects</a
+      >
+    </header>
+
+    <ol>
+      {
+        projects.map((project, i) => {
+          const cover =
+            projectCovers[`/src/assets/projects/${project.id}/cover.webp`]
+              ?.default;
+          const href =
+            project.data.deployments?.[0]?.url ?? project.data.repository;
+          return (
+            <li class="work-row border-sage-6 reveal group relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 border-b py-6 md:grid-cols-[3rem_minmax(0,1fr)_minmax(0,18rem)] md:items-center md:py-8">
+              <span class="text-sage-11 text-sm">{index(i)}</span>
+              <div class="flex flex-col gap-2">
+                <h3 class="font-display text-sage-12 text-3xl font-normal transition-transform duration-500 group-hover:translate-x-2 md:text-5xl">
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="after:absolute after:inset-0"
+                    >
+                      {project.data.title}
+                      <span class="sr-only">(opens in new tab)</span>
+                    </a>
+                  ) : (
+                    project.data.title
+                  )}
+                </h3>
+                <p class="text-sage-11 text-sm">
+                  {project.data.date} · {project.data.stack.slice(0, 3).join(", ")}
+                </p>
+              </div>
+              {cover && (
+                <div class="col-span-2 overflow-hidden rounded-sm md:col-span-1">
+                  <Image
+                    src={cover}
+                    alt=""
+                    class="aspect-video w-full object-cover grayscale transition duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                    widths={[480, 720]}
+                    sizes="(min-width: 768px) 18rem, 100vw"
+                  />
+                </div>
+              )}
+            </li>
+          );
+        })
+      }
+    </ol>
+  </section>
+
+  <section class="mt-20 md:mt-32" aria-labelledby="labs-title">
+    <header
+      class="border-sage-12 reveal flex items-baseline justify-between border-b pb-4"
+    >
+      <h2
+        id="labs-title"
+        class="font-display text-sage-12 text-3xl font-normal md:text-5xl"
+      >
+        <span class="text-sage-11 mr-3 align-top font-sans text-sm">02</span
+        >Labs
+      </h2>
+      <a href="/labs" class="text-sage-11 hover:text-sage-12 text-sm"
+        >The archive</a
+      >
+    </header>
+
+    <ul
+      class="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:mt-8 lg:grid-cols-3"
+    >
+      {
+        labs.map((lab, i) => {
+          const cover = labCovers[`/src/assets/labs/${lab.id}.webp`]?.default;
+          return (
+            <li class="reveal group relative flex flex-col gap-3">
+              <div class="bg-sage-3 overflow-hidden rounded-sm">
+                {cover && (
+                  <Image
+                    src={cover}
+                    alt=""
+                    class="aspect-4/3 w-full object-cover transition duration-700 ease-out group-hover:scale-105"
+                    widths={[480, 800]}
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  />
+                )}
+              </div>
+              <div class="flex items-baseline justify-between gap-3">
+                <h3 class="font-display text-sage-12 text-2xl font-normal">
+                  <a
+                    href={lab.data.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="after:absolute after:inset-0"
+                  >
+                    {lab.data.title}
+                    <span class="sr-only">(opens in new tab)</span>
+                  </a>
+                </h3>
+                <span class="text-sage-11 shrink-0 text-xs tracking-wide uppercase">
+                  Exp. {String(labs.length - i).padStart(3, "0")}
+                </span>
+              </div>
+              <p class="text-sage-11 text-sm">{lab.data.description}</p>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </section>
+
+  <section class="mt-20 md:mt-32" aria-labelledby="writing-title">
+    <header
+      class="border-sage-12 reveal flex items-baseline justify-between border-b pb-4"
+    >
+      <h2
+        id="writing-title"
+        class="font-display text-sage-12 text-3xl font-normal md:text-5xl"
+      >
+        <span class="text-sage-11 mr-3 align-top font-sans text-sm">03</span
+        >Writing
+      </h2>
+      <a href="/blog" class="text-sage-11 hover:text-sage-12 text-sm"
+        >All posts</a
+      >
+    </header>
+
+    <ul>
+      {
+        posts.map(({ slug, post }) => (
+          <li class="border-sage-6 reveal group relative flex flex-col gap-2 border-b py-6 md:flex-row md:items-baseline md:justify-between md:gap-6">
+            <h3 class="text-sage-12 text-xl font-semibold transition-transform duration-500 group-hover:translate-x-2 md:text-2xl">
+              <a
+                href={blogPostUrl(slug, post.data.lang)}
+                class="after:absolute after:inset-0"
+              >
+                {post.data.title}
+              </a>
+            </h3>
+            <span class="text-sage-11 shrink-0 text-xs tracking-wide uppercase">
+              {formatDate(post.data.date)}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section
+    class="reveal mt-20 flex flex-col gap-6 md:mt-32"
+    aria-labelledby="contact-title"
+  >
+    <h2
+      id="contact-title"
+      class="font-display text-sage-12 text-5xl leading-none font-normal md:text-[7vw]"
+    >
+      Got an idea worth <span class="italic">building?</span>
+    </h2>
+    <ul class="flex flex-wrap gap-x-6 gap-y-3">
+      {
+        socials.map((social) => (
+          <li>
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sage-12 decoration-sage-7 hover:decoration-sage-12 text-base underline underline-offset-4 transition-colors"
+            >
+              {social.label}
+              <span class="sr-only">(opens in new tab)</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </BaseLayout>
+
+<script>
+  import { gsap } from "gsap";
+
+  const prefersReduced = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  let observer: IntersectionObserver | null = null;
+
+  document.addEventListener("astro:page-load", () => {
+    observer?.disconnect();
+    const lines = document.querySelectorAll(".hero-name > span > span");
+    if (!lines.length) return;
+
+    if (!prefersReduced) {
+      gsap.from(lines, {
+        yPercent: 110,
+        duration: 1.2,
+        ease: "expo.out",
+        stagger: 0.12,
+        delay: 0.15,
+      });
+    }
+
+    observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-visible");
+          observer?.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => observer!.observe(el));
+  });
+</script>
