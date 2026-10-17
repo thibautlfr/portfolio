@@ -63,4 +63,14 @@ const { title, description, pubDate } = note.data;
       gap: var(--space-6);
     }
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .note {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
 </style>

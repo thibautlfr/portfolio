@@ -1,0 +1,101 @@
+// The live hero shader, loaded by boot.ts only when it may run. It pauses
+// off-screen and in hidden tabs, and exposes a pause control.
+import { createRenderer, type FrameInput } from "./renderer";
+import warpSource from "./warp.frag?raw";
+
+// The shader's own colours: ink, teal-12, teal-9, coral, ivory.
+const PALETTE = ["#091213", "#0d3d38", "#12a594", "#f2785c", "#f5ede0"] as const;
+const MAX_PIXEL_RATIO = 1.5;
+// An ambient effect reads the same at three quarters of the resolution.
+const RESOLUTION_SCALE = 0.75;
+const EASING = 0.05;
+// Starts where the composition reads well, so the first live frame matches the static one.
+const START_TIME = 12;
+
+export function startHeroShader(root: HTMLElement) {
+  const canvas = root.querySelector<HTMLCanvasElement>("[data-hero-shader-canvas]");
+  const toggle = root.querySelector<HTMLButtonElement>("[data-hero-shader-toggle]");
+  if (!canvas || !toggle) return;
+
+  const renderer = createRenderer(canvas, warpSource, PALETTE);
+  if (!renderer) return;
+
+  const target = { x: 0.5, y: 0.5, presence: 0 };
+  const frame: FrameInput = { time: START_TIME, pointer: [0.5, 0.5], presence: 0, scroll: 0 };
+  let request = 0;
+  let previous = 0;
+  let visible = true;
+  let paused = false;
+
+  const resize = () => {
+    const ratio = Math.min(devicePixelRatio, MAX_PIXEL_RATIO) * RESOLUTION_SCALE;
+    renderer.resize(
+      Math.max(1, Math.round(canvas.clientWidth * ratio)),
+      Math.max(1, Math.round(canvas.clientHeight * ratio)),
+    );
+    renderer.draw(frame);
+  };
+
+  const tick = (now: number) => {
+    frame.time += Math.min(now - previous, 50) / 1000;
+    previous = now;
+    frame.pointer[0] += (target.x - frame.pointer[0]) * EASING;
+    frame.pointer[1] += (target.y - frame.pointer[1]) * EASING;
+    frame.presence += (target.presence - frame.presence) * EASING;
+    renderer.draw(frame);
+    request = requestAnimationFrame(tick);
+  };
+
+  const sync = () => {
+    cancelAnimationFrame(request);
+    if (visible && !paused && !document.hidden) {
+      previous = performance.now();
+      request = requestAnimationFrame(tick);
+    }
+  };
+
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([entry]) => {
+    visible = entry?.isIntersecting ?? false;
+    sync();
+  }).observe(root);
+  document.addEventListener("visibilitychange", sync);
+
+  root.addEventListener(
+    "pointermove",
+    (event) => {
+      const rect = canvas.getBoundingClientRect();
+      target.x = (event.clientX - rect.left) / rect.width;
+      target.y = 1 - (event.clientY - rect.top) / rect.height;
+      target.presence = 1;
+    },
+    { passive: true },
+  );
+  root.addEventListener("pointerleave", () => (target.presence = 0), { passive: true });
+  addEventListener(
+    "scroll",
+    () => {
+      const rect = canvas.getBoundingClientRect();
+      frame.scroll = Math.min(Math.max(-rect.top / rect.height, 0), 1);
+    },
+    { passive: true },
+  );
+
+  canvas.addEventListener("webglcontextlost", () => {
+    cancelAnimationFrame(request);
+    root.classList.remove("is-live");
+    toggle.hidden = true;
+  });
+
+  toggle.hidden = false;
+  toggle.addEventListener("click", () => {
+    paused = !paused;
+    toggle.setAttribute("aria-pressed", String(paused));
+    toggle.textContent = paused ? "Play animation" : "Pause animation";
+    sync();
+  });
+
+  root.classList.add("is-live");
+  sync();
+}

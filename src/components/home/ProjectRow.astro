@@ -120,4 +120,14 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
       grid-column: 9 / -1;
     }
   }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .row {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
 </style>
