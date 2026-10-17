@@ -18,8 +18,8 @@ pnpm lighthouse    # Mobile Lighthouse with the CI budgets (after pnpm build)
 ## Add a project in one minute
 
 1. Copy `src/content/projects/_template/` to `src/content/projects/<slug>/` (English, kebab-case: the folder name is the URL).
-2. Fill the frontmatter of `index.mdx`, drop the cover image next to it, and set `draft: false`.
-3. Run `pnpm dev`: the project is on the home page and at `/work/<slug>/`. A missing or invalid field stops the build and names it.
+2. Fill the frontmatter of `index.mdx`, drop the cover image next to it, and set `draft: false`. Set `featured: true` to list it on the home page; `order` sets its position.
+3. Run `pnpm dev`: the project has its page at `/work/<slug>/`, and shows on the home page when featured. A missing or invalid field stops the build and names it.
 
 Experiments, artworks and notes work the same way, each with its own `_template`. Every field is documented in [`docs/content.md`](docs/content.md). Name, email, location and socials live in [`src/data/profile.ts`](src/data/profile.ts).
 
