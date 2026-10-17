@@ -2,6 +2,10 @@
 import { Image } from "astro:assets";
 
 import shaderFrame from "@/assets/images/shader-frame.jpg";
+// Built by Vite as a standalone ES module (vite.worker.format is "es"); only its URL ships in
+// the page, so nothing is requested before the inline boot step below decides to load it.
+import shaderModule from "@/scripts/hero-shader/index.ts?worker&url";
+import { heroBootScript } from "@/scripts/hero-shader/boot";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
@@ -30,7 +34,7 @@ const stack = Object.values(profile.stack).flat();
     />
   </Cell>
 
-  <Cell span={8} flush as="figure" class="hero-shader" data-hero-shader>
+  <Cell span={8} flush as="figure" class="hero-shader" data-hero-shader={shaderModule}>
     <div class="shader-frame">
       <Image
         class="shader-still"
@@ -38,8 +42,8 @@ const stack = Object.values(profile.stack).flat();
         alt=""
         format="avif"
         quality={45}
-        loading="eager"
-        fetchpriority="high"
+        loading="lazy"
+        fetchpriority="low"
         widths={[640, 960, 1440]}
         sizes="(width >= 60rem) 66vw, 100vw"
       />
@@ -75,15 +79,15 @@ const stack = Object.values(profile.stack).flat();
   </Cell>
 </Sheet>
 
-<script>
-  import "@/scripts/hero-shader/boot";
-</script>
-
+<!-- Inline boot step (see boot-inline.js); the page passes its hash to BaseLayout for the CSP. -->
+<script is:inline set:html={heroBootScript} />
 <style>
   /* Below 60rem the sheet becomes two columns so the portrait can sit beside
-     the base; the pitch comes right after the name, before the shader. */
+     the base; the pitch comes right after the name, before the shader. The
+     portrait column stays narrower than the pitch, which keeps the pitch text
+     (painted with the first frame) as the largest element of the first view. */
   .hero {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
   }
 
   .hero-name,
