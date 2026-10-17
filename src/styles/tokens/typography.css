@@ -22,12 +22,17 @@
     --font-size-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
     --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
 
+    /* The email is set on one line: it never grows past this share of the viewport. */
+    --font-size-email: min(var(--font-size-step-2), 5.4vw);
+    --font-size-email-large: min(var(--font-size-step-3), 5.4vw);
+
     /* Mono runs a little large next to the text face. */
     --font-size-data: 0.9em;
 
     --line-height-tight: 0.9;
     --line-height-title: 1.05;
     --line-height-text: 1.5;
+    --line-height-lede: 1.45;
 
     --letter-spacing-wordmark: -0.03em;
     --letter-spacing-title: -0.015em;

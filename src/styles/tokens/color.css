@@ -21,5 +21,9 @@
     --color-link: var(--teal-11);
     --color-focus: var(--teal-11);
     --color-selection: var(--teal-4);
+
+    /* The hero shader is a work and carries its own colours; this is its
+       darkest ink, shown before the first frame and as its static fallback. */
+    --color-shader-ground: #091213;
   }
 }
