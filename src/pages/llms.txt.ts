@@ -4,11 +4,11 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 
 import { profile } from "@/data/profile";
-import { selectFeatured, selectLatest } from "@/lib/content";
+import { selectLatest, selectPublished } from "@/lib/content";
 
 export const GET: APIRoute = async ({ site }) => {
   const url = (path: string) => new URL(path, site).href;
-  const projects = selectFeatured(await getCollection("projects", ({ data }) => !data.draft));
+  const projects = selectPublished(await getCollection("projects"));
   const notes = selectLatest(await getCollection("notes"));
   const lines = [
     `# ${profile.name}`,

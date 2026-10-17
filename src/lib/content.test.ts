@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { selectFeatured, selectLatest } from "./content";
+import { selectFeatured, selectLatest, selectPublished } from "./content";
 
 const project = (id: string, data: Partial<{ draft: boolean; featured: boolean; order: number }> = {}) => ({
   id,
@@ -22,6 +22,17 @@ describe("selectFeatured", () => {
 
   it("breaks order ties by id so the result never depends on file system order", () => {
     expect(selectFeatured([project("b"), project("a")]).map((entry) => entry.id)).toEqual(["a", "b"]);
+  });
+});
+
+describe("selectPublished", () => {
+  it("keeps every published entry, featured or not, in order", () => {
+    const result = selectPublished([
+      project("b", { order: 20 }),
+      project("hidden", { featured: false, order: 5 }),
+      project("wip", { draft: true }),
+    ]);
+    expect(result.map((entry) => entry.id)).toEqual(["hidden", "b"]);
   });
 });
 

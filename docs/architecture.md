@@ -1,6 +1,6 @@
 # Architecture
 
-How the V2 site is organised and the conventions every change follows. Read this before adding code; read [`content.md`](content.md) before adding content.
+How the V2 site is organised and the conventions every change follows. Read this before adding code; read [`content.md`](content.md) before adding content, and [`design/system.md`](design/system.md) before touching the visuals.
 
 ## Stack
 

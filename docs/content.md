@@ -6,8 +6,13 @@ How to add and edit content. This file is the reference for people and for writi
 
 1. Copy the `_template` folder of the collection, for example `src/content/projects/_template/`.
 2. Rename the copy to the entry's slug: English, kebab-case (`steerkit`, `ocean-heartbeat`). The folder name becomes the URL.
-3. Fill the frontmatter (the template lists every field, optional ones commented out), drop the images and videos next to `index.mdx`, and set `draft: false`.
-4. Run `pnpm dev`. A missing or invalid field stops the build with the entry and the field named, for example `projects → my-project … summary: Required`.
+3. Fill the frontmatter (the template lists every field, optional ones commented out), drop the images and videos next to `index.mdx`, set `draft: false`, and `featured: true` if it belongs on the home page.
+4. Run `pnpm dev`. A missing or invalid field stops the build with the entry and the field named:
+
+   ```
+   [InvalidContentEntryDataError] projects → my-project data does not match collection schema.
+     role: Required
+   ```
 
 Templates are never published: folders starting with `_` are ignored by the loader.
 
@@ -17,34 +22,34 @@ Every collection has these three, which drive the home page without touching cod
 
 | Field      | Type    | Default | Purpose                                                                                             |
 | ---------- | ------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `featured` | boolean | `false` | Shown on the home page.                                                                             |
+| `featured` | boolean | `false` | Shown on the home page. Every published project and note has its own page either way.               |
 | `order`    | integer | `100`   | Position on the home page, lowest first. Ties fall back to the slug. Use steps of 10 to leave room. |
 | `draft`    | boolean | `false` | Never published, never listed. Templates start as drafts.                                           |
 
 ## Images and video
 
 - Images sit next to the entry and are referenced with a relative path: `src: ./cover.png`. Every image is an object with `src` and `alt`, so none can ship without alternative text. Write `alt` for someone who cannot see it: what it shows, not "image of".
-- Sources: PNG for flat artwork and screenshots, JPEG for photographs, SVG for vector placeholders. Up to 2400 px on the long side, sRGB. The build produces AVIF, WebP and every responsive size.
+- Sources: PNG for flat artwork and screenshots, JPEG for photographs, SVG for vector placeholders. Up to 2400 px on the long side, sRGB. The build produces AVIF in every responsive size.
 - Videos are short loops next to the entry (`preview: ./preview.mp4`): H.264, 720p, about 6 seconds, no audio, 1.5 MB at most. They play on hover or focus and never under reduced motion; the image is their poster.
 
 ## Projects
 
 `src/content/projects/<slug>/index.mdx`, one case study page at `/work/<slug>/`.
 
-| Field        | Type     | Required | Constraint and purpose                                                                                                                        |
-| ------------ | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `title`      | string   | yes      | 60 characters at most.                                                                                                                        |
-| `summary`    | string   | yes      | One sentence, 160 characters at most. Shown on the home row and used as the meta description.                                                 |
-| `role`       | string   | yes      | Thibaut's role, for example `Full-stack developer`, `Author`.                                                                                 |
-| `context`    | enum     | yes      | `client`, `open-source`, `personal` or `hackathon`.                                                                                           |
-| `year`       | integer  | no       | Year of delivery. Leave it out rather than guess.                                                                                             |
-| `stack`      | string[] | yes      | At least one item, most important first. Set in mono on the site.                                                                             |
-| `cover`      | image    | no       | 16:10 works best; the page holds without it.                                                                                                  |
-| `preview`    | video    | no       | A short loop, see above.                                                                                                                      |
-| `links`      | list     | no       | `{ label, url, kind }` with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none.                                     |
-| `award`      | string   | no       | One line, for example `Winner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                       |
-| `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces). |
-| `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                   |
+| Field        | Type     | Required | Constraint and purpose                                                                                                                                 |
+| ------------ | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `title`      | string   | yes      | 60 characters at most.                                                                                                                                 |
+| `summary`    | string   | yes      | One sentence, 160 characters at most. Shown on the home row and used as the meta description.                                                          |
+| `role`       | string   | yes      | Thibaut's role, for example `Full-stack developer`, `Author`.                                                                                          |
+| `context`    | enum     | yes      | `client`, `open-source`, `personal` or `hackathon`.                                                                                                    |
+| `year`       | integer  | no       | Year of delivery. Leave it out rather than guess.                                                                                                      |
+| `stack`      | string[] | yes      | At least one item, most important first. Set in mono on the site.                                                                                      |
+| `cover`      | image    | no       | PNG or JPEG, 16:10 works best; the page holds without it. The SVG covers in the repository are placeholders.                                           |
+| `preview`    | video    | no       | A short loop, see above.                                                                                                                               |
+| `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none. |
+| `award`      | string   | no       | One line, for example `Winner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                |
+| `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces).          |
+| `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                            |
 
 **Body.** The case study is written for a technical reader (a CTO, a lead developer), in five sections with exactly these headings, in this order:
 
@@ -54,7 +59,22 @@ Every collection has these three, which drive the home page without touching cod
 4. `## Engineering notes`: the interesting technical detail (types, architecture, performance numbers that can be shared).
 5. `## Outcome`: what shipped and what it changed. No invented metrics.
 
-The body may use `<Figure>` and `<Video>` (Phase 3) for captioned media. Client work under NDA shows no code, no source links, no figures and no competitor names.
+Client work under NDA shows no code, no source links, no figures and no competitor names.
+
+The body is MDX and can show captioned media next to the text. Import the files placed in the entry's folder, then use the two components, which are available without importing them:
+
+```mdx
+import pipeline from "./pipeline.png";
+import demo from "./demo.mp4";
+
+<Figure src={pipeline} alt="Providers normalised into one OCTO schema." caption="The ingestion pipeline." />
+
+<Video
+  src={demo}
+  label="An agent arriving on the cursor and slowing down."
+  caption="arrive(), with a 120 px slowing radius."
+/>
+```
 
 ## Playground
 

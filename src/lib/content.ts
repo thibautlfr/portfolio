@@ -12,11 +12,16 @@ interface Dated {
   data: { draft: boolean; pubDate: Date };
 }
 
-/** Entries the home page shows: published, featured, by `order` then id. */
+const byOrder = (a: Publishable, b: Publishable) => a.data.order - b.data.order || a.id.localeCompare(b.id);
+
+/** Every published entry, by `order` then id: each gets its page, feed entry and OG image. */
+export function selectPublished<Entry extends Publishable>(entries: Entry[]): Entry[] {
+  return entries.filter((entry) => !entry.data.draft).sort(byOrder);
+}
+
+/** The subset the home page shows: published and featured, in the same order. */
 export function selectFeatured<Entry extends Publishable>(entries: Entry[]): Entry[] {
-  return entries
-    .filter((entry) => !entry.data.draft && entry.data.featured)
-    .sort((a, b) => a.data.order - b.data.order || a.id.localeCompare(b.id));
+  return selectPublished(entries).filter((entry) => entry.data.featured);
 }
 
 /** Published notes, newest first; `limit` keeps the most recent ones. */
