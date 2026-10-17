@@ -1,4 +1,7 @@
 ---
+import { Image } from "astro:assets";
+
+import shaderFrame from "@/assets/images/shader-frame.jpg";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
@@ -27,9 +30,27 @@ const stack = Object.values(profile.stack).flat();
     />
   </Cell>
 
-  <Cell span={8} flush as="figure" class="hero-shader">
-    <div class="shader-frame" data-hero-shader></div>
-    <figcaption>Domain warp, live. It drifts toward a wandering point, then follows your cursor.</figcaption>
+  <Cell span={8} flush as="figure" class="hero-shader" data-hero-shader>
+    <div class="shader-frame">
+      <Image
+        class="shader-still"
+        src={shaderFrame}
+        alt=""
+        format="avif"
+        quality={45}
+        loading="eager"
+        fetchpriority="high"
+        widths={[640, 960, 1440]}
+        sizes="(width >= 60rem) 66vw, 100vw"
+      />
+      <canvas class="shader-canvas" data-hero-shader-canvas aria-hidden="true"></canvas>
+    </div>
+    <figcaption>
+      <span>Domain warp, live. It drifts toward a wandering point, then follows your cursor.</span>
+      <button type="button" data-hero-shader-toggle aria-pressed="false" hidden>
+        Pause animation
+      </button>
+    </figcaption>
   </Cell>
 
   <Cell span={4} class="hero-pitch">
@@ -53,6 +74,10 @@ const stack = Object.values(profile.stack).flat();
     <p class="data">{stack.join(", ")}</p>
   </Cell>
 </Sheet>
+
+<script>
+  import "@/scripts/hero-shader/boot";
+</script>
 
 <style>
   /* Below 60rem the sheet becomes two columns so the portrait can sit beside
@@ -136,12 +161,38 @@ const stack = Object.values(profile.stack).flat();
     grid-template-rows: 1fr auto;
   }
 
+  /* The still frame holds the space and stays under the canvas, so the live
+     shader fades in without any layout shift. */
   .shader-frame {
+    position: relative;
     min-block-size: var(--hero-shader-height);
+    overflow: hidden;
     background: var(--color-shader-ground);
   }
 
+  .shader-still,
+  .shader-canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .shader-canvas {
+    opacity: 0;
+    transition: opacity var(--duration-fade) var(--ease-snap);
+  }
+
+  .hero-shader:global(.is-live) .shader-canvas {
+    opacity: 1;
+  }
+
   figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
     padding: var(--space-3) var(--space-4);
     border-block-start: var(--border-hairline);
     color: var(--color-text-muted);
@@ -153,6 +204,17 @@ const stack = Object.values(profile.stack).flat();
     display: grid;
     align-content: space-between;
     gap: var(--space-6);
+  }
+
+  figcaption button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
   }
 
   .positioning {
