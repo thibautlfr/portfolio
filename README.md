@@ -15,4 +15,4 @@ pnpm preview    # Preview the production build
 
 ## Deployment
 
-Every push to `main` builds the site and publishes `dist/` to the `gh-pages` branch through GitHub Actions (`.github/workflows/deploy.yml`). The custom domain is set in `public/CNAME`.
+Every pull request and push runs `pnpm verify` and a build through GitHub Actions (`.github/workflows/ci.yml`). Pushes to `main` then publish `dist/` to the `gh-pages` branch. The custom domain is set in `public/CNAME`.
