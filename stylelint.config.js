@@ -25,9 +25,12 @@ export default {
         disableFix: true,
       },
     ],
+    // Token files group custom properties by role with blank lines.
+    "custom-property-empty-line-before": null,
     // Vite resolves bare package paths in string imports.
     "import-notation": "string",
-    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    // Kebab-case, with BEM-style modifiers (block--modifier).
+    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*(--[a-z0-9]+(-[a-z0-9]+)*)?$",
     "custom-property-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
   },
   overrides: [
