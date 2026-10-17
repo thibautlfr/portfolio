@@ -1,0 +1,123 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import FactList from "@/components/ui/FactList.astro";
+import Media from "@/components/ui/Media.astro";
+import { formatContext } from "@/lib/format";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, summary, award, context, year, role, stack, cover } = project.data;
+---
+
+<li class:list={["row", { "row--text": !cover }]}>
+  <div class="row-main">
+    <h3 class="row-title">
+      <a href={`/work/${project.id}/`}>{title}</a>
+    </h3>
+    <p class="row-summary">{summary}</p>
+    {award && <p class="row-award">{award}</p>}
+  </div>
+  <div class="row-facts">
+    <FactList
+      facts={[
+        { term: "Context", value: formatContext(context, year) },
+        { term: "Role", value: role },
+        { term: "Stack", value: stack.join(", "), data: true },
+      ]}
+    />
+  </div>
+  {cover && (
+    <div class="row-image">
+      <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 33vw, 100vw" />
+    </div>
+  )}
+</li>
+
+<style>
+  .row {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-4);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+    background: var(--color-surface);
+  }
+
+  .row-main {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+  }
+
+  .row-title {
+    font-size: var(--font-size-step-2);
+  }
+
+  .row-title a {
+    text-decoration: none;
+  }
+
+  .row-summary {
+    max-inline-size: var(--layout-measure);
+  }
+
+  .row-award {
+    justify-self: start;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-accent);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .row-title a:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  /* Hover keeps the white cell: teal-11 links fail on any tinted ground. */
+  .row:hover .row-title a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .row:hover :global(.media) {
+    outline-color: var(--color-accent);
+  }
+
+  @media (width >= 60rem) {
+    .row {
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+      gap: var(--space-6);
+      padding-block: var(--space-8);
+    }
+
+    .row-main {
+      grid-column: 1 / span 5;
+    }
+
+    .row-facts {
+      grid-column: 6 / span 3;
+    }
+
+    .row-image {
+      grid-column: 9 / -1;
+    }
+
+    .row--text .row-main {
+      grid-column: 1 / span 7;
+    }
+
+    .row--text .row-summary {
+      font-size: var(--font-size-step-1);
+    }
+
+    .row--text .row-facts {
+      grid-column: 9 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import FactList from "@/components/ui/FactList.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { profile } from "@/data/profile";
+
+interface Offer {
+  title: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  offers: Offer[];
+}
+
+const { title, offers } = Astro.props;
+const { stack, languages, cvPath } = profile;
+---
+
+<Sheet aria-labelledby="about-title">
+  <SectionTitle id="about-title">{title}</SectionTitle>
+  {offers.map((offer) => (
+    <Cell span={4} as="article" class="offer">
+      <h3>{offer.title}</h3>
+      <p>{offer.text}</p>
+    </Cell>
+  ))}
+  <Cell span={4} class="facts">
+    <FactList
+      facts={[
+        { term: "Languages", value: stack.languages.join(", "), data: true },
+        { term: "Front-end", value: stack.frontEnd.join(", "), data: true },
+        { term: "Back-end", value: stack.backEnd.join(", "), data: true },
+        { term: "Speaks", value: languages.join(", ") },
+      ]}
+    />
+    {cvPath && (
+      <a class="cv" href={cvPath} data-umami-event="cv">
+        Download my CV (PDF)
+      </a>
+    )}
+  </Cell>
+</Sheet>
+
+<style>
+  .offer {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+
+  h3 {
+    font-size: var(--font-size-step-1);
+  }
+
+  .facts {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+  }
+
+  .cv {
+    justify-self: start;
+    color: var(--color-link);
+    font-weight: var(--font-weight-strong);
+  }
+</style>

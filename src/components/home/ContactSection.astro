@@ -1,0 +1,47 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import EmailLink from "@/components/ui/EmailLink.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { profile } from "@/data/profile";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Sheet aria-labelledby="contact-title">
+  <Cell span={8} class="contact">
+    <h2 id="contact-title">{title}</h2>
+    <EmailLink size="large" />
+  </Cell>
+  <Cell span={4} class="socials">
+    <ul role="list">
+      {profile.socials.map((social) => (
+        <li>
+          <a href={social.url} rel="me">
+            {social.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Cell>
+</Sheet>
+
+<style>
+  .contact {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-8);
+  }
+
+  h2 {
+    font-size: var(--font-size-step-2);
+  }
+
+  .socials ul {
+    display: grid;
+    gap: var(--space-2);
+  }
+</style>

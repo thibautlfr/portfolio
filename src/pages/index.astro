@@ -1,48 +1,59 @@
 ---
-// Temporary home until Phase 3: checks that fonts and collections load.
 import { getCollection } from "astro:content";
 
-import Cell from "@/components/ui/Cell.astro";
-import Sheet from "@/components/ui/Sheet.astro";
+import AboutSection from "@/components/home/AboutSection.astro";
+import ArtworkSection from "@/components/home/ArtworkSection.astro";
+import ContactSection from "@/components/home/ContactSection.astro";
+import Hero from "@/components/home/Hero.astro";
+import NotesSection from "@/components/home/NotesSection.astro";
+import PlaygroundSection from "@/components/home/PlaygroundSection.astro";
+import WorkSection from "@/components/home/WorkSection.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
 import { selectFeatured, selectLatest } from "@/lib/content";
+import { profilePage } from "@/lib/seo/json-ld";
+import { author } from "@/lib/seo/site";
 
 const projects = selectFeatured(await getCollection("projects"));
+const experiments = selectFeatured(await getCollection("playground"));
+const artworks = selectFeatured(await getCollection("artworks"));
 const notes = selectLatest(await getCollection("notes"), 3);
+const instagram = profile.socials.find((social) => social.label === "Instagram");
+const person = await author(Astro.site ?? Astro.url);
 ---
 
-<BaseLayout title={profile.name} description={`${profile.name}, ${profile.role}.`} preloadWordmark>
+<BaseLayout
+  title={`${profile.name}, ${profile.role}`}
+  description={`${profile.role} based in ${profile.location.city}. ${profile.positioning}`}
+  jsonLd={[profilePage(person)]}
+  preloadWordmark
+>
   <div class="page">
-    <Sheet aria-labelledby="hero-title">
-      <Cell>
-        <h1 id="hero-title" class="wordmark">
-          {profile.name}
-        </h1>
-        <p class="role">{profile.role}</p>
-      </Cell>
-      <Cell>
-        <a class="email" href={`mailto:${profile.email}`}>
-          {profile.email}
-        </a>
-      </Cell>
-    </Sheet>
-    <Sheet aria-label="Content check">
-      <Cell span={6}>
-        <ul>
-          {projects.map((project) => (
-            <li>{project.data.title}</li>
-          ))}
-        </ul>
-      </Cell>
-      <Cell span={6}>
-        <ul>
-          {notes.map((note) => (
-            <li>{note.data.title}</li>
-          ))}
-        </ul>
-      </Cell>
-    </Sheet>
+    <Hero />
+    <WorkSection title="Selected work" {projects} />
+    <AboutSection
+      title="About"
+      offers={[
+        {
+          title: "Inside your team",
+          text: "Missions through ESNs and IT departments. I join the team, its rituals and its codebase, and take features from the ticket to production.",
+        },
+        {
+          title: "For your product",
+          text: "Startups and agencies: a platform to build, a product to take to production, or a team to reinforce for a while.",
+        },
+      ]}
+    />
+    {experiments.length > 0 && <PlaygroundSection title="Playground" {experiments} />}
+    {artworks.length > 0 && (
+      <ArtworkSection
+        title="Off the clock"
+        {artworks}
+        more={instagram && { label: "More on Instagram", url: instagram.url }}
+      />
+    )}
+    {notes.length > 0 && <NotesSection title="Notes" {notes} />}
+    <ContactSection title="Have a project or a mission in mind?" />
   </div>
 </BaseLayout>
 
@@ -51,25 +62,5 @@ const notes = selectLatest(await getCollection("notes"), 3);
     display: grid;
     gap: var(--space-12);
     padding-block-start: var(--layout-gutter);
-  }
-
-  .wordmark {
-    font-family: var(--font-wordmark);
-    font-size: var(--font-size-step-5);
-    font-weight: var(--font-weight-wordmark);
-    font-stretch: var(--font-stretch-wordmark);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-wordmark);
-  }
-
-  .role {
-    margin-block-start: var(--space-8);
-    font-size: var(--font-size-step-1);
-  }
-
-  .email {
-    font-family: var(--font-email);
-    font-size: var(--font-size-step-2);
-    font-weight: var(--font-weight-title);
   }
 </style>

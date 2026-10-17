@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import Cell from "@/components/ui/Cell.astro";
+import Media from "@/components/ui/Media.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+
+interface Props {
+  title: string;
+  artworks: CollectionEntry<"artworks">[];
+  /** Where the rest lives (Instagram), when known. */
+  more?: { label: string; url: string } | undefined;
+}
+
+const { title, artworks, more } = Astro.props;
+const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing", illustration: "Illustration" };
+---
+
+<Sheet aria-labelledby="artworks-title">
+  <SectionTitle id="artworks-title">
+    {title}
+    {more && (
+      <a slot="aside" href={more.url}>
+        {more.label}
+      </a>
+    )}
+  </SectionTitle>
+  {artworks.map(({ data }) => (
+    <Cell span={6} as="figure" class="artwork">
+      <Media src={data.image.src} alt={data.image.alt} sizes="(width >= 60rem) 45vw, 100vw" />
+      <figcaption>
+        <span class="artwork-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</span>
+        <span class="artwork-kind">
+          {kindLabels[data.kind]}
+          {data.year && `, ${data.year}`}
+        </span>
+        {data.description && <span class="artwork-description">{data.description}</span>}
+      </figcaption>
+    </Cell>
+  ))}
+</Sheet>
+
+<style>
+  .artwork {
+    display: grid;
+    align-content: end;
+    gap: var(--space-3);
+  }
+
+  figcaption {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .artwork-title {
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+  }
+
+  .artwork-kind,
+  .artwork-description {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

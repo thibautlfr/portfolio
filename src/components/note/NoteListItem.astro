@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { formatDate, isoDate } from "@/lib/format";
+
+interface Props {
+  note: CollectionEntry<"notes">;
+}
+
+const { note } = Astro.props;
+const { title, description, pubDate } = note.data;
+---
+
+<li class="note">
+  <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+  <div>
+    <h3>
+      <a href={`/notes/${note.id}/`}>{title}</a>
+    </h3>
+    <p>{description}</p>
+  </div>
+</li>
+
+<style>
+  .note {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+    background: var(--color-surface);
+  }
+
+  time {
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h3 {
+    font-size: var(--font-size-step-1);
+  }
+
+  h3 a {
+    text-decoration: none;
+  }
+
+  h3 a:hover,
+  h3 a:focus-visible {
+    text-decoration: underline;
+  }
+
+  p {
+    max-inline-size: var(--layout-measure);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  @media (width >= 60rem) {
+    .note {
+      grid-template-columns: 12rem minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>
