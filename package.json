@@ -20,6 +20,7 @@
     "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm lint:unused && pnpm check && pnpm test"
   },
   "dependencies": {
+    "@astrojs/mdx": "^8.1.0",
     "@radix-ui/colors": "^3.0.0",
     "astro": "^7.4.0"
   },

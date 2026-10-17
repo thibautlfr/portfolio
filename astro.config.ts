@@ -1,3 +1,4 @@
+import mdx from "@astrojs/mdx";
 import { defineConfig, fontProviders } from "astro/config";
 
 // Built by scripts/fonts.sh: instanced and subset, see docs/architecture.md#fonts.
@@ -9,6 +10,7 @@ export default defineConfig({
   // GitHub Pages serves folders and redirects /page to /page/: canonical URLs match that.
   trailingSlash: "always",
   build: { format: "directory" },
+  integrations: [mdx()],
   fonts: [
     {
       provider: fontProviders.local(),
