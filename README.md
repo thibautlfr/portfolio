@@ -4,7 +4,7 @@ Personal portfolio of Thibaut Lefrançois, built with [Astro](https://astro.buil
 
 ## Getting started
 
-Requires **Node >= 22.12.0** and **pnpm**.
+Requires **Node >= 22.22.0** and **pnpm**.
 
 ```bash
 pnpm install    # Install dependencies
