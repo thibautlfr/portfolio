@@ -1,0 +1,40 @@
+---
+// Inner pages have no header: the trail is how they lead back home.
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: Crumb[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb">
+  <ol role="list">
+    {items.map((item) => (
+      <li>{item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}</li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  li:not(:last-child)::after {
+    content: "/";
+    margin-inline-start: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  span {
+    color: var(--color-text-muted);
+  }
+</style>

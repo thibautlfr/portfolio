@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import NoteListItem from "@/components/note/NoteListItem.astro";
+
+interface Props {
+  title: string;
+  notes: CollectionEntry<"notes">[];
+}
+
+const { title, notes } = Astro.props;
+---
+
+<Sheet aria-labelledby="notes-title">
+  <SectionTitle id="notes-title">
+    {title}
+    <a slot="aside" href="/notes/">
+      All notes
+    </a>
+  </SectionTitle>
+  <ol role="list" class="notes">
+    {notes.map((note) => (
+      <NoteListItem {note} />
+    ))}
+  </ol>
+</Sheet>
+
+<style>
+  .notes {
+    display: grid;
+    grid-column: 1 / -1;
+  }
+</style>

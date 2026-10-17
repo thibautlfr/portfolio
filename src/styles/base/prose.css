@@ -1,0 +1,61 @@
+/* Long-form text: case study and note bodies rendered from Markdown. */
+@layer base {
+  .prose {
+    max-inline-size: var(--layout-measure);
+    font-size: var(--font-size-step-1);
+    line-height: var(--line-height-lede);
+  }
+
+  .prose > * + * {
+    margin-block-start: var(--space-4);
+  }
+
+  .prose h2 {
+    margin-block-start: var(--space-12);
+    font-size: var(--font-size-step-3);
+  }
+
+  .prose h3 {
+    margin-block-start: var(--space-8);
+    font-size: var(--font-size-step-2);
+  }
+
+  .prose > :first-child {
+    margin-block-start: 0;
+  }
+
+  .prose h2 + *,
+  .prose h3 + * {
+    margin-block-start: var(--space-3);
+  }
+
+  .prose a {
+    color: var(--color-link);
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-inline-start: var(--space-6);
+  }
+
+  .prose li + li {
+    margin-block-start: var(--space-2);
+  }
+
+  .prose blockquote {
+    padding-inline-start: var(--space-4);
+    border-inline-start: var(--border-hairline);
+    color: var(--color-text-muted);
+  }
+
+  .prose pre {
+    overflow-x: auto;
+    padding: var(--space-4);
+    outline: var(--border-hairline);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .prose :not(pre) > code {
+    font-size: var(--font-size-data);
+  }
+}

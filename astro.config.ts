@@ -1,5 +1,8 @@
 import mdx from "@astrojs/mdx";
-import { defineConfig, fontProviders } from "astro/config";
+import sitemap from "@astrojs/sitemap";
+import { defineConfig, envField, fontProviders } from "astro/config";
+
+import { legacyRedirects } from "./src/data/legacy-redirects";
 
 // Built by scripts/fonts.sh: instanced and subset, see docs/architecture.md#fonts.
 const fontFile = (name: string) => `./src/assets/fonts/${name}.woff2`;
@@ -10,7 +13,41 @@ export default defineConfig({
   // GitHub Pages serves folders and redirects /page to /page/: canonical URLs match that.
   trailingSlash: "always",
   build: { format: "directory" },
-  integrations: [mdx()],
+  redirects: legacyRedirects,
+  env: {
+    schema: {
+      // Umami Cloud site id; analytics stay off when it is not set (local builds, forks).
+      PUBLIC_UMAMI_WEBSITE_ID: envField.string({ context: "client", access: "public", optional: true }),
+    },
+  },
+  security: {
+    csp: {
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data:",
+        "font-src 'self'",
+        "media-src 'self'",
+        "connect-src 'self' https://cloud.umami.is https://api-gateway.umami.dev",
+        "base-uri 'self'",
+        "form-action 'none'",
+        "object-src 'none'",
+      ],
+      scriptDirective: { resources: ["'self'", "https://cloud.umami.is"] },
+      // Inline style attributes (cell spans, image ratios) carry no script and are allowed;
+      // style elements stay limited to Astro's generated hashes.
+      styleDirective: { resources: ["'self'", { resource: "'unsafe-inline'", kind: "attribute" }] },
+    },
+  },
+  integrations: [
+    mdx(),
+    sitemap({
+      // Redirect pages and the 404 are not content.
+      filter: (page) =>
+        !page.endsWith("/404/") && !Object.keys(legacyRedirects).some((path) => page.endsWith(`${path}/`)),
+    }),
+  ],
+  // The overlay sits on top of the sheets; Astro check and the CI cover what it reports.
+  devToolbar: { enabled: false },
   fonts: [
     {
       provider: fontProviders.local(),

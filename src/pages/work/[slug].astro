@@ -1,0 +1,179 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+import Figure from "@/components/mdx/Figure.astro";
+import Video from "@/components/mdx/Video.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import FactList from "@/components/ui/FactList.astro";
+import Media from "@/components/ui/Media.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+import { selectFeatured } from "@/lib/content";
+import { formatContext } from "@/lib/format";
+import { breadcrumbs, work } from "@/lib/seo/json-ld";
+
+export async function getStaticPaths() {
+  const projects = selectFeatured(await getCollection("projects", ({ data }) => !data.draft));
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(index + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  next: CollectionEntry<"projects"> | undefined;
+}
+
+const { project, next } = Astro.props;
+const { title, summary, role, context, year, stack, cover, links, award, schemaType, seo } = project.data;
+const { Content } = await render(project);
+
+const site = Astro.site ?? Astro.url;
+const url = new URL(`/work/${project.id}/`, site).href;
+const source = links.find((link) => link.kind === "source");
+---
+
+<BaseLayout
+  title={`${seo?.title ?? title}, case study · ${profile.name}`}
+  description={seo?.description ?? summary}
+  ogImage={`/og/work/${project.id}.png`}
+  type="article"
+  jsonLd={[
+    work({
+      type: schemaType,
+      name: title,
+      description: summary,
+      url,
+      authorUrl: site.href,
+      keywords: stack,
+      ...(year && { year }),
+      ...(source && { codeRepository: source.url }),
+    }),
+    breadcrumbs([
+      { name: profile.name, url: site.href },
+      { name: title, url },
+    ]),
+  ]}
+>
+  <article class="page">
+    <Sheet as="div">
+      <Cell>
+        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
+      </Cell>
+      <Cell span={8} as="header" class="title-block">
+        <h1>{title}</h1>
+        <p class="summary">{summary}</p>
+        {award && <p class="award">{award}</p>}
+      </Cell>
+      <Cell span={4} class="facts">
+        <FactList
+          facts={[
+            { term: "Context", value: formatContext(context, year) },
+            { term: "Role", value: role },
+            { term: "Stack", value: stack.join(", "), data: true },
+          ]}
+        />
+        {links.length > 0 && (
+          <ul role="list" class="links">
+            {links.map((link) => (
+              <li>
+                <a href={link.url} data-umami-event={`project-${link.kind}`}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Cell>
+      {cover && (
+        <Cell flush as="figure">
+          <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="100vw" priority />
+        </Cell>
+      )}
+      <Cell class="body">
+        <div class="prose">
+          <Content components={{ Figure, Video }} />
+        </div>
+      </Cell>
+      {next && next.id !== project.id && (
+        <Cell as="footer" class="next">
+          <p class="next-label">Next case study</p>
+          <a href={`/work/${next.id}/`}>{next.data.title}</a>
+        </Cell>
+      )}
+    </Sheet>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--font-size-step-5);
+    line-height: var(--line-height-tight);
+  }
+
+  .summary {
+    max-inline-size: var(--layout-measure);
+    font-size: var(--font-size-step-1);
+    line-height: var(--line-height-lede);
+  }
+
+  .award {
+    justify-self: start;
+    padding: var(--space-1) var(--space-2);
+    border: 1px solid var(--color-accent);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .facts {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding-block: var(--space-8);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .links a {
+    color: var(--color-link);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .body {
+    padding-block: var(--space-8) var(--space-16);
+  }
+
+  .next {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-8);
+  }
+
+  .next-label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .next a {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-3);
+    font-weight: var(--font-weight-title);
+  }
+</style>

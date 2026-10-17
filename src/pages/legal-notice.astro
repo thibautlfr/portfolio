@@ -1,0 +1,90 @@
+---
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+
+const { legal, email } = profile;
+---
+
+<BaseLayout
+  title={`Legal notice · ${profile.name}`}
+  description={`Publisher, hosting and personal data information for ${profile.name}'s website.`}
+>
+  <div class="page">
+    <Sheet aria-labelledby="legal-title">
+      <Cell>
+        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Legal notice" }]} />
+      </Cell>
+      <Cell as="header" class="title-block">
+        <h1 id="legal-title">Legal notice</h1>
+      </Cell>
+      <Cell span={6} class="prose">
+        <h2>Publisher</h2>
+        <p>
+          {legal.publisher}, individual.
+          <br />
+          Contact: <a href={`mailto:${email}`}>{email}</a>
+        </p>
+        <p>
+          In accordance with article 6-III-2 of French law no. 2004-575 of 21 June 2004 (LCEN), an individual publisher
+          is not required to disclose their personal address. This information has been communicated to the hosting
+          provider.
+        </p>
+        <h2>Hosting</h2>
+        <p>
+          {legal.host.name}
+          <br />
+          {legal.host.address}
+          <br />
+          <a href={legal.host.url}>{legal.host.url.replace("https://", "")}</a>
+        </p>
+      </Cell>
+      <Cell span={6} class="prose">
+        <h2>Personal data</h2>
+        <p>
+          This website collects no personal data. Audience is measured with Umami, without cookies and without
+          identifying visitors. Emails you send are only used to answer you.
+        </p>
+        <h2>Intellectual property</h2>
+        <p>
+          All content on this website (text, images, source code, graphic elements) is the property of {legal.publisher}
+          unless stated otherwise. Any reproduction without prior authorisation is prohibited.
+        </p>
+        <h2>Applicable law</h2>
+        <p>
+          This legal notice is governed by French law. In the event of a dispute, French courts have exclusive
+          jurisdiction.
+        </p>
+      </Cell>
+    </Sheet>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .title-block {
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--font-size-step-5);
+    line-height: var(--line-height-tight);
+  }
+
+  .prose {
+    font-size: var(--font-size-step-0);
+  }
+
+  .prose h2 {
+    font-size: var(--font-size-step-2);
+  }
+
+  .prose h2:first-child {
+    margin-block-start: 0;
+  }
+</style>

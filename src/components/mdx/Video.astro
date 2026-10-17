@@ -1,0 +1,35 @@
+---
+// A captioned loop inside a case study. Import the file in the MDX body
+// (import demo from "./demo.mp4") and pass it as src.
+interface Props {
+  src: string;
+  /** Describes what the video shows, for people who cannot see it. */
+  label: string;
+  caption?: string;
+}
+
+const { src, label, caption } = Astro.props;
+---
+
+<figure>
+  <video src={src} aria-label={label} controls muted playsinline preload="metadata"></video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure {
+    display: grid;
+    gap: var(--space-2);
+    margin-block: var(--space-8);
+  }
+
+  video {
+    inline-size: 100%;
+    outline: var(--border-hairline);
+  }
+
+  figcaption {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

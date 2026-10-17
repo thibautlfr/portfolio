@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+
+import ProjectRow from "./ProjectRow.astro";
+
+interface Props {
+  title: string;
+  projects: CollectionEntry<"projects">[];
+}
+
+const { title, projects } = Astro.props;
+---
+
+<Sheet aria-labelledby="work-title">
+  <SectionTitle id="work-title">{title}</SectionTitle>
+  <ol role="list" class="rows">
+    {projects.map((project) => (
+      <ProjectRow {project} />
+    ))}
+  </ol>
+</Sheet>
+
+<style>
+  .rows {
+    display: grid;
+    grid-column: 1 / -1;
+  }
+</style>

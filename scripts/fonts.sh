@@ -36,8 +36,14 @@ build() {
   else
     mv "$WORK/$name.subset.ttf" "$WORK/$name.ttf"
   fi
-  "$FONTTOOLS" ttLib "$WORK/$name.ttf" --flavor woff2 -o "$OUT/$name.woff2"
-  printf '%-32s %6s bytes\n' "$name.woff2" "$(wc -c < "$OUT/$name.woff2" | tr -d ' ')"
+  if [ "${FORMAT:-woff2}" = woff ]; then
+    mkdir -p "$OUT/og"
+    "$FONTTOOLS" ttLib "$WORK/$name.ttf" --flavor woff -o "$OUT/og/$name.woff"
+    printf '%-32s %6s bytes\n' "og/$name.woff" "$(wc -c < "$OUT/og/$name.woff" | tr -d ' ')"
+  else
+    "$FONTTOOLS" ttLib "$WORK/$name.ttf" --flavor woff2 -o "$OUT/$name.woff2"
+    printf '%-32s %6s bytes\n' "$name.woff2" "$(wc -c < "$OUT/$name.woff2" | tr -d ' ')"
+  fi
 }
 
 build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WORDMARK" wght=800 wdth=125
@@ -45,3 +51,9 @@ build "stack-sans-notch:vf@$VERSION/latin-wght-normal.woff2" stack-sans-notch-em
 build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
 build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400:500
 build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$LATIN"
+
+# Open Graph images are rendered at build time by Satori, which reads WOFF
+# but not WOFF2. These files never reach the browser.
+FORMAT=woff build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WORDMARK" wght=800 wdth=125
+FORMAT=woff build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
+FORMAT=woff build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400

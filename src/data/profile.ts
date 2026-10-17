@@ -3,6 +3,17 @@
 import avatar from "@/assets/images/avatar.png";
 import portrait from "@/assets/images/portrait.jpg";
 
+interface Social {
+  label: string;
+  url: string;
+}
+
+const socials: readonly Social[] = [
+  { label: "LinkedIn", url: "https://linkedin.com/in/thibaut-lefrancois" },
+  { label: "GitHub", url: "https://github.com/thibautlfr" },
+  { label: "X", url: "https://x.com/thibautlfr" },
+];
+
 export const profile = {
   name: "Thibaut Lefrançois",
   givenName: "Thibaut",
@@ -26,11 +37,7 @@ export const profile = {
     frontEnd: ["React", "Astro", "Three.js"],
     backEnd: ["Node.js", "PostgreSQL"],
   },
-  socials: [
-    { label: "LinkedIn", url: "https://linkedin.com/in/thibaut-lefrancois" },
-    { label: "GitHub", url: "https://github.com/thibautlfr" },
-    { label: "X", url: "https://x.com/thibautlfr" },
-  ],
+  socials,
   portrait: {
     src: portrait,
     alt: "Black and white portrait of Thibaut Lefrançois, smiling, in a white shirt.",

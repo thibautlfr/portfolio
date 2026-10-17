@@ -1,0 +1,36 @@
+---
+import { profile } from "@/data/profile";
+
+interface Props {
+  size?: "regular" | "large";
+}
+
+const { size = "regular" } = Astro.props;
+---
+
+<a class:list={["email", `email--${size}`]} href={`mailto:${profile.email}`} data-umami-event="email">
+  {profile.email}
+</a>
+
+<style>
+  .email {
+    justify-self: start;
+    font-family: var(--font-email);
+    font-weight: var(--font-weight-title);
+    text-decoration-thickness: 2px;
+    white-space: nowrap;
+  }
+
+  .email:hover {
+    text-decoration-thickness: 4px;
+  }
+
+  /* The address stays on one line down to 320px wide. */
+  .email--regular {
+    font-size: var(--font-size-email);
+  }
+
+  .email--large {
+    font-size: var(--font-size-email-large);
+  }
+</style>

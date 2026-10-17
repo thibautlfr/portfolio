@@ -9,4 +9,5 @@
 @import "./tokens/layout.css";
 @import "./tokens/motion.css";
 @import "./base/elements.css";
+@import "./base/prose.css";
 @import "./utilities.css";

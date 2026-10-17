@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+
+import NoteListItem from "@/components/note/NoteListItem.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+import { selectLatest } from "@/lib/content";
+import { breadcrumbs } from "@/lib/seo/json-ld";
+
+const notes = selectLatest(await getCollection("notes"));
+const site = Astro.site ?? Astro.url;
+---
+
+<BaseLayout
+  title={`Notes · ${profile.name}`}
+  description="Short notes on web development, shaders and freelance work: experiments, things learned, and posts first shared on X and LinkedIn."
+  jsonLd={[
+    breadcrumbs([
+      { name: profile.name, url: site.href },
+      { name: "Notes", url: new URL("/notes/", site).href },
+    ]),
+  ]}
+>
+  <div class="page">
+    <Sheet aria-labelledby="notes-title">
+      <Cell>
+        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Notes" }]} />
+      </Cell>
+      <Cell as="header" class="title-block">
+        <h1 id="notes-title">Notes</h1>
+        <p>Experiments, things learned, and posts first shared on X and LinkedIn.</p>
+      </Cell>
+      <ol role="list" class="notes">
+        {notes.map((note) => (
+          <NoteListItem {note} />
+        ))}
+      </ol>
+    </Sheet>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--font-size-step-5);
+    line-height: var(--line-height-tight);
+  }
+
+  .notes {
+    display: grid;
+    grid-column: 1 / -1;
+  }
+</style>

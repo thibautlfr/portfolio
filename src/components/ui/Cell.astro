@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"div"> & {
-  as?: "div" | "figure" | "article" | "header";
+  as?: "div" | "figure" | "article" | "header" | "footer" | "li";
   /** Columns spanned on wide screens, out of 12. Cells are full width below 60rem. */
   span?: number;
   /** Drops the padding, for media that fills the cell. */
