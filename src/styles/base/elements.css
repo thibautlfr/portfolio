@@ -54,3 +54,18 @@
     font-size: var(--font-size-data);
   }
 }
+
+/* Page transitions and scroll reveals: CSS only, skipped under reduced motion,
+   and content stays visible where the browser lacks support. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--space-4);
+  }
+}
