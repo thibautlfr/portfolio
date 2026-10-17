@@ -1,0 +1,41 @@
+---
+import { Font } from "astro:assets";
+
+import SiteFooter from "@/components/site/SiteFooter.astro";
+import SkipLink from "@/components/site/SkipLink.astro";
+import "@/styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Only the home hero sets the wordmark above the fold. */
+  preloadWordmark?: boolean;
+}
+
+const { title, description, preloadWordmark = false } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <Font cssVariable="--font-archivo-wordmark" preload={preloadWordmark} />
+    <Font cssVariable="--font-stack-sans-headline" />
+    <Font cssVariable="--font-stack-sans-text" />
+    <Font cssVariable="--font-stack-sans-notch" />
+    <Font cssVariable="--font-fragment-mono" />
+  </head>
+  <body>
+    <SkipLink target="main" />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
