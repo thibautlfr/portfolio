@@ -9,11 +9,16 @@ import type { Seo } from "@/lib/seo/types";
 import "@/styles/global.css";
 
 interface Props extends Seo {
-  /** Only the home hero sets the wordmark above the fold. */
-  preloadWordmark?: boolean;
+  /** Hashes of inline scripts the page renders (see src/scripts/hero-shader/boot.ts). */
+  scriptHashes?: `sha256-${string}`[];
+  /** The home hero sets the wordmark and the email above the fold; other pages open on a title. */
+  hero?: boolean;
 }
 
-const { preloadWordmark = false, ...seo } = Astro.props;
+const { hero = false, scriptHashes = [], ...seo } = Astro.props;
+
+// The CSP meta tag is in <head>, so inline scripts rendered further down declare their hash here.
+for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
 ---
 
 <html lang="en">
@@ -26,10 +31,12 @@ const { preloadWordmark = false, ...seo } = Astro.props;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <Font cssVariable="--font-archivo-wordmark" preload={preloadWordmark} />
-    <Font cssVariable="--font-stack-sans-headline" />
+    <!-- Faces set in the first viewport are preloaded so they are in place for the first paint;
+         body text is display: optional and never waits (see astro.config.ts). -->
+    <Font cssVariable="--font-archivo-wordmark" preload={hero} />
+    <Font cssVariable="--font-stack-sans-headline" preload={!hero} />
     <Font cssVariable="--font-stack-sans-text" />
-    <Font cssVariable="--font-stack-sans-notch" />
+    <Font cssVariable="--font-stack-sans-notch" preload={hero} />
     <Font cssVariable="--font-fragment-mono" />
     {PUBLIC_UMAMI_WEBSITE_ID && (
       <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id={PUBLIC_UMAMI_WEBSITE_ID} />
