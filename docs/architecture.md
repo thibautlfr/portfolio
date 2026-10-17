@@ -39,7 +39,7 @@ src/
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
-│   ├── hero-shader/          # index.ts (lifecycle), renderer.ts (WebGL2), warp.frag
+│   ├── hero-shader/          # boot.ts (when to load), index.ts (lifecycle), renderer.ts (WebGL2), warp.frag
 │   └── loop-video.ts         # Playground previews: play on hover or focus
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
