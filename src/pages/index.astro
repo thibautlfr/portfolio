@@ -1,14 +1,51 @@
 ---
-import "../styles/global.css";
+// Temporary home until Phase 3: enough to check the fonts in place.
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Thibaut Lefrançois</title>
-  </head>
-  <body>
-    <h1>Thibaut Lefrançois</h1>
-  </body>
-</html>
+<BaseLayout title={profile.name} description={`${profile.name}, ${profile.role}.`} preloadWordmark>
+  <div class="page">
+    <Sheet aria-labelledby="hero-title">
+      <Cell>
+        <h1 id="hero-title" class="wordmark">
+          {profile.name}
+        </h1>
+        <p class="role">{profile.role}</p>
+      </Cell>
+      <Cell>
+        <a class="email" href={`mailto:${profile.email}`}>
+          {profile.email}
+        </a>
+      </Cell>
+    </Sheet>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-size: var(--font-size-step-5);
+    font-weight: var(--font-weight-wordmark);
+    font-stretch: var(--font-stretch-wordmark);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-wordmark);
+  }
+
+  .role {
+    margin-block-start: var(--space-8);
+    font-size: var(--font-size-step-1);
+  }
+
+  .email {
+    font-family: var(--font-email);
+    font-size: var(--font-size-step-2);
+    font-weight: var(--font-weight-title);
+  }
+</style>
