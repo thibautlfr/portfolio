@@ -36,6 +36,9 @@ jobs:
       - run: pnpm verify
 
       - run: pnpm build
+        env:
+          # Repository variable; analytics stay off when it is unset.
+          PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
 
       - uses: actions/upload-artifact@v4
         with:
