@@ -24,10 +24,10 @@ src/
 │   ├── fonts/                # Instanced and subset woff2 files (see Fonts)
 │   └── images/               # Site-level images: portrait, avatar, static shader frame
 ├── layouts/
-│   └── BaseLayout.astro      # Document shell: head, skip link, header, main, footer
+│   └── BaseLayout.astro      # Document shell: head, skip link, main, footer (no header by design)
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
-│   ├── site/                 # SiteHeader, SiteFooter
+│   ├── site/                 # SiteFooter, SkipLink
 │   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
@@ -92,38 +92,40 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 
 Zero by default. Each script is isolated, justified here, and loaded as late as possible.
 
-| Script | Why | Loaded | Budget |
-|---|---|---|---|
-| `hero-shader` | The signature domain warp | After `load`, on idle | 6 KB gzip |
-| `loop-video` | Playground previews on hover or focus | Deferred module | 1 KB gzip |
-| Umami | Cookieless analytics | `defer`, third party | about 2 KB |
+| Script        | Why                                   | Loaded                | Budget     |
+| ------------- | ------------------------------------- | --------------------- | ---------- |
+| `hero-shader` | The signature domain warp             | After `load`, on idle | 6 KB gzip  |
+| `loop-video`  | Playground previews on hover or focus | Deferred module       | 1 KB gzip  |
+| Umami         | Cookieless analytics                  | `defer`, third party  | about 2 KB |
 
 Page transitions use native cross-document View Transitions (CSS only). Scroll reveals use CSS scroll-driven animations behind `@supports`.
 
 ## Tooling
 
-| Script | Runs |
-|---|---|
-| `pnpm format` / `format:check` | Prettier with the Astro plugin |
-| `pnpm lint` | ESLint: typescript-eslint, eslint-plugin-astro, jsx-a11y rules |
-| `pnpm lint:css` | Stylelint, including the no-raw-value rule |
-| `pnpm lint:unused` | knip: unused files, exports and dependencies |
-| `pnpm check` | `astro check`, zero errors and zero warnings |
-| `pnpm test` | Vitest on `src/lib` |
-| `pnpm verify` | All of the above, in CI order |
+| Script                         | Runs                                              |
+| ------------------------------ | ------------------------------------------------- |
+| `pnpm format` / `format:check` | Prettier with the Astro plugin                    |
+| `pnpm lint`                    | ESLint: typescript-eslint and eslint-plugin-astro |
+| `pnpm lint:css`                | Stylelint, including the no-raw-value rule        |
+| `pnpm lint:unused`             | knip: unused files, exports and dependencies      |
+| `pnpm check`                   | `astro check`, zero errors and zero warnings      |
+| `pnpm test`                    | Vitest on `src/lib`                               |
+| `pnpm verify`                  | All of the above, in CI order                     |
+
+eslint-plugin-jsx-a11y is left out: it does not support ESLint 10, which eslint-plugin-astro requires. Accessibility is enforced by Lighthouse CI on every pull request and by the axe audit of Phase 5.
 
 CI (`.github/workflows/ci.yml`) runs `verify`, then `build`, then Lighthouse CI with budgets on every pull request and push. The deploy job runs on `main` only, after the same checks, and refuses to ship if `src/content` still contains lorem ipsum.
 
 ## Dependencies
 
-| Package | Why | Ships to the client |
-|---|---|---|
-| `astro` | Framework | no |
-| `@radix-ui/colors` | Colour scales behind the tokens | CSS only |
-| `@astrojs/mdx` | `Figure` and `Video` inside case studies | no |
-| `@astrojs/sitemap`, `@astrojs/rss` | Official, small | no |
-| `satori`, `@resvg/resvg-js` | Open Graph images at build time | no |
-| Dev: `typescript`, `@astrojs/check`, `prettier`, `prettier-plugin-astro`, `eslint`, `typescript-eslint`, `eslint-plugin-astro`, `eslint-plugin-jsx-a11y`, `stylelint`, `stylelint-config-standard`, `postcss-html`, `stylelint-declaration-strict-value`, `knip`, `vitest`, `@lhci/cli` | Each one makes a rule of this file checkable by a machine | no |
+| Package                                                                                                                                                                                                                                                       | Why                                                       | Ships to the client |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------- |
+| `astro`                                                                                                                                                                                                                                                       | Framework                                                 | no                  |
+| `@radix-ui/colors`                                                                                                                                                                                                                                            | Colour scales behind the tokens                           | CSS only            |
+| `@astrojs/mdx`                                                                                                                                                                                                                                                | `Figure` and `Video` inside case studies                  | no                  |
+| `@astrojs/sitemap`, `@astrojs/rss`                                                                                                                                                                                                                            | Official, small                                           | no                  |
+| `satori`, `@resvg/resvg-js`                                                                                                                                                                                                                                   | Open Graph images at build time                           | no                  |
+| Dev: `typescript`, `@astrojs/check`, `prettier`, `prettier-plugin-astro`, `eslint`, `typescript-eslint`, `eslint-plugin-astro`, `stylelint`, `stylelint-config-standard`, `postcss-html`, `stylelint-declaration-strict-value`, `knip`, `vitest`, `@lhci/cli` | Each one makes a rule of this file checkable by a machine | no                  |
 
 Not used on purpose: Tailwind (the tokens are the system), GSAP (CSS covers the motion), Three.js or OGL (one fullscreen triangle in raw WebGL2), Astro's `ClientRouter` (native View Transitions cost no JavaScript and keep the CSP strict), any UI framework.
 
