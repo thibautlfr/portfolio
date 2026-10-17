@@ -12,8 +12,14 @@ export default defineConfig({
   site: "https://thibaut-lefrancois.com",
   // GitHub Pages serves folders and redirects /page to /page/: canonical URLs match that.
   trailingSlash: "always",
-  build: { format: "directory" },
+  // About 4 KB of CSS gzipped in all: inlining it removes the render-blocking request.
+  build: { format: "directory", inlineStylesheets: "always" },
   redirects: legacyRedirects,
+  vite: {
+    // The hero shader is built as one standalone ES module (see Hero.astro), loaded by an
+    // inline boot step: no script request competes with the first paint.
+    worker: { format: "es" },
+  },
   env: {
     schema: {
       // Umami Cloud site id; analytics stay off when it is not set (local builds, forks).
@@ -75,14 +81,19 @@ export default defineConfig({
       name: "Stack Sans Text",
       cssVariable: "--font-stack-sans-text",
       fallbacks: ["sans-serif"],
-      options: { variants: [{ src: [fontFile("stack-sans-text")], weight: "400 500", style: "normal" }] },
+      // Body text: never preloaded and never swapped in late, so it cannot delay the first
+      // paint nor move the layout. A slow first visit shows the metric-matched fallback.
+      options: {
+        variants: [{ src: [fontFile("stack-sans-text")], weight: "400 500", style: "normal", display: "optional" }],
+      },
     },
     {
       provider: fontProviders.local(),
       name: "Fragment Mono",
       cssVariable: "--font-fragment-mono",
       fallbacks: ["monospace"],
-      options: { variants: [{ src: [fontFile("fragment-mono")], weight: 400, style: "normal" }] },
+      // Data only: a system monospace is fine when the file is late, and never swaps in later.
+      options: { variants: [{ src: [fontFile("fragment-mono")], weight: 400, style: "normal", display: "optional" }] },
     },
   ],
 });

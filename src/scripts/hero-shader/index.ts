@@ -1,5 +1,7 @@
-// The live hero shader, loaded by boot.ts only when it may run. It pauses
-// off-screen and in hidden tabs, and exposes a pause control.
+// The live hero shader. Hero.astro's inline boot step imports this module only
+// when it may run (no reduced motion, no Save-Data), after load, the largest
+// paint and idle; it then starts itself. It pauses off-screen and in hidden
+// tabs, and exposes a pause control.
 import { createRenderer, type FrameInput } from "./renderer";
 import warpSource from "./warp.frag?raw";
 
@@ -12,7 +14,7 @@ const EASING = 0.05;
 // Starts where the composition reads well, so the first live frame matches the static one.
 const START_TIME = 12;
 
-export function startHeroShader(root: HTMLElement) {
+function startHeroShader(root: HTMLElement) {
   const canvas = root.querySelector<HTMLCanvasElement>("[data-hero-shader-canvas]");
   const toggle = root.querySelector<HTMLButtonElement>("[data-hero-shader-toggle]");
   if (!canvas || !toggle) return;
@@ -99,3 +101,6 @@ export function startHeroShader(root: HTMLElement) {
   root.classList.add("is-live");
   sync();
 }
+
+const root = document.querySelector<HTMLElement>("[data-hero-shader]");
+if (root) startHeroShader(root);

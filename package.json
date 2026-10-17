@@ -17,7 +17,8 @@
     "lint:unused": "knip",
     "check": "astro check",
     "test": "vitest run --passWithNoTests",
-    "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm lint:unused && pnpm check && pnpm test"
+    "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm lint:unused && pnpm check && pnpm test",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.0",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
     "eslint": "^10.13.0",
     "eslint-plugin-astro": "^3.2.1",
     "globals": "^17.13.0",

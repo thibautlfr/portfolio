@@ -6,7 +6,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig(
-  { ignores: ["dist/", ".astro/", ".claude/"] },
+  { ignores: ["dist/", ".astro/", ".claude/", ".lighthouseci/"] },
   js.configs.recommended,
   tseslint.configs.strict,
   tseslint.configs.stylistic,

@@ -40,6 +40,9 @@ jobs:
           # Repository variable; analytics stay off when it is unset.
           PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
 
+      # Mobile Lighthouse on the built site: scores, LCP, CLS and byte budgets (lighthouserc.cjs).
+      - run: pnpm lighthouse
+
       - uses: actions/upload-artifact@v4
         with:
           name: site

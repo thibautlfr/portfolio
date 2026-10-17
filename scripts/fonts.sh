@@ -15,7 +15,10 @@ trap 'rm -rf "$WORK"' EXIT
 
 CDN="https://cdn.jsdelivr.net/fontsource/fonts"
 VERSION="5.3.0"
-LATIN="U+0020-007E,U+00A0-017F,U+2013,U+2018-201F,U+2022,U+2026,U+20AC"
+# English and French: ASCII, Latin-1 (é, ç, à...), Œ œ, typographic quotes, en dash, bullet, ellipsis, euro.
+LATIN="U+0020-007E,U+00A0-00FF,U+0152-0153,U+2013,U+2018-201F,U+2022,U+2026,U+20AC"
+# The mono only sets data (stack names, dates, coordinates): ASCII and the degree sign.
+DATA="U+0020-007E,U+00B0,U+00B7"
 # Strings set in a single face: their files only need these glyphs.
 WORDMARK="Thibaut Lefrançois"
 EMAIL="hello@thibaut-lefrancois.com"
@@ -50,7 +53,7 @@ build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WO
 build "stack-sans-notch:vf@$VERSION/latin-wght-normal.woff2" stack-sans-notch-email "--text=$EMAIL" wght=700
 build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
 build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400:500
-build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$LATIN"
+build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$DATA"
 
 # Open Graph images are rendered at build time by Satori, which reads WOFF
 # but not WOFF2. These files never reach the browser.

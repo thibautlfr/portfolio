@@ -13,13 +13,16 @@ interface Props {
   priority?: boolean;
 }
 
-const { src, alt, ratio, sizes, widths = [480, 720, 960, 1280], priority = false } = Astro.props;
+// AVIF for every raster: all target browsers decode it and it is the smallest.
+// SVG stays vector (rasterising it is not supported for every file).
+const { src, alt, ratio, sizes, widths = [320, 480, 720, 960, 1280], priority = false } = Astro.props;
 ---
 
 <Image
   class="media"
   src={src}
   alt={alt}
+  format={src.format === "svg" ? "svg" : "avif"}
   sizes={sizes}
   widths={widths}
   loading={priority ? "eager" : "lazy"}
