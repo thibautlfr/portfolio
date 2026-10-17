@@ -39,7 +39,7 @@ src/
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
-│   ├── hero-shader/          # boot.ts (when to load), index.ts (lifecycle), renderer.ts (WebGL2), warp.frag
+│   ├── hero-shader/          # boot-inline.js (inlined, decides when), boot.ts (its CSP hash), index.ts, renderer.ts, warp.frag
 │   └── loop-video.ts         # Playground previews: play on hover or focus
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
@@ -92,11 +92,11 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 
 Zero by default. Each script is isolated, justified here, and loaded as late as possible.
 
-| Script        | Why                                   | Loaded                | Budget     |
-| ------------- | ------------------------------------- | --------------------- | ---------- |
-| `hero-shader` | The signature domain warp             | After `load`, on idle | 6 KB gzip  |
-| `loop-video`  | Playground previews on hover or focus | Deferred module       | 1 KB gzip  |
-| Umami         | Cookieless analytics                  | `defer`, third party  | about 2 KB |
+| Script        | Why                                   | Loaded                                                                                                                      | Budget     |
+| ------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `hero-shader` | The signature domain warp             | Boot step inlined in the page (no request, hashed in the CSP); the module (2.3 KB) after `load`, the largest paint and idle | 6 KB gzip  |
+| `loop-video`  | Playground previews on hover or focus | Deferred module                                                                                                             | 1 KB gzip  |
+| Umami         | Cookieless analytics                  | `defer`, third party                                                                                                        | about 2 KB |
 
 Page transitions use native cross-document View Transitions (CSS only). Scroll reveals use CSS scroll-driven animations behind `@supports`.
 
