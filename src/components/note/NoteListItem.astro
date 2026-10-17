@@ -5,18 +5,21 @@ import { formatDate, isoDate } from "@/lib/format";
 
 interface Props {
   note: CollectionEntry<"notes">;
+  /** h2 on the notes page, h3 inside the home's Notes section. */
+  headingLevel?: 2 | 3;
 }
 
-const { note } = Astro.props;
+const { note, headingLevel = 3 } = Astro.props;
+const Heading = headingLevel === 2 ? "h2" : "h3";
 const { title, description, pubDate } = note.data;
 ---
 
 <li class="note">
   <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
   <div>
-    <h3>
+    <Heading class="title">
       <a href={`/notes/${note.id}/`}>{title}</a>
-    </h3>
+    </Heading>
     <p>{description}</p>
   </div>
 </li>
@@ -38,16 +41,16 @@ const { title, description, pubDate } = note.data;
     font-variant-numeric: tabular-nums;
   }
 
-  h3 {
+  .title {
     font-size: var(--font-size-step-1);
   }
 
-  h3 a {
+  .title a {
     text-decoration: none;
   }
 
-  h3 a:hover,
-  h3 a:focus-visible {
+  .title a:hover,
+  .title a:focus-visible {
     text-decoration: underline;
   }
 

@@ -35,7 +35,7 @@ const site = Astro.site ?? Astro.url;
       </Cell>
       <ol role="list" class="notes">
         {notes.map((note) => (
-          <NoteListItem {note} />
+          <NoteListItem {note} headingLevel={2} />
         ))}
       </ol>
     </Sheet>
