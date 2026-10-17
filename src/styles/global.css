@@ -1,7 +1,12 @@
-@import "@radix-ui/colors/sage.css";
-@import "@radix-ui/colors/teal.css";
+/* Cascade order. Component styles are Astro scoped and unlayered, so they
+   win over every layer below on purpose. */
+@layer reset, tokens, base, layout, utilities;
 
-body {
-  background: var(--sage-1);
-  color: var(--sage-12);
-}
+@import "./base/reset.css";
+@import "./tokens/color.css";
+@import "./tokens/typography.css";
+@import "./tokens/space.css";
+@import "./tokens/layout.css";
+@import "./tokens/motion.css";
+@import "./base/elements.css";
+@import "./utilities.css";

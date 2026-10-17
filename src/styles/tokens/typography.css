@@ -1,0 +1,35 @@
+/* Type roles. The font variables come from Astro's Fonts API
+   (astro.config.ts); each role names one job, not one face. */
+@layer tokens {
+  :root {
+    --font-wordmark: var(--font-archivo-wordmark);
+    --font-title: var(--font-stack-sans-headline);
+    --font-text: var(--font-stack-sans-text);
+    --font-email: var(--font-stack-sans-notch);
+    --font-data: var(--font-fragment-mono);
+
+    --font-weight-text: 400;
+    --font-weight-strong: 500;
+    --font-weight-title: 700;
+    --font-weight-wordmark: 800;
+    --font-stretch-wordmark: 125%;
+
+    /* Fluid scale, 320px to 1440px viewports. */
+    --font-size-step-minus-1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+    --font-size-step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+    --font-size-step-1: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
+    --font-size-step-2: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+    --font-size-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
+    --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
+
+    /* Mono runs a little large next to the text face. */
+    --font-size-data: 0.9em;
+
+    --line-height-tight: 0.9;
+    --line-height-title: 1.05;
+    --line-height-text: 1.5;
+
+    --letter-spacing-wordmark: -0.03em;
+    --letter-spacing-title: -0.015em;
+  }
+}

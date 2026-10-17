@@ -1,0 +1,56 @@
+/* Element defaults: everything a page gets before any component styles it. */
+@layer base {
+  body {
+    background: var(--color-ground);
+    color: var(--color-text);
+    font-family: var(--font-text);
+    font-size: var(--font-size-step-0);
+    font-weight: var(--font-weight-text);
+    line-height: var(--line-height-text);
+    text-rendering: optimizelegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-title);
+    letter-spacing: var(--letter-spacing-title);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-thickness var(--duration-quick) var(--ease-snap);
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: var(--color-text);
+  }
+
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-data);
+    font-size: var(--font-size-data);
+  }
+}

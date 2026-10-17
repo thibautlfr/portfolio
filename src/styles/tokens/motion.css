@@ -1,0 +1,15 @@
+/* Motion is dry and short; the hero shader is the only continuous motion. */
+@layer tokens {
+  :root {
+    --duration-quick: 140ms;
+    --duration-fade: 400ms;
+    --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-quick: 0ms;
+      --duration-fade: 0ms;
+    }
+  }
+}
