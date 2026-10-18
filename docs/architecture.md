@@ -57,6 +57,8 @@ src/
     └── og/[...path].png.ts   # Open Graph images, rendered at build time
 ```
 
+`src/proposals/` holds design proposals under review (hero shaders, page transitions). They only exist under `astro dev`: the shaders page is registered by a dev-only integration in `astro.config.ts` (`/proposals/shaders/`), and the transition picker is rendered by `BaseLayout` in dev with its CSS and script inlined as strings, so none of it reaches a production build. The folder is emptied once a proposal is chosen and built properly.
+
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `docs/`, `.github/workflows/`.
 
 ## Conventions
