@@ -19,40 +19,79 @@ const { legal, email } = profile;
       </Cell>
       <Cell as="header" class="title-block">
         <h1 id="legal-title">Legal notice</h1>
+        <p>Who publishes this website, who hosts it, and what happens to your data.</p>
       </Cell>
-      <Cell span={6} class="prose">
+
+      <!-- One row per topic: the topic in a narrow cell, the text beside it. -->
+      <Cell span={4} class="topic">
         <h2>Publisher</h2>
-        <p>
-          {legal.publisher}, individual.
-          <br />
-          Contact: <a href={`mailto:${email}`}>{email}</a>
-        </p>
+      </Cell>
+      <Cell span={8} class="statement">
+        <dl class="facts">
+          <div>
+            <dt>Name</dt>
+            <dd>{legal.publisher}, individual</dd>
+          </div>
+          <div>
+            <dt>Contact</dt>
+            <dd>
+              <a href={`mailto:${email}`}>{email}</a>
+            </dd>
+          </div>
+        </dl>
         <p>
           In accordance with article 6-III-2 of French law no. 2004-575 of 21 June 2004 (LCEN), an individual publisher
           is not required to disclose their personal address. This information has been communicated to the hosting
           provider.
         </p>
-        <h2>Hosting</h2>
-        <p>
-          {legal.host.name}
-          <br />
-          {legal.host.address}
-          <br />
-          <a href={legal.host.url}>{legal.host.url.replace("https://", "")}</a>
-        </p>
       </Cell>
-      <Cell span={6} class="prose">
+
+      <Cell span={4} class="topic">
+        <h2>Hosting</h2>
+      </Cell>
+      <Cell span={8} class="statement">
+        <dl class="facts">
+          <div>
+            <dt>Name</dt>
+            <dd>{legal.host.name}</dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd>{legal.host.address}</dd>
+          </div>
+          <div>
+            <dt>Website</dt>
+            <dd>
+              <a href={legal.host.url}>{legal.host.url.replace("https://", "")}</a>
+            </dd>
+          </div>
+        </dl>
+      </Cell>
+
+      <Cell span={4} class="topic">
         <h2>Personal data</h2>
+      </Cell>
+      <Cell span={8} class="statement">
         <p>
           This website collects no personal data. Audience is measured with Umami, without cookies and without
           identifying visitors. Emails you send are only used to answer you.
         </p>
+      </Cell>
+
+      <Cell span={4} class="topic">
         <h2>Intellectual property</h2>
+      </Cell>
+      <Cell span={8} class="statement">
         <p>
-          All content on this website (text, images, source code, graphic elements) is the property of {legal.publisher}
-          unless stated otherwise. Any reproduction without prior authorisation is prohibited.
+          {`All content on this website (text, images, source code, graphic elements) is the property of ${legal.publisher} unless stated otherwise.`}
+          Any reproduction without prior authorisation is prohibited.
         </p>
+      </Cell>
+
+      <Cell span={4} class="topic">
         <h2>Applicable law</h2>
+      </Cell>
+      <Cell span={8} class="statement">
         <p>
           This legal notice is governed by French law. In the event of a dispute, French courts have exclusive
           jurisdiction.
@@ -68,6 +107,8 @@ const { legal, email } = profile;
   }
 
   .title-block {
+    display: grid;
+    gap: var(--space-3);
     padding-block: var(--space-8);
   }
 
@@ -76,15 +117,53 @@ const { legal, email } = profile;
     line-height: var(--line-height-tight);
   }
 
-  .prose {
-    font-size: var(--font-size-step-0);
+  .title-block p {
+    color: var(--color-text-muted);
   }
 
-  .prose h2 {
-    font-size: var(--font-size-step-2);
+  /* Below 60rem the topic sits on top of its text: no hairline between them. */
+  .topic {
+    padding-block-end: 0;
+    border-block-end: 0;
   }
 
-  .prose h2:first-child {
-    margin-block-start: 0;
+  h2 {
+    font-size: var(--font-size-step-1);
+  }
+
+  .statement {
+    display: grid;
+    gap: var(--space-4);
+    padding-block-end: var(--space-6);
+  }
+
+  .statement > * {
+    max-inline-size: var(--layout-measure);
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .facts div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+  }
+
+  a {
+    color: var(--color-link);
+  }
+
+  @media (width >= 60rem) {
+    .topic {
+      padding-block-end: var(--space-6);
+      border-block-end: var(--border-hairline);
+    }
   }
 </style>
