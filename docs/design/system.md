@@ -61,17 +61,15 @@ The one breakpoint is 60rem. Sheets are separated by `--space-12`.
 
 ## Motion
 
-| Token              | Value                          | Use                                                   |
-| ------------------ | ------------------------------ | ----------------------------------------------------- |
-| `--duration-quick` | 140ms (0 under reduced motion) | Colour and underline feedback                         |
-| `--duration-move`  | 360ms (0 under reduced motion) | Anything that travels: arrows, images in their frames |
-| `--duration-fade`  | 400ms (0 under reduced motion) | The shader fading in over its still frame             |
-| `--duration-enter` | 700ms (0 under reduced motion) | The name rising into place on arrival                 |
-| `--duration-page`  | 650ms (0 under reduced motion) | Page transitions                                      |
-| `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                              |
-| `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle                     |
+| Token              | Value                          | Use                                       |
+| ------------------ | ------------------------------ | ----------------------------------------- |
+| `--duration-quick` | 140ms (0 under reduced motion) | Colour and underline feedback             |
+| `--duration-fade`  | 400ms (0 under reduced motion) | The shader fading in over its still frame |
+| `--duration-page`  | 650ms (0 under reduced motion) | Page transitions                          |
+| `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
+| `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Micro-interactions: every arrow has a gesture tied to where its link goes (the email arrow turns from out to forward, internal links step forward, external links lift toward the corner, the CV drops, the way home steps back); project rows show their arrow and move their image inside a fixed frame; posters lift off the wall. The name rises into place once on arrival. Page transitions are native View Transitions; rows and notes rise in on scroll with CSS scroll-driven animations. All of it is off under reduced motion and absent where unsupported.
+Page transitions are native View Transitions; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns from the back-forward cache where it was left.
 
 ## Components
 
@@ -82,9 +80,7 @@ Micro-interactions: every arrow has a gesture tied to where its link goes (the e
 | `SectionTitle` | The title cell of a section, with an optional aside link                                 |
 | `FactList`     | Term and value pairs; `data` values set in mono                                          |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                               |
-| `EmailLink`    | The email in Notch with its arrow, fitted to its cell, on one line at every width        |
-| `Arrow`        | The one drawn arrow (SVG), pointing east, north-east, south or west                      |
-| `ArrowLink`    | A link with its arrow: `next`, `out`, `down` or `back`, each with its own hover gesture  |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
 | `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |
 
 The development page `/styleguide/` shows every token and base component.

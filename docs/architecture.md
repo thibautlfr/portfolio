@@ -57,7 +57,7 @@ src/
     └── og/[...path].png.ts   # Open Graph images, rendered at build time
 ```
 
-`src/proposals/` holds design proposals under review (hero shaders, page transitions). They only exist under `astro dev`: the shaders page is registered by a dev-only integration in `astro.config.ts` (`/proposals/shaders/`), and the transition picker is rendered by `BaseLayout` in dev with its CSS and script inlined as strings, so none of it reaches a production build. The folder is emptied once a proposal is chosen and built properly.
+`src/proposals/` holds design proposals under review: hero shaders (`/proposals/shaders/`), the dynamic ASCII hero (`/proposals/ascii/`) and page transitions (a picker in the corner of every page). They exist under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322), which is the one to judge transitions on: in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes view transitions flash. The pages are registered by an integration in `astro.config.ts`; the picker's inline script and style carry their CSP hashes. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly.
 
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `docs/`, `.github/workflows/`.
 
