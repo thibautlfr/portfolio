@@ -14,6 +14,8 @@ export default defineConfig({
   trailingSlash: "always",
   // About 4 KB of CSS gzipped in all: inlining it removes the render-blocking request.
   build: { format: "directory", inlineStylesheets: "always" },
+  // Scoped styles through a class rather than a data attribute on every element: shorter HTML.
+  scopedStyleStrategy: "class",
   redirects: legacyRedirects,
   vite: {
     // The hero shader is built as one standalone ES module (see Hero.astro), loaded by an
