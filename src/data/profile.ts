@@ -12,6 +12,7 @@ const socials: readonly Social[] = [
   { label: "LinkedIn", url: "https://linkedin.com/in/thibaut-lefrancois" },
   { label: "GitHub", url: "https://github.com/thibautlfr" },
   { label: "X", url: "https://x.com/thibautlfr" },
+  { label: "Instagram", url: "https://www.instagram.com/thibautlfr/" },
 ];
 
 export const profile = {
