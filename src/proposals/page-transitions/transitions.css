@@ -168,7 +168,7 @@ html[data-transition="iris"]::view-transition-new(root) {
    rest of the page fades. */
 html[data-transition="morph"]::view-transition-old(root),
 html[data-transition="morph"]::view-transition-new(root) {
-  animation-duration: var(--duration-move);
+  animation-duration: var(--duration-fade);
 }
 
 html[data-transition="morph"]::view-transition-group(proposal-title),

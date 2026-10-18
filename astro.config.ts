@@ -8,13 +8,15 @@ import { legacyRedirects } from "./src/data/legacy-redirects";
 // Built by scripts/fonts.sh: instanced and subset, see docs/architecture.md#fonts.
 const fontFile = (name: string) => `./src/assets/fonts/${name}.woff2`;
 
-// Design proposals under review (src/proposals): routes that exist in `astro dev` only.
+// Design proposals under review (src/proposals): routes that exist in `astro dev`, and in a
+// build made with PUBLIC_PROPOSALS=true (pnpm proposals) to judge them on the real output.
 const proposals: AstroIntegration = {
   name: "proposals",
   hooks: {
     "astro:config:setup": ({ command, injectRoute }) => {
-      if (command !== "dev") return;
+      if (command !== "dev" && process.env["PUBLIC_PROPOSALS"] !== "true") return;
       injectRoute({ pattern: "/proposals/shaders", entrypoint: "./src/proposals/hero-shaders/ShadersPage.astro" });
+      injectRoute({ pattern: "/proposals/ascii", entrypoint: "./src/proposals/ascii/AsciiPage.astro" });
     },
   },
 };

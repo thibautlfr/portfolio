@@ -7,6 +7,7 @@ import SiteFooter from "@/components/site/SiteFooter.astro";
 import SkipLink from "@/components/site/SkipLink.astro";
 import type { Seo } from "@/lib/seo/types";
 import TransitionPicker from "@/proposals/page-transitions/TransitionPicker.astro";
+import { proposalsEnabled, transitionScriptHash, transitionStyleHash } from "@/proposals/page-transitions";
 import "@/styles/global.css";
 
 interface Props extends Seo {
@@ -20,6 +21,10 @@ const { hero = false, scriptHashes = [], ...seo } = Astro.props;
 
 // The CSP meta tag is in <head>, so inline scripts rendered further down declare their hash here.
 for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
+if (proposalsEnabled) {
+  Astro.csp?.insertScriptHash(transitionScriptHash);
+  Astro.csp?.insertStyleHash(transitionStyleHash);
+}
 ---
 
 <html lang="en">
@@ -42,7 +47,7 @@ for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
     {PUBLIC_UMAMI_WEBSITE_ID && (
       <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id={PUBLIC_UMAMI_WEBSITE_ID} />
     )}
-    {import.meta.env.DEV && <TransitionPicker part="head" />}
+    {proposalsEnabled && <TransitionPicker part="head" />}
   </head>
   <body>
     <SkipLink target="main" />
@@ -50,6 +55,6 @@ for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
       <slot />
     </main>
     <SiteFooter />
-    {import.meta.env.DEV && <TransitionPicker part="body" />}
+    {proposalsEnabled && <TransitionPicker part="body" />}
   </body>
 </html>

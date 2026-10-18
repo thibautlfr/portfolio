@@ -1,7 +1,8 @@
 // @ts-check
-// Development only (inlined in <head> by TransitionPicker.astro): picks the page transition
-// proposal stored in localStorage and gives each navigation a type, open (into a case study),
-// close (back out of one) or other, plus the geometry the variants start from.
+// Proposals only (inlined in <head> by TransitionPicker.astro, with its CSP hash): picks the
+// page transition proposal stored in localStorage and gives each navigation a type, open (into
+// a case study), close (back out of one) or other, plus the geometry the variants start from.
+// It also wires the picker once the page is parsed.
 {
   const KEY = "proposal-transition";
   const root = document.documentElement;
@@ -80,5 +81,15 @@
       root.style.setProperty("--vt-bottom", px(Math.max(innerHeight - saved.bottom, 0)));
       root.style.setProperty("--vt-left", px(Math.max(saved.left, 0)));
     }
+  });
+
+  addEventListener("DOMContentLoaded", () => {
+    const select = document.querySelector("[data-transition-picker]");
+    if (!(select instanceof HTMLSelectElement)) return;
+    select.value = style;
+    select.addEventListener("change", () => {
+      localStorage.setItem(KEY, select.value);
+      root.dataset["transition"] = select.value;
+    });
   });
 }

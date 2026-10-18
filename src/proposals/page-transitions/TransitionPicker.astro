@@ -1,9 +1,7 @@
 ---
-// Development only: switches the page transition proposal (see transitions.css and boot.js).
-// Rendered by BaseLayout under `astro dev`; the CSS and the script are inlined as strings,
-// so nothing of this reaches a production build.
-import boot from "./boot.js?raw";
-import styles from "./transitions.css?raw";
+// Switches the page transition proposal (see transitions.css and boot.js). BaseLayout renders
+// it only when proposals are enabled, and declares the CSP hashes of its inline script and style.
+import { transitionBoot, transitionStyles } from "./index";
 
 interface Props {
   /** head: the styles and the boot script, which must run before the first render. */
@@ -23,8 +21,8 @@ const options = [
 ];
 ---
 
-{part === "head" && <Fragment set:html={`<style>${styles}</style>`} />}
-{part === "head" && <script is:inline set:html={boot} />}
+{part === "head" && <Fragment set:html={`<style>${transitionStyles}</style>`} />}
+{part === "head" && <script is:inline set:html={transitionBoot} />}
 {part === "body" && (
   <label class="transition-picker">
     Page transition
@@ -35,15 +33,3 @@ const options = [
     </select>
   </label>
 )}
-{part === "body" && <script is:inline>
-  {
-    const select = document.querySelector("[data-transition-picker]");
-    if (select instanceof HTMLSelectElement) {
-      select.value = document.documentElement.dataset.transition ?? "crossfade";
-      select.addEventListener("change", () => {
-        localStorage.setItem("proposal-transition", select.value);
-        document.documentElement.dataset.transition = select.value;
-      });
-    }
-  }
-</script>}
