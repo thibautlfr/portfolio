@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
+import ArrowLink from "@/components/ui/ArrowLink.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import NoteListItem from "@/components/note/NoteListItem.astro";
@@ -16,9 +17,9 @@ const { title, notes } = Astro.props;
 <Sheet aria-labelledby="notes-title">
   <SectionTitle id="notes-title">
     {title}
-    <a slot="aside" href="/notes/">
+    <ArrowLink slot="aside" href="/notes/">
       All notes
-    </a>
+    </ArrowLink>
   </SectionTitle>
   <ol role="list" class="notes">
     {notes.map((note) => (

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
+import ArrowLink from "@/components/ui/ArrowLink.astro";
 import Cell from "@/components/ui/Cell.astro";
 import Media from "@/components/ui/Media.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
@@ -21,9 +22,9 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
   <SectionTitle id="artworks-title">
     {title}
     {more && (
-      <a slot="aside" href={more.url}>
+      <ArrowLink slot="aside" kind="out" href={more.url}>
         {more.label}
-      </a>
+      </ArrowLink>
     )}
   </SectionTitle>
   {artworks.map(({ data }) => (
@@ -59,6 +60,15 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
     inline-size: auto;
     block-size: var(--artwork-height);
     margin-inline: auto;
+    transition:
+      translate var(--duration-move) var(--ease-out),
+      outline-color var(--duration-quick) var(--ease-snap);
+  }
+
+  /* Picked up from the wall, a little. */
+  .artwork:hover :global(.media) {
+    translate: 0 calc(var(--space-2) * -1);
+    outline-color: var(--color-accent);
   }
 
   figcaption {

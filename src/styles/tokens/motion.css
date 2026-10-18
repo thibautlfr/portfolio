@@ -1,15 +1,24 @@
-/* Motion is dry and short; the hero shader is the only continuous motion. */
+/* Motion answers the visitor and stops; the hero shader is the only continuous motion.
+   Quick is feedback (colour, underline), move is anything that travels (arrows, images),
+   enter is the one-time arrival of the hero and of rows on scroll. */
 @layer tokens {
   :root {
     --duration-quick: 140ms;
+    --duration-move: 360ms;
     --duration-fade: 400ms;
+    --duration-enter: 700ms;
+    --duration-page: 650ms;
     --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
     :root {
       --duration-quick: 0ms;
+      --duration-move: 0ms;
       --duration-fade: 0ms;
+      --duration-enter: 0ms;
+      --duration-page: 0ms;
     }
   }
 }

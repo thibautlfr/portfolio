@@ -10,5 +10,8 @@
     --space-12: 3rem;
     --space-16: 4rem;
     --space-24: 6rem;
+
+    /* Between a word and the arrow beside it: scales with the text it follows. */
+    --space-icon: 0.35em;
   }
 }

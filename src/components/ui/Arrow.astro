@@ -1,0 +1,36 @@
+---
+interface Props {
+  /** Where the arrow points at rest; hover states rotate it through --arrow-turn. */
+  direction?: "east" | "north-east" | "south" | "west";
+}
+
+const { direction = "east" } = Astro.props;
+const angles = { east: "0deg", "north-east": "-45deg", south: "90deg", west: "180deg" };
+---
+
+<svg
+  class="arrow"
+  viewBox="0 0 16 16"
+  aria-hidden="true"
+  focusable="false"
+  style={`--arrow-angle: ${angles[direction]}`}
+>
+  <path d="M2 8h11M8.5 3.5 13 8l-4.5 4.5" />
+</svg>
+
+<style>
+  .arrow {
+    flex: none;
+    inline-size: 0.75em;
+    block-size: 0.75em;
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 2;
+    stroke-linecap: square;
+    rotate: calc(var(--arrow-angle) + var(--arrow-turn, 0deg));
+    translate: var(--arrow-shift, 0);
+    transition:
+      rotate var(--duration-move) var(--ease-out),
+      translate var(--duration-move) var(--ease-out);
+  }
+</style>
