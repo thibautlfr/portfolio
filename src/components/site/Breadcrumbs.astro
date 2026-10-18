@@ -15,10 +15,22 @@ const { items } = Astro.props;
 <nav aria-label="Breadcrumb">
   <ol role="list">
     {items.map((item) => (
-      <li>{item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}</li>
+      <li>
+        {item.href ? (
+          <a href={item.href} data-back-link>
+            {item.label}
+          </a>
+        ) : (
+          <span aria-current="page">{item.label}</span>
+        )}
+      </li>
     ))}
   </ol>
 </nav>
+
+<script>
+  import "@/scripts/back-link";
+</script>
 
 <style>
   ol {
