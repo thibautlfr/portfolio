@@ -1,5 +1,4 @@
 ---
-import ArrowLink from "@/components/ui/ArrowLink.astro";
 import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
@@ -39,9 +38,9 @@ const { stack, languages, cvPath } = profile;
       ]}
     />
     {cvPath && (
-      <ArrowLink kind="down" class="cv" href={cvPath} data-umami-event="cv">
+      <a class="cv" href={cvPath} data-umami-event="cv">
         Download my CV (PDF)
-      </ArrowLink>
+      </a>
     )}
   </Cell>
 </Sheet>
@@ -71,7 +70,7 @@ const { stack, languages, cvPath } = profile;
     padding-block: var(--space-6) var(--space-8);
   }
 
-  .facts :global(.cv) {
+  .cv {
     justify-self: start;
     color: var(--color-link);
     font-weight: var(--font-weight-strong);

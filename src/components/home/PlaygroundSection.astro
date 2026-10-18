@@ -60,21 +60,9 @@ const hasPreviews = experiments.some(({ data }) => data.preview);
     align-items: center;
   }
 
-  /* The loop sits on its thumbnail and only shows while it plays. The frame stays put
-     and the picture moves inside it. */
+  /* The loop sits on its thumbnail and only shows while it plays. */
   .thumbnail {
     position: relative;
-    overflow: clip;
-    outline: var(--border-hairline);
-  }
-
-  .thumbnail :global(.media) {
-    outline: none;
-    transition: scale var(--duration-move) var(--ease-out);
-  }
-
-  .experiment:hover .thumbnail :global(.media) {
-    scale: 1.04;
   }
 
   video {

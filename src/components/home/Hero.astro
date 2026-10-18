@@ -19,12 +19,8 @@ const stack = Object.values(profile.stack).flat();
 <Sheet aria-labelledby="hero-title" class="hero">
   <Cell span={9} class="hero-name">
     <h1 id="hero-title" class="wordmark">
-      <span class="line">
-        <span>{profile.givenName}</span>
-      </span>
-      <span class="line">
-        <span>{profile.familyName}</span>
-      </span>
+      <span>{profile.givenName}</span>
+      <span>{profile.familyName}</span>
     </h1>
     <p class="role">{profile.role}</p>
   </Cell>
@@ -152,40 +148,6 @@ const stack = Object.values(profile.stack).flat();
 
   .wordmark span {
     display: block;
-  }
-
-  /* Each line rises into its own slot once, on arrival. The slot is padded so the
-     cedilla is not clipped, and pulled back so the lines keep their spacing. */
-  .line {
-    overflow: clip;
-    padding-block-end: var(--wordmark-descender);
-    margin-block-end: var(--wordmark-descender-pull);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .line > span {
-      animation: line-rise var(--duration-enter) var(--ease-out) both;
-    }
-
-    .line + .line > span {
-      animation-delay: 90ms;
-    }
-
-    .role {
-      animation: fade-in var(--duration-enter) var(--ease-out) 240ms both;
-    }
-  }
-
-  @keyframes line-rise {
-    from {
-      translate: 0 105%;
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
   }
 
   .role {

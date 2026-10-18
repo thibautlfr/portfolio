@@ -23,10 +23,10 @@
     --font-size-step-4: clamp(2rem, 1.55rem + 2.25vw, 3.5rem);
     --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
 
-    /* The email is set on one line with its arrow, fitted to the width of its own cell
-       (EmailLink is a size container): about 14.5em wide, so 6.6cqi fills the cell. */
-    --font-size-email: min(var(--font-size-step-2), 6.6cqi);
-    --font-size-email-large: min(var(--font-size-step-3), 6.6cqi);
+    /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
+       size container): about 13.5em wide, so 7cqi fills the cell. */
+    --font-size-email: min(var(--font-size-step-2), 7cqi);
+    --font-size-email-large: min(var(--font-size-step-3), 7cqi);
 
     /* Mono runs a little large next to the text face. */
     --font-size-data: 0.9em;
@@ -37,10 +37,6 @@
     --line-height-lede: 1.45;
 
     --letter-spacing-wordmark: -0.03em;
-
-    /* Room below a clipped wordmark line, so the cedilla is not cut. */
-    --wordmark-descender: 0.12em;
-    --wordmark-descender-pull: -0.12em;
     --letter-spacing-title: -0.015em;
   }
 }

@@ -1,5 +1,4 @@
 ---
-import ArrowLink from "@/components/ui/ArrowLink.astro";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Sheet from "@/components/ui/Sheet.astro";
@@ -22,9 +21,9 @@ const { title } = Astro.props;
     <ul role="list">
       {profile.socials.map((social) => (
         <li>
-          <ArrowLink kind="out" href={social.url} rel="me">
+          <a href={social.url} rel="me">
             {social.label}
-          </ArrowLink>
+          </a>
         </li>
       ))}
     </ul>

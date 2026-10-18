@@ -1,7 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-import Arrow from "@/components/ui/Arrow.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Media from "@/components/ui/Media.astro";
 import { formatContext, formatList } from "@/lib/format";
@@ -17,10 +16,7 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
 <li class:list={["row", { "row--text": !cover }]}>
   <div class="row-main">
     <h3 class="row-title">
-      <a href={`/work/${project.id}/`}>
-        <span class="row-title-text">{title}</span>
-        <Arrow />
-      </a>
+      <a href={`/work/${project.id}/`}>{title}</a>
     </h3>
     <p class="row-summary">{summary}</p>
     {award && <p class="row-award">{award}</p>}
@@ -42,9 +38,7 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
 </li>
 
 <style>
-  /* The title's link covers the whole row, so the row is one target. */
   .row {
-    position: relative;
     display: grid;
     gap: var(--space-4);
     padding: var(--space-6) var(--space-4);
@@ -64,68 +58,7 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
   }
 
   .row-title a {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-icon);
     text-decoration: none;
-    --arrow-shift: -0.4em 0;
-  }
-
-  .row-title a::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-  }
-
-  .row-title-text {
-    text-decoration: underline;
-    text-decoration-color: transparent;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.2em;
-    transition: text-decoration-color var(--duration-quick) var(--ease-snap);
-  }
-
-  /* The arrow arrives from behind the title on hover. */
-  .row-title :global(.arrow) {
-    opacity: 0;
-    transition:
-      opacity var(--duration-quick) var(--ease-snap),
-      translate var(--duration-move) var(--ease-out);
-  }
-
-  .row-title a:focus-visible,
-  .row:hover .row-title a {
-    --arrow-shift: 0;
-  }
-
-  .row:hover .row-title :global(.arrow),
-  .row-title a:focus-visible :global(.arrow) {
-    opacity: 1;
-  }
-
-  .row:hover .row-title-text,
-  .row-title a:focus-visible .row-title-text {
-    text-decoration-color: var(--color-accent);
-  }
-
-  /* The frame stays put and the image moves inside it. */
-  .row-image {
-    overflow: clip;
-    outline: var(--border-hairline);
-    transition: outline-color var(--duration-quick) var(--ease-snap);
-  }
-
-  .row-image :global(.media) {
-    outline: none;
-    transition: scale var(--duration-move) var(--ease-out);
-  }
-
-  .row:hover .row-image {
-    outline-color: var(--color-accent);
-  }
-
-  .row:hover .row-image :global(.media) {
-    scale: 1.03;
   }
 
   .row-summary {
@@ -138,6 +71,21 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
     border: 1px solid var(--color-accent);
     font-size: var(--font-size-step-minus-1);
     font-weight: var(--font-weight-strong);
+  }
+
+  .row-title a:focus-visible {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  /* Hover keeps the white cell: teal-11 links fail on any tinted ground. */
+  .row:hover .row-title a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+  }
+
+  .row:hover :global(.media) {
+    outline-color: var(--color-accent);
   }
 
   @media (width >= 60rem) {
@@ -162,6 +110,10 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
 
     .row--text .row-main {
       grid-column: 1 / span 7;
+    }
+
+    .row--text .row-summary {
+      font-size: var(--font-size-step-1);
     }
 
     .row--text .row-facts {

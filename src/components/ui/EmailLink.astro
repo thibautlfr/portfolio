@@ -1,5 +1,4 @@
 ---
-import Arrow from "./Arrow.astro";
 import { profile } from "@/data/profile";
 
 interface Props {
@@ -12,8 +11,7 @@ const { size = "regular" } = Astro.props;
 <!-- The wrapper is a size container: the address is fitted to its cell, never to the window. -->
 <div class="email-fit">
   <a class:list={["email", `email--${size}`]} href={`mailto:${profile.email}`} data-umami-event="email">
-    <span class="email-address">{profile.email}</span>
-    <Arrow direction="north-east" />
+    {profile.email}
   </a>
 </div>
 
@@ -23,36 +21,14 @@ const { size = "regular" } = Astro.props;
   }
 
   .email {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-icon);
     font-family: var(--font-email);
     font-weight: var(--font-weight-title);
-    text-decoration: none;
+    text-decoration-thickness: 2px;
     white-space: nowrap;
   }
 
-  .email-address {
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.18em;
-    transition:
-      text-decoration-thickness var(--duration-quick) var(--ease-snap),
-      text-underline-offset var(--duration-quick) var(--ease-snap);
-  }
-
-  /* The arrow turns from "out" to "go" and steps forward. */
-  .email:hover,
-  .email:focus-visible {
-    --arrow-turn: 45deg;
-    --arrow-shift: 0.12em 0;
-  }
-
-  .email:hover .email-address,
-  .email:focus-visible .email-address {
+  .email:hover {
     text-decoration-thickness: 4px;
-    text-underline-offset: 0.24em;
   }
 
   .email--regular {

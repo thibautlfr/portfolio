@@ -1,7 +1,5 @@
 ---
 // Inner pages have no header: the trail is how they lead back home.
-import ArrowLink from "@/components/ui/ArrowLink.astro";
-
 interface Crumb {
   label: string;
   href?: string;
@@ -16,20 +14,8 @@ const { items } = Astro.props;
 
 <nav aria-label="Breadcrumb">
   <ol role="list">
-    {items.map((item, index) => (
-      <li>
-        {item.href ? (
-          index === 0 ? (
-            <ArrowLink kind="back" href={item.href}>
-              {item.label}
-            </ArrowLink>
-          ) : (
-            <a href={item.href}>{item.label}</a>
-          )
-        ) : (
-          <span aria-current="page">{item.label}</span>
-        )}
-      </li>
+    {items.map((item) => (
+      <li>{item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}</li>
     ))}
   </ol>
 </nav>
