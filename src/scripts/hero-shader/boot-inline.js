@@ -14,14 +14,25 @@
   const whenIdle = (callback) =>
     "requestIdleCallback" in window ? requestIdleCallback(callback, { timeout: 2500 }) : setTimeout(callback, 300);
 
+  // Chrome reports no largest paint for a page loaded in a background tab, so it is awaited
+  // for two seconds at most; otherwise the shader would never start there.
+  const LARGEST_PAINT_TIMEOUT = 2000;
+
   /** @param {() => void} callback */
-  const afterLargestPaint = (callback) =>
-    PerformanceObserver.supportedEntryTypes.includes("largest-contentful-paint")
-      ? new PerformanceObserver((_, observer) => {
-          observer.disconnect();
-          callback();
-        }).observe({ type: "largest-contentful-paint", buffered: true })
-      : callback();
+  const afterLargestPaint = (callback) => {
+    let called = false;
+    const once = () => {
+      if (!called) callback();
+      called = true;
+    };
+    setTimeout(once, LARGEST_PAINT_TIMEOUT);
+    if (PerformanceObserver.supportedEntryTypes.includes("largest-contentful-paint")) {
+      new PerformanceObserver((_, observer) => {
+        observer.disconnect();
+        once();
+      }).observe({ type: "largest-contentful-paint", buffered: true });
+    } else once();
+  };
 
   // The largest paint can still be updated briefly as late fonts render; the still frame is
   // the shader's own first frame, so waiting one more second for things to settle is invisible.
