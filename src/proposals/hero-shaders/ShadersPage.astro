@@ -1,0 +1,96 @@
+---
+// Development-only review page: hero shader proposals, each live at the hero's size.
+// Registered by the proposals integration in astro.config.ts under `astro dev` only, so a
+// production build never sees it or its script.
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const proposals = [
+  {
+    id: "warp",
+    name: "0. Domain warp (current)",
+    text: "The V1 warp: five colours folding toward a wandering point that the cursor replaces.",
+  },
+  {
+    id: "dither",
+    name: "1. Gros pixel",
+    text: "The same warp, cut down to the five colours with an ordered dither on big pixels. Finer pixels around the point and the cursor, like a loupe on a print. A nod to the Nuit de l'Info award.",
+  },
+  {
+    id: "cells",
+    name: "2. Sheet",
+    text: "The site's own sheet of cells and hairlines, set loose: Voronoi cells drift, the cursor pushes them apart, and the cells near it take the warp's colours.",
+  },
+  {
+    id: "lens",
+    name: "3. Loupe",
+    text: "The twelve-column grid as hairlines on ink, with crosses on the intersections like a cutting mat. A loupe follows the point; through it the grid magnifies and the warp shows in colour.",
+  },
+  {
+    id: "glyphs",
+    name: "4. Type case",
+    text: "The warp read out as drawn marks on a character grid, from a dot to a full block, coloured along the palette. The marks thicken around the cursor.",
+  },
+  {
+    id: "moire",
+    name: "5. Moiré",
+    text: "Two sets of fine rings, one on the point or the cursor, the other drifting across. Where they beat, slow bands of the palette slide: print and op-art.",
+  },
+];
+---
+
+<BaseLayout title="Hero shader proposals" description="Development review page." noindex>
+  <div class="page">
+    {proposals.map((proposal) => (
+      <Sheet aria-labelledby={`proposal-${proposal.id}`}>
+        <Cell span={8} flush class="stage" data-proposal-shader={proposal.id}>
+          <canvas aria-hidden="true"></canvas>
+        </Cell>
+        <Cell span={4} class="about">
+          <h2 id={`proposal-${proposal.id}`}>{proposal.name}</h2>
+          <p>{proposal.text}</p>
+        </Cell>
+      </Sheet>
+    ))}
+  </div>
+</BaseLayout>
+
+<script>
+  import "@/proposals/hero-shaders/lab";
+</script>
+
+<style>
+  .page {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--layout-gutter);
+  }
+
+  .stage {
+    position: relative;
+    min-block-size: var(--hero-shader-height);
+    background: var(--color-shader-ground);
+  }
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .about {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+
+  h2 {
+    font-size: var(--font-size-step-2);
+  }
+
+  p {
+    color: var(--color-text-muted);
+  }
+</style>

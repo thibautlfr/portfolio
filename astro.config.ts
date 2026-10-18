@@ -1,11 +1,23 @@
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import type { AstroIntegration } from "astro";
 import { defineConfig, envField, fontProviders } from "astro/config";
 
 import { legacyRedirects } from "./src/data/legacy-redirects";
 
 // Built by scripts/fonts.sh: instanced and subset, see docs/architecture.md#fonts.
 const fontFile = (name: string) => `./src/assets/fonts/${name}.woff2`;
+
+// Design proposals under review (src/proposals): routes that exist in `astro dev` only.
+const proposals: AstroIntegration = {
+  name: "proposals",
+  hooks: {
+    "astro:config:setup": ({ command, injectRoute }) => {
+      if (command !== "dev") return;
+      injectRoute({ pattern: "/proposals/shaders", entrypoint: "./src/proposals/hero-shaders/ShadersPage.astro" });
+    },
+  },
+};
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -53,6 +65,7 @@ export default defineConfig({
       filter: (page) =>
         !page.endsWith("/404/") && !Object.keys(legacyRedirects).some((path) => page.endsWith(`${path}/`)),
     }),
+    proposals,
   ],
   // The overlay sits on top of the sheets; Astro check and the CI cover what it reports.
   devToolbar: { enabled: false },

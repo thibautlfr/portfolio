@@ -1,0 +1,202 @@
+/* Page transition proposals, development only (inlined by TransitionPicker.astro).
+   Each variant is keyed on html[data-transition] and on the navigation's type:
+   open (into a case study), close (back out of one), other. */
+@property --vt-blind {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+::view-transition-group(root) {
+  animation-duration: var(--duration-page);
+  animation-timing-function: var(--ease-out);
+}
+
+/* 1. Window: the next page rises from the bottom as a card, then opens to the full screen
+   while the page behind recedes. Back runs it in reverse. */
+html[data-transition="window"]::view-transition-old(root),
+html[data-transition="window"]::view-transition-new(root) {
+  animation: none;
+  transform-origin: 50% 100%;
+}
+
+html[data-transition="window"]:active-view-transition-type(open, other)::view-transition-new(root) {
+  animation: window-open var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="window"]:active-view-transition-type(open, other)::view-transition-old(root) {
+  animation: recede var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="window"]:active-view-transition-type(close)::view-transition-old(root) {
+  z-index: var(--layer-transition-top);
+  animation: window-open var(--duration-page) var(--ease-out) reverse both;
+}
+
+html[data-transition="window"]:active-view-transition-type(close)::view-transition-new(root) {
+  animation: recede var(--duration-page) var(--ease-out) reverse both;
+}
+
+@keyframes window-open {
+  0% {
+    clip-path: inset(100% 6% 0 6% round 18px);
+    scale: 0.92;
+  }
+
+  45% {
+    clip-path: inset(22% 6% 0 6% round 18px);
+    scale: 0.92;
+  }
+
+  100% {
+    clip-path: inset(0 0 0 0 round 0);
+    scale: 1;
+  }
+}
+
+@keyframes recede {
+  to {
+    scale: 0.94;
+    filter: brightness(0.82);
+  }
+}
+
+/* 2. Expand: the clicked row grows into the next page, from its own rectangle. */
+html[data-transition="expand"]::view-transition-old(root) {
+  animation: recede var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="expand"]::view-transition-new(root) {
+  animation: expand var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="expand"]:active-view-transition-type(close)::view-transition-old(root) {
+  z-index: var(--layer-transition-top);
+  animation: expand var(--duration-page) var(--ease-out) reverse both;
+}
+
+html[data-transition="expand"]:active-view-transition-type(close)::view-transition-new(root) {
+  animation: recede var(--duration-page) var(--ease-out) reverse both;
+}
+
+@keyframes expand {
+  from {
+    clip-path: inset(var(--vt-top, 40%) var(--vt-right, 10%) var(--vt-bottom, 40%) var(--vt-left, 10%));
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+/* 3. Sheet: the next page slides up over the current one like a new sheet on the pile. */
+html[data-transition="sheet"]::view-transition-new(root) {
+  animation: slide-up var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="sheet"]::view-transition-old(root) {
+  animation: lift var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="sheet"]:active-view-transition-type(close)::view-transition-old(root) {
+  z-index: var(--layer-transition-top);
+  animation: slide-up var(--duration-page) var(--ease-out) reverse both;
+}
+
+html[data-transition="sheet"]:active-view-transition-type(close)::view-transition-new(root) {
+  animation: lift var(--duration-page) var(--ease-out) reverse both;
+}
+
+@keyframes slide-up {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes lift {
+  to {
+    translate: 0 -8%;
+    filter: brightness(0.85);
+  }
+}
+
+/* 4. Columns: the next page is laid down in the twelve columns of the grid, all at once. */
+html[data-transition="columns"]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-transition="columns"]::view-transition-new(root) {
+  mask-image: linear-gradient(90deg, #000 var(--vt-blind), transparent var(--vt-blind));
+  mask-size: calc(100% / 12) 100%;
+  animation: blinds var(--duration-page) var(--ease-out) both;
+}
+
+html[data-transition="columns"]:active-view-transition-type(close)::view-transition-new(root) {
+  mask-image: linear-gradient(270deg, #000 var(--vt-blind), transparent var(--vt-blind));
+}
+
+@keyframes blinds {
+  from {
+    --vt-blind: 0%;
+  }
+
+  to {
+    --vt-blind: 100%;
+  }
+}
+
+/* 5. Iris: the next page opens from the point that was clicked. */
+html[data-transition="iris"]::view-transition-old(root) {
+  animation: none;
+}
+
+html[data-transition="iris"]::view-transition-new(root) {
+  animation: iris var(--duration-page) var(--ease-out) both;
+}
+
+@keyframes iris {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+
+  to {
+    clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
+/* 6. Morph: the project's title and image travel to their place on the case study; the
+   rest of the page fades. */
+html[data-transition="morph"]::view-transition-old(root),
+html[data-transition="morph"]::view-transition-new(root) {
+  animation-duration: var(--duration-move);
+}
+
+html[data-transition="morph"]::view-transition-group(proposal-title),
+html[data-transition="morph"]::view-transition-group(proposal-cover) {
+  animation-duration: var(--duration-page);
+  animation-timing-function: var(--ease-out);
+}
+
+/* Text keeps its proportions while it scales: the two snapshots crossfade at their own ratio. */
+html[data-transition="morph"]::view-transition-old(proposal-title),
+html[data-transition="morph"]::view-transition-new(proposal-title) {
+  block-size: auto;
+  object-fit: none;
+  object-position: left top;
+}
+
+/* The picker itself. */
+.transition-picker {
+  position: fixed;
+  inset-block-end: var(--space-3);
+  inset-inline-start: var(--space-3);
+  z-index: var(--layer-skip-link);
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  outline: var(--border-hairline);
+  background: var(--color-surface);
+  font-size: var(--font-size-step-minus-1);
+  view-transition-name: transition-picker;
+}

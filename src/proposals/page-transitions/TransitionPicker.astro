@@ -1,0 +1,49 @@
+---
+// Development only: switches the page transition proposal (see transitions.css and boot.js).
+// Rendered by BaseLayout under `astro dev`; the CSS and the script are inlined as strings,
+// so nothing of this reaches a production build.
+import boot from "./boot.js?raw";
+import styles from "./transitions.css?raw";
+
+interface Props {
+  /** head: the styles and the boot script, which must run before the first render. */
+  part: "head" | "body";
+}
+
+const { part } = Astro.props;
+
+const options = [
+  ["crossfade", "0. Crossfade (current)"],
+  ["window", "1. Window"],
+  ["expand", "2. Expand from the row"],
+  ["sheet", "3. Sheet"],
+  ["columns", "4. Columns"],
+  ["iris", "5. Iris"],
+  ["morph", "6. Morph"],
+];
+---
+
+{part === "head" && <Fragment set:html={`<style>${styles}</style>`} />}
+{part === "head" && <script is:inline set:html={boot} />}
+{part === "body" && (
+  <label class="transition-picker">
+    Page transition
+    <select data-transition-picker>
+      {options.map(([value, label]) => (
+        <option {value}>{label}</option>
+      ))}
+    </select>
+  </label>
+)}
+{part === "body" && <script is:inline>
+  {
+    const select = document.querySelector("[data-transition-picker]");
+    if (select instanceof HTMLSelectElement) {
+      select.value = document.documentElement.dataset.transition ?? "crossfade";
+      select.addEventListener("change", () => {
+        localStorage.setItem("proposal-transition", select.value);
+        document.documentElement.dataset.transition = select.value;
+      });
+    }
+  }
+</script>}
