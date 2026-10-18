@@ -1,8 +1,8 @@
 // @ts-check
-// Proposals only (inlined in <head> by TransitionPicker.astro, with its CSP hash): picks the
-// page transition proposal stored in localStorage and gives each navigation a type, open (into
-// a case study), close (back out of one) or other, plus the geometry the variants start from.
-// It also wires the picker once the page is parsed.
+// Proposals only (inlined in <head> by TransitionPicker.astro): picks the page transition
+// proposal stored in localStorage and gives each navigation a type, open (into a case study),
+// close (back out of one) or other, plus the geometry the variants start from. It also wires
+// the picker on every page.
 {
   const KEY = "proposal-transition";
   const root = document.documentElement;
@@ -44,7 +44,7 @@
    * @param {string} casePath
    */
   const name = (casePath) => {
-    const morph = style === "morph";
+    const morph = root.dataset["transition"] === "morph";
     const onCase = isCase(location.href);
     const title = onCase
       ? document.querySelector("h1")
@@ -56,37 +56,44 @@
     if (cover instanceof HTMLElement) cover.style.viewTransitionName = morph ? "proposal-cover" : "none";
   };
 
-  addEventListener("pageswap", (event) => {
-    const transition = /** @type {any} */ (event).viewTransition;
-    if (!transition) return;
-    const to = /** @type {any} */ (event).activation?.entry?.url;
-    transition.types.add(typeOf(location.href, to));
-    name(isCase(to) ? new URL(to).pathname : location.pathname);
-  });
-
-  addEventListener("pagereveal", (event) => {
-    const transition = /** @type {any} */ (event).viewTransition;
-    if (!transition) return;
-    const from = /** @type {any} */ (window).navigation?.activation?.from?.url;
-    transition.types.add(typeOf(from, location.href));
-    name(isCase(location.href) ? location.pathname : from ? new URL(from).pathname : "");
-
+  /** The click geometry the expand and iris variants start from. @param {HTMLElement} target */
+  const geometry = (target) => {
     const saved = JSON.parse(sessionStorage.getItem("proposal-transition-from") ?? "null");
+    if (!saved) return;
     const px = (/** @type {number} */ value) => `${Math.round(value)}px`;
-    if (saved) {
-      root.style.setProperty("--vt-x", px(saved.x));
-      root.style.setProperty("--vt-y", px(saved.y));
-      root.style.setProperty("--vt-top", px(Math.max(saved.top, 0)));
-      root.style.setProperty("--vt-right", px(Math.max(innerWidth - saved.right, 0)));
-      root.style.setProperty("--vt-bottom", px(Math.max(innerHeight - saved.bottom, 0)));
-      root.style.setProperty("--vt-left", px(Math.max(saved.left, 0)));
-    }
+    target.style.setProperty("--vt-x", px(saved.x));
+    target.style.setProperty("--vt-y", px(saved.y));
+    target.style.setProperty("--vt-top", px(Math.max(saved.top, 0)));
+    target.style.setProperty("--vt-right", px(Math.max(innerWidth - saved.right, 0)));
+    target.style.setProperty("--vt-bottom", px(Math.max(innerHeight - saved.bottom, 0)));
+    target.style.setProperty("--vt-left", px(Math.max(saved.left, 0)));
+  };
+
+  // The ClientRouter's events: names on the old page before its snapshot, the type and the
+  // choice on the new one before the swap, names on the new page after it.
+  let fromPath = "";
+  document.addEventListener("astro:before-preparation", (event) => {
+    const { from, to } = /** @type {any} */ (event);
+    fromPath = from.pathname;
+    name(isCase(to.href) ? to.pathname : from.pathname);
+  });
+  document.addEventListener("astro:before-swap", (event) => {
+    const { from, to, viewTransition, newDocument } = /** @type {any} */ (event);
+    viewTransition?.types?.add(typeOf(from.href, to.href));
+    // The swap copies the new page's <html> attributes, which do not carry the choice.
+    const next = /** @type {HTMLElement} */ (newDocument.documentElement);
+    next.dataset["transition"] = root.dataset["transition"];
+    geometry(next);
+  });
+  document.addEventListener("astro:after-swap", () => {
+    name(isCase(location.href) ? location.pathname : fromPath);
   });
 
-  addEventListener("DOMContentLoaded", () => {
+  // The router swaps the picker with the rest of the body: it is wired again on every page.
+  document.addEventListener("astro:page-load", () => {
     const select = document.querySelector("[data-transition-picker]");
     if (!(select instanceof HTMLSelectElement)) return;
-    select.value = style;
+    select.value = root.dataset["transition"] ?? style;
     select.addEventListener("change", () => {
       localStorage.setItem(KEY, select.value);
       root.dataset["transition"] = select.value;

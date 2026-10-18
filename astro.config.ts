@@ -42,24 +42,6 @@ export default defineConfig({
       PUBLIC_UMAMI_WEBSITE_ID: envField.string({ context: "client", access: "public", optional: true }),
     },
   },
-  security: {
-    csp: {
-      directives: [
-        "default-src 'self'",
-        "img-src 'self' data:",
-        "font-src 'self'",
-        "media-src 'self'",
-        "connect-src 'self' https://cloud.umami.is https://api-gateway.umami.dev",
-        "base-uri 'self'",
-        "form-action 'none'",
-        "object-src 'none'",
-      ],
-      scriptDirective: { resources: ["'self'", "https://cloud.umami.is"] },
-      // Inline style attributes (cell spans, image ratios) carry no script and are allowed;
-      // style elements stay limited to Astro's generated hashes.
-      styleDirective: { resources: ["'self'", { resource: "'unsafe-inline'", kind: "attribute" }] },
-    },
-  },
   integrations: [
     mdx(),
     sitemap({

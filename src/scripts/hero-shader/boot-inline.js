@@ -1,5 +1,5 @@
 // @ts-check
-// Inlined in the page by Hero.astro (with its CSP hash): a bundled script would be one more
+// Inlined in the page by Hero.astro: a bundled script would be one more
 // request competing with the first paint. Loads the shader module only when it may animate,
 // after the load event, the largest contentful paint and idle time; otherwise the still frame stays.
 {

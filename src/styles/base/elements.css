@@ -55,14 +55,8 @@
   }
 }
 
-/* Page transitions and scroll reveals: CSS only, skipped under reduced motion,
-   and content stays visible where the browser lacks support. */
-@media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
-}
-
+/* Scroll reveals: CSS only, skipped under reduced motion, and content stays visible where
+   the browser lacks support. Page transitions come from Astro's ClientRouter (BaseLayout). */
 @keyframes reveal-rise {
   from {
     opacity: 0;

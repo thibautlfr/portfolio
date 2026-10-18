@@ -4,7 +4,7 @@ How the V2 site is organised and the conventions every change follows. Read this
 
 ## Stack
 
-Astro 7, static output, deployed to GitHub Pages from `main`. TypeScript strict. Native CSS on Radix Colors, no CSS framework, no UI framework. Every dependency is listed with its reason in the [dependencies table](#dependencies).
+Astro 7, static output, deployed to GitHub Pages from `main`. TypeScript strict. Native CSS on Radix Colors, no CSS framework, no UI framework. Page transitions run through Astro's `ClientRouter`, so navigation between pages stays in one document. Every dependency is listed with its reason in the [dependencies table](#dependencies).
 
 ## Source tree
 
@@ -39,8 +39,9 @@ src/
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
-│   ├── hero-shader/          # boot-inline.js (inlined, decides when), boot.ts (its CSP hash), index.ts, renderer.ts, warp.frag
-│   └── loop-video.ts         # Playground previews: play on hover or focus
+│   ├── hero-shader/          # boot-inline.js (inlined, decides when), index.ts, renderer.ts, warp.frag
+│   ├── loop-video.ts         # Playground previews: play on hover or focus
+│   └── back-link.ts          # A breadcrumb back to the previous page acts as history.back()
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
 │   ├── tokens/               # color, typography, space, layout, motion
@@ -57,7 +58,7 @@ src/
     └── og/[...path].png.ts   # Open Graph images, rendered at build time
 ```
 
-`src/proposals/` holds design proposals under review: hero shaders (`/proposals/shaders/`), the dynamic ASCII hero (`/proposals/ascii/`) and page transitions (a picker in the corner of every page). They exist under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322), which is the one to judge transitions on: in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes view transitions flash. The pages are registered by an integration in `astro.config.ts`; the picker's inline script and style carry their CSP hashes. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly.
+`src/proposals/` holds design proposals under review: hero shaders (`/proposals/shaders/`), the dynamic ASCII hero (`/proposals/ascii/`) and page transitions (a picker in the corner of every page). They exist under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322), which is the one to judge transitions on: in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes view transitions flash. The pages are registered by an integration in `astro.config.ts`. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly.
 
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `docs/`, `.github/workflows/`.
 
@@ -92,15 +93,21 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 
 ## Client JavaScript
 
-Zero by default. Each script is isolated, justified here, and loaded as late as possible.
+As little as possible. Each script is isolated, justified here, and loaded as late as possible.
 
-| Script        | Why                                   | Loaded                                                                                                                      | Budget     |
-| ------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `hero-shader` | The signature domain warp             | Boot step inlined in the page (no request, hashed in the CSP); the module (2.3 KB) after `load`, the largest paint and idle | 6 KB gzip  |
-| `loop-video`  | Playground previews on hover or focus | Deferred module                                                                                                             | 1 KB gzip  |
-| Umami         | Cookieless analytics                  | `defer`, third party                                                                                                        | about 2 KB |
+| Script         | Why                                          | Loaded                                                                                                   | Budget     |
+| -------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------- |
+| `ClientRouter` | Page transitions that do not flash           | Module on every page (5.7 KB)                                                                            | 6 KB gzip  |
+| `hero-shader`  | The signature domain warp                    | Boot step inlined in the page (no request); the module (2.6 KB) after `load`, the largest paint and idle | 6 KB gzip  |
+| `loop-video`   | Playground previews on hover or focus        | Module                                                                                                   | 1 KB gzip  |
+| `back-link`    | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip  |
+| Umami          | Cookieless analytics                         | `defer`, third party                                                                                     | about 2 KB |
 
-Page transitions use native cross-document View Transitions (CSS only). Scroll reveals use CSS scroll-driven animations behind `@supports`.
+**Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little.
+
+**Scripts under the router.** A bundled module runs once per visit, not once per page. A script that binds to elements of the page binds again after `astro:after-swap` (or `astro:page-load`), and a script that keeps running stops on `astro:before-swap`: the hero shader disposes of its WebGL context there. Inline scripts run again on every page that contains them.
+
+Scroll reveals use CSS scroll-driven animations behind `@supports`.
 
 ## Tooling
 
@@ -129,7 +136,7 @@ CI (`.github/workflows/ci.yml`) runs `verify`, then `build`, then Lighthouse CI 
 | `satori`, `@resvg/resvg-js`                                                                                                                                                                                                                                   | Open Graph images at build time                           | no                  |
 | Dev: `typescript`, `@astrojs/check`, `prettier`, `prettier-plugin-astro`, `eslint`, `typescript-eslint`, `eslint-plugin-astro`, `stylelint`, `stylelint-config-standard`, `postcss-html`, `stylelint-declaration-strict-value`, `knip`, `vitest`, `@lhci/cli` | Each one makes a rule of this file checkable by a machine | no                  |
 
-Not used on purpose: Tailwind (the tokens are the system), GSAP (CSS covers the motion), Three.js or OGL (one fullscreen triangle in raw WebGL2), Astro's `ClientRouter` (native View Transitions cost no JavaScript and keep the CSP strict), any UI framework.
+Not used on purpose: Tailwind (the tokens are the system), GSAP (CSS covers the motion), Three.js or OGL (one fullscreen triangle in raw WebGL2), any UI framework.
 
 ## Git
 

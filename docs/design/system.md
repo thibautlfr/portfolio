@@ -69,7 +69,7 @@ The one breakpoint is 60rem. Sheets are separated by `--space-12`.
 | `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
 | `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Page transitions are native View Transitions; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns from the back-forward cache where it was left.
+Page transitions are View Transitions run by Astro's `ClientRouter`; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
 
 ## Components
 
@@ -91,7 +91,7 @@ Project visuals at 16:10, experiments at 4:3, the portrait square and in black a
 
 ## The shader
 
-The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.3 KB gzipped. It starts one second after the largest paint (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
+The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts one second after the largest paint (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
 
 ## Anti AI-look checklist
 
