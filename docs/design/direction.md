@@ -66,7 +66,7 @@ Dry and short: 140ms with `cubic-bezier(0.2, 0, 0, 1)`. On hover a project title
 
 The domain warp from the V1 `gallery-redesign` branch, ported to WebGL2: ink, teal-12, teal-9, coral and ivory folding into each other, with a vignette and grain. From the flow-field study it keeps the wandering agent: the warp is always pulled toward a slow autonomous point, and the cursor takes over when it is on the cell. Ink (#091213), coral (#f2785c) and ivory (#f5ede0) are the shader's own colours, outside the Radix tokens: the shader is a work, and works carry their own colour.
 
-Lifecycle rules: starts after load on idle, pauses off-screen and in hidden tabs, pixel ratio capped at 1.5 and rendered at 75% resolution, a static frame under reduced motion or without WebGL2, and a visible pause button (WCAG 2.2.2).
+Lifecycle rules: starts after load on idle, pauses off-screen and in hidden tabs, pixel ratio capped at 1.5 and rendered at 75% resolution, a static frame under reduced motion, without WebGL2 or without a GPU, and a visible pause button (WCAG 2.2.2).
 
 ## Rejected directions
 

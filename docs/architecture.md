@@ -114,7 +114,7 @@ Page transitions use native cross-document View Transitions (CSS only). Scroll r
 
 eslint-plugin-jsx-a11y is left out: it does not support ESLint 10, which eslint-plugin-astro requires. Accessibility is enforced by Lighthouse CI on every pull request and by the axe audit of Phase 5.
 
-CI (`.github/workflows/ci.yml`) runs `verify`, then `build`, then Lighthouse CI with budgets on every pull request and push. The deploy job runs on `main` only, after the same checks, and refuses to ship if `src/content` still contains lorem ipsum.
+CI (`.github/workflows/ci.yml`) runs `verify`, then `build`, then Lighthouse CI with budgets on every pull request and on every push to `main`. The deploy job runs on a push to `main` only, after the same checks, and refuses to ship if `src/content` still contains lorem ipsum. A ruleset protects `main` and `v2`: changes land through a pull request whose `verify` check passed, with no force push and no deletion.
 
 ## Dependencies
 

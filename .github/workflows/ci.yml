@@ -1,12 +1,11 @@
-# Checks every change, and publishes main to GitHub Pages (gh-pages branch)
-# only after the same checks pass.
+# Checks every pull request. A push to main, which branch rules only allow through a merged
+# pull request, runs the same checks and then publishes to GitHub Pages (gh-pages branch).
 name: CI
 
 on:
   pull_request:
   push:
-    branches: [main, v2]
-  workflow_dispatch:
+    branches: [main]
 
 permissions:
   contents: read
@@ -51,7 +50,7 @@ jobs:
 
   deploy:
     needs: verify
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write

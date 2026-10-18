@@ -14,12 +14,12 @@ const EASING = 0.05;
 // Starts where the composition reads well, so the first live frame matches the static one.
 const START_TIME = 12;
 
-function startHeroShader(root: HTMLElement) {
+async function startHeroShader(root: HTMLElement) {
   const canvas = root.querySelector<HTMLCanvasElement>("[data-hero-shader-canvas]");
   const toggle = root.querySelector<HTMLButtonElement>("[data-hero-shader-toggle]");
   if (!canvas || !toggle) return;
 
-  const renderer = createRenderer(canvas, warpSource, PALETTE);
+  const renderer = await createRenderer(canvas, warpSource, PALETTE);
   if (!renderer) return;
 
   const target = { x: 0.5, y: 0.5, presence: 0 };
@@ -103,4 +103,4 @@ function startHeroShader(root: HTMLElement) {
 }
 
 const root = document.querySelector<HTMLElement>("[data-hero-shader]");
-if (root) startHeroShader(root);
+if (root) void startHeroShader(root);

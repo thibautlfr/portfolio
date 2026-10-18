@@ -37,11 +37,13 @@ Weight transferred on the home page: 92 KB in all, of which 61 KB of fonts, 11 K
 
 Measured in headless Chrome on the production build:
 
-| Case                             | Shader module requested                            | Live            | CLS |
-| -------------------------------- | -------------------------------------------------- | --------------- | --- |
-| Default                          | after load, the largest paint, one second and idle | yes             | 0   |
-| `prefers-reduced-motion: reduce` | never                                              | no, still frame | 0   |
-| WebGL disabled                   | requested, then gives up                           | no, still frame | 0   |
+| Case                              | Shader module requested                            | Live            | CLS |
+| --------------------------------- | -------------------------------------------------- | --------------- | --- |
+| Default                           | after load, the largest paint, one second and idle | yes             | 0   |
+| `prefers-reduced-motion: reduce`  | never                                              | no, still frame | 0   |
+| WebGL disabled                    | requested, then gives up                           | no, still frame | 0   |
+| Software WebGL (no GPU, as in CI) | requested, then gives up                           | no, still frame | 0   |
+| Page loaded in a background tab   | two seconds after load at most                     | yes             | 0   |
 
 ## SEO and structured data
 

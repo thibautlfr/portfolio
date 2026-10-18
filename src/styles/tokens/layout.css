@@ -7,6 +7,9 @@
     --layout-gutter: clamp(0.75rem, 0.4rem + 1.8vw, 2rem);
     --layout-measure: 36rem;
     --hero-shader-height: clamp(15rem, 34vh, 22rem);
+
+    /* Artworks hang at one height, each at its own ratio; the minimum keeps a 4:5 poster within a phone cell. */
+    --artwork-height: clamp(18rem, 90vw, 28rem);
     --border-hairline: 1px solid var(--color-line);
     --focus-ring: 2px solid var(--color-focus);
     --focus-offset: 2px;

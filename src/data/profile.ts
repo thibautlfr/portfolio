@@ -12,6 +12,7 @@ const socials: readonly Social[] = [
   { label: "LinkedIn", url: "https://linkedin.com/in/thibaut-lefrancois" },
   { label: "GitHub", url: "https://github.com/thibautlfr" },
   { label: "X", url: "https://x.com/thibautlfr" },
+  { label: "Instagram", url: "https://www.instagram.com/thibautlfr/" },
 ];
 
 export const profile = {
@@ -20,7 +21,7 @@ export const profile = {
   familyName: "Lefrançois",
   role: "Freelance full-stack developer",
   positioning:
-    "I build web platforms that run in production, and I sweat the parts people see. TypeScript end to end, WebGL when it earns its place.",
+    "I build web platforms that run in production, and I sweat the parts people see. Kotlin on the server, TypeScript, Vue and WebGL in the browser.",
   email: "hello@thibaut-lefrancois.com",
   location: {
     city: "La Rochelle",
@@ -31,11 +32,11 @@ export const profile = {
   mobility: "Remote across France, on-site in Bordeaux, Niort and around",
   languages: ["French", "English"],
   /** Published under public/cv/; the link stays hidden while this is undefined. */
-  cvPath: undefined as string | undefined,
+  cvPath: "/cv/thibaut-lefrancois-cv.pdf" as string | undefined,
   stack: {
-    languages: ["TypeScript", "JavaScript", "GLSL"],
-    frontEnd: ["React", "Astro", "Three.js"],
-    backEnd: ["Node.js", "PostgreSQL"],
+    languages: ["Kotlin", "Java", "TypeScript"],
+    frontEnd: ["Vue 3", "Astro", "Three.js", "WebGL"],
+    backEnd: ["Ktor", "PostgreSQL", "Temporal", "Docker", "Kubernetes"],
   },
   socials,
   portrait: {

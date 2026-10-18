@@ -28,7 +28,12 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
   </SectionTitle>
   {artworks.map(({ data }) => (
     <Cell span={6} as="figure" class="artwork">
-      <Media src={data.image.src} alt={data.image.alt} sizes="(width >= 60rem) 45vw, 100vw" />
+      <Media
+        src={data.image.src}
+        alt={data.image.alt}
+        sizes="(width >= 60rem) 23rem, 80vw"
+        widths={[320, 480, 720, 960]}
+      />
       <figcaption>
         <span class="artwork-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</span>
         <span class="artwork-kind">
@@ -44,8 +49,16 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
 <style>
   .artwork {
     display: grid;
-    align-content: end;
-    gap: var(--space-3);
+    align-content: start;
+    gap: var(--space-4);
+  }
+
+  /* Hung like a wall: one height for every artwork, each at its natural ratio, centred in its cell. */
+  .artwork :global(.media) {
+    display: block;
+    inline-size: auto;
+    block-size: var(--artwork-height);
+    margin-inline: auto;
   }
 
   figcaption {
