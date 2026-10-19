@@ -2,11 +2,13 @@
 // when it may run (no reduced motion, no Save-Data), after load, the largest
 // paint and idle; it then starts itself. It pauses off-screen and in hidden
 // tabs, exposes a pause control, and stops when the router swaps the page away.
+import { SHADER_PALETTE } from "./palette";
 import { createRenderer, type FrameInput } from "./renderer";
 import warpSource from "./warp.frag?raw";
 
-// The shader's own colours: ink, teal-12, teal-9, coral, ivory.
-const PALETTE = ["#091213", "#0d3d38", "#12a594", "#f2785c", "#f5ede0"] as const;
+// In the order of warp.frag's u_colors: ink, teal-12, teal-9, coral, ivory.
+const { ink, deep, teal, coral, ivory } = SHADER_PALETTE;
+const PALETTE = [ink, deep, teal, coral, ivory];
 const MAX_PIXEL_RATIO = 1.5;
 // An ambient effect reads the same at three quarters of the resolution.
 const RESOLUTION_SCALE = 0.75;

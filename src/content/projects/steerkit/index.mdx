@@ -7,7 +7,7 @@ year: 2026
 stack: [TypeScript, Three.js, Canvas 2D, Vite, Vitest, fast-check]
 cover:
   src: ./cover.png
-  alt: The steerkit title card on an off-white ground, the name in bold black above the line "Steering behaviors for games, as small typed functions", with small grey arrows scattered around it like a flock.
+  alt: The steerkit title card, set as a sheet of white cells. A dark square with a light arrow stands beside the name in bold, above the line "Steering behaviors for games, as small typed functions", with faint grey arrows wandering behind. A row of facts below reads npm i steerkit, TypeScript with zero dependency, and the Three.js adapter.
 preview: ./preview.mp4
 links:
   - { label: Interactive demos, url: "https://steerkit.thibaut-lefrancois.com", kind: demo }
@@ -78,8 +78,8 @@ Each behavior has its own demo page, prerendered for search and link previews, w
 
 <Figure
   src={arriveFrame}
-  alt="An arrow-shaped agent just past a target at the center of a dashed circle, under the call arrive(agent, target, { slowingDistance: 2.2 }, force). A blue arrow points ahead of it, green and orange arrows point back toward the target."
-  caption="arrive(), as the demos draw it. The steering force (orange) is the desired velocity (green) minus the velocity (blue): it turns the agent back, and within the dashed circle the desired speed drops until it stops on the target."
+  alt="An arrow-shaped agent just past a target at the center of a dashed circle, under the call arrive(agent, target, { slowingDistance: 2.2 }, force). An ivory arrow points ahead of it, a short dashed teal arrow and a coral arrow point back toward the target."
+  caption="arrive(), drawn from the forces the library returns. The steering force (coral) is the desired velocity (dashed teal) minus the velocity (ivory): it turns the agent back, and within the dashed circle the desired speed drops until it stops on the target."
 />
 
 ## Engineering notes
