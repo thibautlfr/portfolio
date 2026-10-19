@@ -101,7 +101,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 
 Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 
-A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
+A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The measured figures are framed as small cells of the sheet, in mono. Images, videos and code blocks in the body take the width of the text. The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
 
 The development page `/styleguide/` shows every token and base component.
 
