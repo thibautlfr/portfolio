@@ -73,7 +73,7 @@ const source = links.find((link) => link.kind === "source");
           facts={[
             { term: "Context", value: formatContext(context, year) },
             { term: "Role", value: role },
-            { term: "Stack", value: formatList(stack), data: true },
+            { term: "Stack", value: formatList(stack) },
           ]}
         />
         {links.length > 0 && (

@@ -34,9 +34,9 @@ const { stack, languages, cvPath } = profile;
     <h3>{factsTitle}</h3>
     <FactList
       facts={[
-        { term: "Languages", value: formatList(stack.languages), data: true },
-        { term: "Front-end", value: formatList(stack.frontEnd), data: true },
-        { term: "Back-end", value: formatList(stack.backEnd), data: true },
+        { term: "Languages", value: formatList(stack.languages) },
+        { term: "Front-end", value: formatList(stack.frontEnd) },
+        { term: "Back-end", value: formatList(stack.backEnd) },
         { term: "Speaks", value: languages.join(", ") },
       ]}
     />

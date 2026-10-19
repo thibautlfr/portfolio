@@ -40,7 +40,7 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 | `--font-title`    | Stack Sans Headline | 700        | Titles, project names, the footer email on inner pages |
 | `--font-text`     | Stack Sans Text     | 400 to 500 | Everything else                                        |
 | `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                     |
-| `--font-data`     | Fragment Mono       | 400        | Stack, dates, coordinates                              |
+| `--font-data`     | Fragment Mono       | 400        | Coordinates, dates, handles, code                      |
 
 Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (unused for now, kept to complete the scale), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width: up to `step-2` in the hero, up to `step-5` in the contact section, where it is the display line and the question above it is a `step-2` title. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
