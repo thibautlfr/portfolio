@@ -44,7 +44,7 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 
 Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (the contact question), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
-Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all). Body text and mono use `font-display: optional`; the wordmark and the email are preloaded on the home page, Headline on inner pages.
+Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all). Every face uses `font-display: swap`. Body text is preloaded on every page, the wordmark and the email on the home page, Headline on inner pages; the mono swaps in when it arrives.
 
 ## Space and layout
 
