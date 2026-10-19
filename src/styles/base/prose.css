@@ -29,8 +29,20 @@
     margin-block-start: var(--space-3);
   }
 
+  /* Running text keeps a real underline: it skips the descenders, and nothing moves while
+     someone reads. */
   .prose a {
     color: var(--color-link);
+    background-image: none;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: text-decoration-thickness var(--duration-quick) var(--ease-snap);
+  }
+
+  .prose a:hover {
+    text-decoration-thickness: 2px;
   }
 
   .prose ul,

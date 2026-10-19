@@ -23,12 +23,11 @@ const { size = "regular" } = Astro.props;
   .email {
     font-family: var(--font-email);
     font-weight: var(--font-weight-title);
-    text-decoration-thickness: 2px;
     white-space: nowrap;
-  }
 
-  .email:hover {
-    text-decoration-thickness: 4px;
+    /* Display size, heavier lines. */
+    --link-rest: 2px;
+    --link-drawn: 4px;
   }
 
   .email--regular {

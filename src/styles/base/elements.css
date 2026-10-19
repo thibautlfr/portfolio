@@ -25,16 +25,46 @@
     text-wrap: pretty;
   }
 
+  /* Links are ruled by two lines in the accent, painted as backgrounds so that the second one
+     can be drawn: a resting line (--link-rest) and, on hover or focus, a heavier one
+     (--link-drawn) drawn in from the left, which runs out to the right when left. The state
+     lives in custom properties, so an ancestor can draw the line of the link inside it (a
+     project row draws its title's). A .link-line inside a link carries the line when the link
+     wraps more than its words. The line sits under the inline box: a link that is a flex or
+     grid item would carry it under its leading, so such links wrap their text in an element.
+     Prose keeps text-decoration for reading (prose.css). */
   a {
     color: inherit;
-    text-decoration-color: var(--color-accent);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    transition: text-decoration-thickness var(--duration-quick) var(--ease-snap);
+    text-decoration: none;
   }
 
-  a:hover {
-    text-decoration-thickness: 2px;
+  :where(a, .link-line) {
+    background-image: linear-gradient(var(--color-accent) 0 0), linear-gradient(var(--color-accent) 0 0);
+    background-repeat: no-repeat;
+    background-position:
+      var(--link-from, right) bottom,
+      left bottom;
+    background-size:
+      var(--link-draw, 0%) var(--link-drawn, 2px),
+      100% var(--link-rest, 1px);
+    transition: background-size var(--duration-draw) var(--ease-out);
+  }
+
+  :where(a:has(.link-line)) {
+    background-image: none;
+  }
+
+  a:hover,
+  a:focus-visible {
+    --link-draw: 100%;
+    --link-from: left;
+  }
+
+  /* Forced colours drop background images: links get their underline back. */
+  @media (forced-colors: active) {
+    a {
+      text-decoration: underline;
+    }
   }
 
   :focus-visible {

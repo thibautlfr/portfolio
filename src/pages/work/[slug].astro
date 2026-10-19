@@ -101,7 +101,9 @@ const source = links.find((link) => link.kind === "source");
       {next && next.id !== project.id && (
         <Cell as="footer" class="next">
           <p class="next-label">Next case study</p>
-          <a href={`/work/${next.id}/`}>{next.data.title}</a>
+          <p class="next-title">
+            <a href={`/work/${next.id}/`}>{next.data.title}</a>
+          </p>
         </Cell>
       )}
     </Sheet>
@@ -171,7 +173,7 @@ const source = links.find((link) => link.kind === "source");
     font-size: var(--font-size-step-minus-1);
   }
 
-  .next a {
+  .next-title {
     font-family: var(--font-title);
     font-size: var(--font-size-step-3);
     font-weight: var(--font-weight-title);
