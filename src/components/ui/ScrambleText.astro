@@ -16,6 +16,11 @@ const { text, digitsOnly = false } = Astro.props;
   {text}
 </span>
 
+<!-- Bundled once per page however many instances it has, so the module ships as one file. -->
+<script>
+  import "@/scripts/scramble";
+</script>
+
 <style>
   /* A copy of the selection holds the real text once. */
   .scramble {
