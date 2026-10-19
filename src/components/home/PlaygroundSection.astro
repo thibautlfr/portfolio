@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import Cell from "@/components/ui/Cell.astro";
-import Media from "@/components/ui/Media.astro";
+import LoopMedia from "@/components/ui/LoopMedia.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { resolveVideo } from "@/lib/media";
@@ -13,33 +13,20 @@ interface Props {
 }
 
 const { title, experiments } = Astro.props;
-const hasPreviews = experiments.some(({ data }) => data.preview);
 ---
 
 <Sheet aria-labelledby="playground-title">
   <SectionTitle id="playground-title">{title}</SectionTitle>
   {experiments.map(({ id, data }) => (
-    <Cell span={6} as="article" class="experiment">
-      <div class="thumbnail">
-        <Media
-          src={data.thumbnail.src}
-          alt={data.thumbnail.alt}
-          ratio="4 / 3"
-          sizes="(width >= 60rem) 16rem, 40vw"
-          widths={[320, 640]}
-        />
-        {data.preview && (
-          <video
-            src={resolveVideo("playground", id, data.preview)}
-            muted
-            loop
-            playsinline
-            preload="none"
-            aria-hidden="true"
-            data-loop-video
-          />
-        )}
-      </div>
+    <Cell span={6} as="article" class="experiment" data-loop-video-trigger>
+      <LoopMedia
+        src={data.thumbnail.src}
+        alt={data.thumbnail.alt}
+        ratio="4 / 3"
+        sizes="(width >= 60rem) 16rem, 40vw"
+        widths={[320, 640]}
+        loop={data.preview && resolveVideo("playground", id, data.preview)}
+      />
       <div class="text">
         <h3>{data.url ? <a href={data.url}>{data.title}</a> : data.title}</h3>
         <p>{data.description}</p>
@@ -48,36 +35,12 @@ const hasPreviews = experiments.some(({ data }) => data.preview);
   ))}
 </Sheet>
 
-{hasPreviews && <script>
-  import "@/scripts/loop-video";
-</script>}
-
 <style>
   .experiment {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: var(--space-4);
     align-items: center;
-  }
-
-  /* The loop sits on its thumbnail and only shows while it plays. */
-  .thumbnail {
-    position: relative;
-  }
-
-  video {
-    position: absolute;
-    inset: 0;
-    inline-size: 100%;
-    block-size: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity var(--duration-quick) var(--ease-snap);
-  }
-
-  .experiment:hover video,
-  .experiment:focus-within video {
-    opacity: 1;
   }
 
   .text {
