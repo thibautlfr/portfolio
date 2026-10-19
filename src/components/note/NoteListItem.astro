@@ -28,7 +28,7 @@ const { title, description, pubDate } = note.data;
   .note {
     display: grid;
     gap: var(--space-2);
-    padding: var(--space-4);
+    padding: var(--space-6) var(--space-4);
     border-inline-end: var(--border-hairline);
     border-block-end: var(--border-hairline);
     background: var(--color-surface);
@@ -42,6 +42,7 @@ const { title, description, pubDate } = note.data;
   }
 
   .title {
+    margin-block-end: var(--space-2);
     font-size: var(--font-size-step-1);
   }
 
@@ -54,16 +55,20 @@ const { title, description, pubDate } = note.data;
     text-decoration: underline;
   }
 
+  /* The description is read, not scanned: body size, grey under the title. */
   p {
     max-inline-size: var(--layout-measure);
     color: var(--color-text-muted);
-    font-size: var(--font-size-step-minus-1);
   }
 
+  /* The date sits on the title's baseline, in a column just wide enough for the longest
+     month ("12 September 2026"). */
   @media (width >= 60rem) {
     .note {
-      grid-template-columns: 12rem minmax(0, 1fr);
+      grid-template-columns: 10rem minmax(0, 1fr);
+      align-items: first baseline;
       gap: var(--space-6);
+      padding-block: var(--space-8);
     }
   }
 
