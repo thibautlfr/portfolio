@@ -36,7 +36,7 @@ const person = await author(Astro.site ?? Astro.url);
       offers={[
         {
           title: "Inside your team",
-          text: "Missions through ESNs and IT departments. I join the team, its rituals and its codebase, and take features from the ticket to production.",
+          text: "Missions with product teams, directly or through ESNs. I join the team, its rituals and its codebase, and take features from the ticket to production.",
         },
         {
           title: "For your product",
@@ -44,6 +44,7 @@ const person = await author(Astro.site ?? Astro.url);
         },
       ]}
       factsTitle="Stack"
+      clientsTitle="Clients and partners"
     />
     {experiments.length > 0 && <PlaygroundSection title="Playground" {experiments} />}
     {artworks.length > 0 && (

@@ -15,6 +15,45 @@ const socials: readonly Social[] = [
   { label: "Instagram", url: "https://www.instagram.com/thibautlfr/" },
 ];
 
+/** Words a client or partner wrote about the work, quoted as written and published with their
+    agreement. Never paraphrased, never invented. */
+interface Testimonial {
+  quote: string;
+  author: string;
+  /** The author's role at the time, for example "Technical lead". */
+  role: string;
+}
+
+/** A client or partner, named in a row under the About offers. Worded so it stays true once
+    the work is over. */
+interface Collaboration {
+  name: string;
+  url: string;
+  /** Under the name: what Thibaut does there, a few words. */
+  credit: string;
+  /** The group it belongs to, or what it is (llms.txt). */
+  detail?: string;
+  /** Shown under the name in the About section, and on the case study whose `client.name` matches. */
+  testimonial?: Testimonial;
+}
+
+const collaborations: Readonly<Record<string, Collaboration>> = {
+  raccourci: {
+    name: "Raccourci Agency",
+    url: "https://www.raccourci.fr",
+    credit: "Youbook, for Groupe Yoni's tourism software",
+    detail: "Groupe Yoni",
+    // Asked for at the end of the Youbook mission. Paste it as written, once it is agreed:
+    // testimonial: { quote: "…", author: "First Last", role: "Technical lead" },
+  },
+  areti: {
+    name: "Areti",
+    url: "https://areti.fr/approche",
+    credit: "Development partner of the studio",
+    detail: "a creative and technical studio",
+  },
+};
+
 export const profile = {
   name: "Thibaut Lefrançois",
   givenName: "Thibaut",
@@ -29,6 +68,8 @@ export const profile = {
     country: "France",
     coordinates: "46.16° N, 1.15° W",
   },
+  /** Shown above the email in the hero; leave it undefined when not taking missions. */
+  availability: "Available for missions now" as string | undefined,
   mobility: "Remote across France, on-site in Bordeaux, Niort and around",
   languages: ["French", "English"],
   /** Published under public/cv/; the link stays hidden while this is undefined. */
@@ -39,6 +80,7 @@ export const profile = {
     backEnd: ["Ktor", "PostgreSQL", "Temporal", "Docker", "Kubernetes"],
   },
   socials,
+  collaborations,
   portrait: {
     src: portrait,
     alt: "Black and white portrait of Thibaut Lefrançois, smiling, in a white shirt.",

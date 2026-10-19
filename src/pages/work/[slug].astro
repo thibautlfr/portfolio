@@ -8,10 +8,12 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
+import Testimonial from "@/components/ui/Testimonial.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
+import { findCollaboration } from "@/lib/collaborations";
 import { selectPublished } from "@/lib/content";
-import { formatContext } from "@/lib/format";
+import { formatClient, formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
@@ -28,12 +30,13 @@ interface Props {
 }
 
 const { project, next } = Astro.props;
-const { title, summary, role, context, year, stack, cover, links, award, schemaType, seo } = project.data;
+const { title, summary, role, context, client, year, stack, cover, links, award, schemaType, seo } = project.data;
 const { Content } = await render(project);
 
 const site = Astro.site ?? Astro.url;
 const url = new URL(`/work/${project.id}/`, site).href;
 const source = links.find((link) => link.kind === "source");
+const testimonial = findCollaboration(Object.values(profile.collaborations), client)?.testimonial;
 ---
 
 <BaseLayout
@@ -51,6 +54,7 @@ const source = links.find((link) => link.kind === "source");
       keywords: stack,
       ...(year && { year }),
       ...(source && { codeRepository: source.url }),
+      ...(client && { producer: client }),
     }),
     breadcrumbs([
       { name: profile.name, url: site.href },
@@ -72,6 +76,7 @@ const source = links.find((link) => link.kind === "source");
         <FactList
           facts={[
             { term: "Context", value: formatContext(context, year) },
+            ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
             { term: "Role", value: role },
             { term: "Stack", value: stack },
           ]}
@@ -98,6 +103,11 @@ const source = links.find((link) => link.kind === "source");
           <Content components={{ Figure, Video }} />
         </div>
       </Cell>
+      {client && testimonial && (
+        <Cell class="testimonial-cell">
+          <Testimonial {...testimonial} organisation={client.name} />
+        </Cell>
+      )}
       {next && next.id !== project.id && (
         <Cell as="footer" class="next">
           <p class="next-label">Next case study</p>
@@ -160,6 +170,12 @@ const source = links.find((link) => link.kind === "source");
 
   .body {
     padding-block: var(--space-8) var(--space-16);
+  }
+
+  .testimonial-cell {
+    --testimonial-size: var(--font-size-step-2);
+
+    padding-block: var(--space-8);
   }
 
   .next {

@@ -3,6 +3,7 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
+import Testimonial from "@/components/ui/Testimonial.astro";
 import { profile } from "@/data/profile";
 
 interface Offer {
@@ -15,10 +16,13 @@ interface Props {
   offers: Offer[];
   /** Title of the facts cell, at the offers' level so the three columns read as peers. */
   factsTitle: string;
+  /** Label of the row naming clients and partners, under the offers. */
+  clientsTitle: string;
 }
 
-const { title, offers, factsTitle } = Astro.props;
+const { title, offers, factsTitle, clientsTitle } = Astro.props;
 const { stack, languages, cvPath } = profile;
+const clients = Object.values(profile.collaborations);
 ---
 
 <Sheet aria-labelledby="about-title">
@@ -47,6 +51,26 @@ const { stack, languages, cvPath } = profile;
       </p>
     )}
   </Cell>
+  {clients.length > 0 && (
+    <Cell class="clients">
+      <h3 class="clients-title">{clientsTitle}</h3>
+      <ul role="list" class="client-list">
+        {clients.map((client) => (
+          <li>
+            <a href={client.url} class="client-name">
+              {client.name}
+            </a>
+            <p class="client-credit">{client.credit}</p>
+            {client.testimonial && (
+              <div class="client-testimonial">
+                <Testimonial {...client.testimonial} organisation={client.name} />
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </Cell>
+  )}
 </Sheet>
 
 <style>
@@ -65,6 +89,50 @@ const { stack, languages, cvPath } = profile;
   .offer p {
     max-inline-size: var(--layout-measure);
     color: var(--color-text-muted);
+  }
+
+  /* A label, then one column per client, on the thirds of the offers above. */
+  .clients,
+  .client-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .clients {
+    padding-block: var(--space-6);
+  }
+
+  @media (width >= 60rem) {
+    .clients {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .client-list {
+      grid-column: span 2;
+      grid-template-columns: subgrid;
+    }
+  }
+
+  .clients-title,
+  .client-credit {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .clients-title {
+    font-family: var(--font-text);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .client-testimonial {
+    margin-block-start: var(--space-4);
+  }
+
+  .client-name {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-2);
+    font-weight: var(--font-weight-title);
+    letter-spacing: var(--letter-spacing-title);
   }
 
   /* The facts are this cell's content, not metadata: body size, like the offers' text. */

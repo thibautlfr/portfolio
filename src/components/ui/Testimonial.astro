@@ -1,0 +1,46 @@
+---
+interface Props {
+  quote: string;
+  author: string;
+  role: string;
+  /** Who the author speaks for, after their role. */
+  organisation: string;
+}
+
+const { quote, author, role, organisation } = Astro.props;
+---
+
+<figure class="testimonial">
+  <blockquote>
+    <p>{quote}</p>
+  </blockquote>
+  <figcaption>
+    <span class="author">{author}</span>, {role}, {organisation}
+  </figcaption>
+</figure>
+
+<style>
+  /* The words are the content: text face, no quote marks or rule to dress them. The size is a
+     variant: body size beside other content, a lede where the quote stands alone
+     (--testimonial-size). */
+  .testimonial {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  blockquote {
+    max-inline-size: var(--layout-measure);
+    font-size: var(--testimonial-size, var(--font-size-step-0));
+    line-height: var(--line-height-lede);
+  }
+
+  figcaption {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .author {
+    color: var(--color-text);
+    font-weight: var(--font-weight-strong);
+  }
+</style>
