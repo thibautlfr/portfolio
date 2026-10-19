@@ -4,7 +4,6 @@ import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
-import { formatList } from "@/lib/format";
 
 interface Offer {
   title: string;
@@ -34,9 +33,9 @@ const { stack, languages, cvPath } = profile;
     <h3>{factsTitle}</h3>
     <FactList
       facts={[
-        { term: "Languages", value: formatList(stack.languages) },
-        { term: "Front-end", value: formatList(stack.frontEnd) },
-        { term: "Back-end", value: formatList(stack.backEnd) },
+        { term: "Languages", value: stack.languages },
+        { term: "Front-end", value: stack.frontEnd },
+        { term: "Back-end", value: stack.backEnd },
         { term: "Speaks", value: languages.join(", ") },
       ]}
     />

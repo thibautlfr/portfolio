@@ -11,7 +11,7 @@ import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
-import { formatList } from "@/lib/format";
+import TagList from "@/components/ui/TagList.astro";
 
 const stack = Object.values(profile.stack).flat();
 ---
@@ -76,7 +76,7 @@ const stack = Object.values(profile.stack).flat();
   </Cell>
   <Cell span={4} class="hero-stack">
     <p class="label">Stack</p>
-    <p>{formatList(stack)}</p>
+    <TagList items={stack} />
   </Cell>
 </Sheet>
 

@@ -1,7 +1,10 @@
 ---
+import TagList from "./TagList.astro";
+
 interface Fact {
   term: string;
-  value: string;
+  /** A list is shown as tags (technologies). */
+  value: string | readonly string[];
   /** Set in mono: the value is data (stack, coordinates, versions). */
   data?: boolean;
 }
@@ -17,7 +20,7 @@ const { facts } = Astro.props;
   {facts.map(({ term, value, data = false }) => (
     <div class="fact">
       <dt>{term}</dt>
-      <dd class:list={{ data }}>{value}</dd>
+      <dd class:list={{ data }}>{typeof value === "string" ? value : <TagList items={value} />}</dd>
     </div>
   ))}
 </dl>

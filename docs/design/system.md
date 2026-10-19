@@ -78,7 +78,8 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `Sheet`        | A block of cells: draws the top and left hairlines                                       |
 | `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media |
 | `SectionTitle` | The title cell of a section, with an optional aside link                                 |
-| `FactList`     | Term and value pairs; `data` values set in mono                                          |
+| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`              |
+| `TagList`      | Technologies as small tags framed by a hairline, in the text face                        |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                               |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
 | `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |

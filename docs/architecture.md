@@ -28,7 +28,7 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList, TagList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
 │   ├── note/                 # NoteHeader, NoteListItem
