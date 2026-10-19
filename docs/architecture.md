@@ -28,9 +28,9 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList, CodeText
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
-│   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
+│   ├── project/              # Case study parts: ProjectBrief (decisions and figures), SectionIndex
 │   ├── note/                 # NoteHeader, NoteListItem
 │   └── mdx/                  # Components available inside MDX bodies: Figure, Video
 ├── lib/                      # Plain TypeScript, no Astro imports where avoidable, unit tested
@@ -80,6 +80,7 @@ Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `
 - Two token levels. Radix primitives (`--teal-9`) are only read by the token files. Everything else uses semantic tokens: `--color-text`, `--color-surface`, `--color-line`, `--font-title`, `--step-3`, `--space-4`, `--duration-quick`, `--ease-snap`. Names are chosen to be extracted as they are into a design system.
 - No raw values: Stylelint with `declaration-strict-value` rejects literal colours, font sizes, spacing, durations and z-indexes outside `src/styles/tokens/`.
 - Light theme only; `color-scheme: light`. A dark theme is one more token file.
+- Code blocks use Shiki's `dark-plus` theme (`astro.config.ts`), VS Code's default dark theme, in the system's monospace (`--font-code`): the one place the site does not set its own colours, so a developer reads the code at a glance.
 
 ## Fonts
 
@@ -87,7 +88,7 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 
 - Archivo, weight 800 and width 125%, subset to the glyphs of the name.
 - Stack Sans Notch, weight 700, subset to the glyphs of the email address.
-- Stack Sans Headline (700) and Text (400 to 500), Latin subset.
+- Stack Sans Headline (700) and Text (300 to 600: light for running text, 600 for its bold), Latin subset.
 - Fragment Mono, Latin subset.
 
 `scripts/fonts.sh` documents and reruns the process (`uvx --from fonttools`, no project dependency). Astro's Fonts API serves them through the local provider, generates metric-adjusted fallbacks, and preloads the faces of the first viewport: body text everywhere, the wordmark and the email on the home page, Headline on inner pages. Every face swaps in: `font-display: optional` was tried for body text and mono and kept Arial and Courier New on screen on most visits.

@@ -16,7 +16,7 @@ The frame stays quiet and precise; colour comes from the works: the hero shader,
 | -------- | ------------------- | ---------------------- | ------------------------------------------------------ |
 | Wordmark | Archivo             | weight 800, width 125% | The name in the hero, nothing else                     |
 | Titles   | Stack Sans Headline | weight 700             | Section titles, project titles, the large footer email |
-| Text     | Stack Sans Text     | weight 400 to 500      | Body, captions, labels, navigation                     |
+| Text     | Stack Sans Text     | weight 300 to 600      | Body, captions, labels, navigation; long reads at 300  |
 | Email    | Stack Sans Notch    | weight 700             | The email address only, at display size                |
 | Data     | Fragment Mono       | 400                    | Coordinates, dates, measurements. Never decoration     |
 

@@ -34,13 +34,14 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 
 ## Type
 
-| Token             | Face                | Weight     | Use                                                    |
-| ----------------- | ------------------- | ---------- | ------------------------------------------------------ |
-| `--font-wordmark` | Archivo, width 125% | 800        | The name, and only the name                            |
-| `--font-title`    | Stack Sans Headline | 700        | Titles, project names, the footer email on inner pages |
-| `--font-text`     | Stack Sans Text     | 400 to 500 | Everything else                                        |
-| `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                     |
-| `--font-data`     | Fragment Mono       | 400        | Coordinates, dates, handles, code                      |
+| Token             | Face                | Weight     | Use                                                                   |
+| ----------------- | ------------------- | ---------- | --------------------------------------------------------------------- |
+| `--font-wordmark` | Archivo, width 125% | 800        | The name, and only the name                                           |
+| `--font-title`    | Stack Sans Headline | 700        | Titles, project names, the footer email on inner pages                |
+| `--font-text`     | Stack Sans Text     | 300 to 600 | Everything else; case study and note bodies at 300, their bold at 600 |
+| `--font-code`     | System monospace    | 400        | Code: SF Mono, Menlo, Consolas, the faces code is read in             |
+| `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                                    |
+| `--font-data`     | Fragment Mono       | 400        | Coordinates, dates, handles, figures                                  |
 
 Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (unused for now, kept to complete the scale), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width: up to `step-2` in the hero, up to `step-5` in the contact section, where it is the display line and the question above it is a `step-2` title. `step-minus-1` in muted grey is for labels, captions and metadata (dates, kinds, handles); a sentence meant to be read, such as a note or experiment description, is at `step-0`, in grey when it sits under a title. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
@@ -54,6 +55,7 @@ Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all)
 | `--layout-columns`          | 12 from 60rem; one column below                                                 |
 | `--layout-gutter`           | 0.75 to 2 rem                                                                   |
 | `--layout-measure`          | 36rem, the longest line of running text                                         |
+| `--layout-measure-wide`     | 44rem, case study bodies beside their section titles                            |
 | `--border-hairline`         | 1px solid line                                                                  |
 | `--hero-shader-height`      | 15 to 22 rem                                                                    |
 
@@ -90,6 +92,13 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable    |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
 | `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |
+| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code               |
+| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells             |
+| `SectionIndex` | A case study's sections, numbered like their titles, kept in view beside the body        |
+
+Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
+
+A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
 
 The development page `/styleguide/` shows every token and base component.
 

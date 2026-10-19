@@ -44,3 +44,16 @@ export function isoDate(date: Date): string {
 export function formatHandle(url: string): string {
   return new URL(url).pathname.split("/").filter(Boolean).at(-1) ?? "";
 }
+
+export interface Segment {
+  text: string;
+  code: boolean;
+}
+
+/** Splits a line of frontmatter on backticks, so identifiers in it can be set as code. */
+export function splitCode(line: string): Segment[] {
+  return line
+    .split("`")
+    .map((text, index) => ({ text, code: index % 2 === 1 }))
+    .filter((segment) => segment.text !== "");
+}
