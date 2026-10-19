@@ -59,6 +59,17 @@ interface WorkInput {
   year?: number;
   keywords: readonly string[];
   codeRepository?: string;
+  /** The client the work was made for, and the group it belongs to. */
+  producer?: { name: string; url?: string | undefined; group?: string | undefined };
+}
+
+function organization({ name, url, group }: NonNullable<WorkInput["producer"]>) {
+  return {
+    "@type": "Organization",
+    name,
+    ...(url && { url }),
+    ...(group && { parentOrganization: { "@type": "Organization", name: group } }),
+  };
 }
 
 export function work(input: WorkInput) {
@@ -73,6 +84,7 @@ export function work(input: WorkInput) {
     ...(input.image && { image: input.image }),
     ...(input.year && { dateCreated: String(input.year) }),
     ...(input.codeRepository && { codeRepository: input.codeRepository }),
+    ...(input.producer && { producer: organization(input.producer) }),
     ...(input.type === "WebApplication" && { applicationCategory: "BusinessApplication" }),
   };
 }

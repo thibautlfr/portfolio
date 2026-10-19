@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import FactList from "@/components/ui/FactList.astro";
 import LoopMedia from "@/components/ui/LoopMedia.astro";
-import { formatContext } from "@/lib/format";
+import { formatClient, formatContext } from "@/lib/format";
 import { resolveVideo } from "@/lib/media";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const { project } = Astro.props;
-const { title, summary, award, context, year, role, stack, cover, preview } = project.data;
+const { title, summary, award, context, client, year, role, stack, cover, preview } = project.data;
 ---
 
 <!-- The whole row is the hover target: it draws the title's line, frames the cover in teal and
@@ -28,6 +28,7 @@ const { title, summary, award, context, year, role, stack, cover, preview } = pr
     <FactList
       facts={[
         { term: "Context", value: formatContext(context, year) },
+        ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
         { term: "Role", value: role },
         { term: "Stack", value: stack },
       ]}

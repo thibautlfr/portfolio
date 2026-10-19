@@ -36,6 +36,13 @@ const projects = defineCollection({
       summary: z.string().max(160),
       role: z.string(),
       context: z.enum(["client", "open-source", "personal", "hackathon"]),
+      client: z
+        .object({
+          name: z.string(),
+          url: z.url().optional(),
+          group: z.string().optional(),
+        })
+        .optional(),
       year: year.optional(),
       stack: z.array(z.string()).min(1),
       cover: picture(image).optional(),
