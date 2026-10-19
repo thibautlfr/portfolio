@@ -6,6 +6,9 @@
     --layout-columns: 12;
     --layout-gutter: clamp(0.75rem, 0.4rem + 1.8vw, 2rem);
     --layout-measure: 36rem;
+
+    /* Case study bodies, beside their section titles: a longer line, about 75 characters. */
+    --layout-measure-wide: 44rem;
     --hero-shader-height: clamp(15rem, 34vh, 22rem);
 
     /* Artworks hang at one height, each at its own ratio; the minimum keeps a 4:5 poster within a phone cell. */

@@ -52,7 +52,7 @@ build() {
 build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WORDMARK" wght=800 wdth=125
 build "stack-sans-notch:vf@$VERSION/latin-wght-normal.woff2" stack-sans-notch-email "--text=$EMAIL" wght=700
 build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
-build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400:500
+build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=300:600
 build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$DATA"
 
 # Open Graph images are rendered at build time by Satori, which reads WOFF

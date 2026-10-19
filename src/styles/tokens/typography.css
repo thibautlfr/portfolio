@@ -8,8 +8,15 @@
     --font-email: var(--font-stack-sans-notch);
     --font-data: var(--font-fragment-mono);
 
+    /* Code is read like in an editor: the system's own monospace (SF Mono, Menlo, Consolas),
+       which needs no download and is the face developers already read code in. */
+    --font-code: ui-monospace, "SF Mono", sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
+
+    /* Running text in case studies and notes is set light, so the words set in bold carry. */
+    --font-weight-light: 300;
     --font-weight-text: 400;
     --font-weight-strong: 500;
+    --font-weight-bold: 600;
     --font-weight-title: 700;
     --font-weight-wordmark: 800;
     --font-stretch-wordmark: 125%;
