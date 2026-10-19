@@ -1,5 +1,6 @@
 ---
 import { Font } from "astro:assets";
+import { ClientRouter } from "astro:transitions";
 import { PUBLIC_UMAMI_WEBSITE_ID } from "astro:env/client";
 
 import SeoHead from "@/components/seo/SeoHead.astro";
@@ -9,16 +10,11 @@ import type { Seo } from "@/lib/seo/types";
 import "@/styles/global.css";
 
 interface Props extends Seo {
-  /** Hashes of inline scripts the page renders (see src/scripts/hero-shader/boot.ts). */
-  scriptHashes?: `sha256-${string}`[];
   /** The home hero sets the wordmark and the email above the fold; other pages open on a title. */
   hero?: boolean;
 }
 
-const { hero = false, scriptHashes = [], ...seo } = Astro.props;
-
-// The CSP meta tag is in <head>, so inline scripts rendered further down declare their hash here.
-for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
+const { hero = false, ...seo } = Astro.props;
 ---
 
 <html lang="en">
@@ -41,6 +37,8 @@ for (const hash of scriptHashes) Astro.csp?.insertScriptHash(hash);
     {PUBLIC_UMAMI_WEBSITE_ID && (
       <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id={PUBLIC_UMAMI_WEBSITE_ID} />
     )}
+    <!-- Page transitions: same-document View Transitions, see docs/architecture.md. -->
+    <ClientRouter />
   </head>
   <body>
     <SkipLink target="main" />

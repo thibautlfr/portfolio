@@ -42,7 +42,7 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 | `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                     |
 | `--font-data`     | Fragment Mono       | 400        | Stack, dates, coordinates                              |
 
-Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-5` 40 to 96 px. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
+Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (the contact question), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
 Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all). Body text and mono use `font-display: optional`; the wordmark and the email are preloaded on the home page, Headline on inner pages.
 
@@ -63,11 +63,13 @@ The one breakpoint is 60rem. Sheets are separated by `--space-12`.
 
 | Token              | Value                          | Use                                       |
 | ------------------ | ------------------------------ | ----------------------------------------- |
-| `--duration-quick` | 140ms (0 under reduced motion) | Hover and focus feedback                  |
+| `--duration-quick` | 140ms (0 under reduced motion) | Colour and underline feedback             |
 | `--duration-fade`  | 400ms (0 under reduced motion) | The shader fading in over its still frame |
-| `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Every transition                          |
+| `--duration-page`  | 650ms (0 under reduced motion) | Page transitions                          |
+| `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
+| `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Page transitions are native View Transitions (project titles morph into the case study); rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported.
+Page transitions are View Transitions run by Astro's `ClientRouter`, in the sheet style: the next page slides up over the current one, which lifts and darkens slightly, and going back runs it in reverse; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
 
 ## Components
 
@@ -78,7 +80,7 @@ Page transitions are native View Transitions (project titles morph into the case
 | `SectionTitle` | The title cell of a section, with an optional aside link                                 |
 | `FactList`     | Term and value pairs; `data` values set in mono                                          |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                               |
-| `EmailLink`    | The email in Notch, on one line at every width                                           |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
 | `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |
 
 The development page `/styleguide/` shows every token and base component.
@@ -89,7 +91,7 @@ Project visuals at 16:10, experiments at 4:3, the portrait square and in black a
 
 ## The shader
 
-The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.3 KB gzipped. It starts one second after the largest paint (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
+The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts after the largest paint and a short idle wait, half a second at most (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
 
 ## Anti AI-look checklist
 

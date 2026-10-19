@@ -13,7 +13,6 @@ import { profile } from "@/data/profile";
 import { selectFeatured, selectLatest } from "@/lib/content";
 import { profilePage } from "@/lib/seo/json-ld";
 import { author } from "@/lib/seo/site";
-import { heroBootScriptHash } from "@/scripts/hero-shader/boot";
 
 const projects = selectFeatured(await getCollection("projects"));
 const experiments = selectFeatured(await getCollection("playground"));
@@ -27,7 +26,6 @@ const person = await author(Astro.site ?? Astro.url);
   title={`${profile.name}, ${profile.role}`}
   description={`${profile.role} based in ${profile.location.city}. ${profile.positioning}`}
   jsonLd={[profilePage(person)]}
-  scriptHashes={[heroBootScriptHash]}
   hero
 >
   <div class="page">
@@ -64,5 +62,12 @@ const person = await author(Astro.site ?? Astro.url);
     display: grid;
     gap: var(--space-12);
     padding-block-start: var(--layout-gutter);
+  }
+
+  /* Sections below the hero are laid out when they come near the viewport, not on the first
+     render: the first paint only pays for the hero. Their last measured size is kept. */
+  .page > :global(:not(:first-child)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 40rem;
   }
 </style>

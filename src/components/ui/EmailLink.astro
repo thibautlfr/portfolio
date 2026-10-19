@@ -8,13 +8,19 @@ interface Props {
 const { size = "regular" } = Astro.props;
 ---
 
-<a class:list={["email", `email--${size}`]} href={`mailto:${profile.email}`} data-umami-event="email">
-  {profile.email}
-</a>
+<!-- The wrapper is a size container: the address is fitted to its cell, never to the window. -->
+<div class="email-fit">
+  <a class:list={["email", `email--${size}`]} href={`mailto:${profile.email}`} data-umami-event="email">
+    {profile.email}
+  </a>
+</div>
 
 <style>
+  .email-fit {
+    container-type: inline-size;
+  }
+
   .email {
-    justify-self: start;
     font-family: var(--font-email);
     font-weight: var(--font-weight-title);
     text-decoration-thickness: 2px;
@@ -25,7 +31,6 @@ const { size = "regular" } = Astro.props;
     text-decoration-thickness: 4px;
   }
 
-  /* The address stays on one line down to 320px wide. */
   .email--regular {
     font-size: var(--font-size-email);
   }

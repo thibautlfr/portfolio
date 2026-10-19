@@ -1,0 +1,40 @@
+/* Page transitions, run by Astro's ClientRouter: the next page slides up over the current
+   one like a new sheet on the pile, and going back lifts it off again. The router marks the
+   direction on <html> (data-astro-transition) for the length of the transition. Under
+   reduced motion --duration-page is 0, so the pages swap at once. */
+@layer base {
+  ::view-transition-group(root) {
+    animation-duration: var(--duration-page);
+    animation-timing-function: var(--ease-out);
+  }
+
+  ::view-transition-new(root) {
+    animation: sheet-slide-up var(--duration-page) var(--ease-out) both;
+  }
+
+  ::view-transition-old(root) {
+    animation: sheet-lift var(--duration-page) var(--ease-out) both;
+  }
+
+  html[data-astro-transition="back"]::view-transition-old(root) {
+    z-index: var(--layer-transition-top);
+    animation: sheet-slide-up var(--duration-page) var(--ease-out) reverse both;
+  }
+
+  html[data-astro-transition="back"]::view-transition-new(root) {
+    animation: sheet-lift var(--duration-page) var(--ease-out) reverse both;
+  }
+}
+
+@keyframes sheet-slide-up {
+  from {
+    translate: 0 100%;
+  }
+}
+
+@keyframes sheet-lift {
+  to {
+    translate: 0 -8%;
+    filter: brightness(0.85);
+  }
+}

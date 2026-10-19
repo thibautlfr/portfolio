@@ -11,7 +11,7 @@ import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
 import { selectPublished } from "@/lib/content";
-import { formatContext } from "@/lib/format";
+import { formatContext, formatList } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
@@ -64,7 +64,7 @@ const source = links.find((link) => link.kind === "source");
         <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
       </Cell>
       <Cell span={8} as="header" class="title-block">
-        <h1 style={`view-transition-name: work-${project.id}`}>{title}</h1>
+        <h1>{title}</h1>
         <p class="summary">{summary}</p>
         {award && <p class="award">{award}</p>}
       </Cell>
@@ -73,7 +73,7 @@ const source = links.find((link) => link.kind === "source");
           facts={[
             { term: "Context", value: formatContext(context, year) },
             { term: "Role", value: role },
-            { term: "Stack", value: stack.join(", "), data: true },
+            { term: "Stack", value: formatList(stack), data: true },
           ]}
         />
         {links.length > 0 && (

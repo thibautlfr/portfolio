@@ -1,11 +1,24 @@
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
+import type { AstroIntegration } from "astro";
 import { defineConfig, envField, fontProviders } from "astro/config";
 
 import { legacyRedirects } from "./src/data/legacy-redirects";
 
 // Built by scripts/fonts.sh: instanced and subset, see docs/architecture.md#fonts.
 const fontFile = (name: string) => `./src/assets/fonts/${name}.woff2`;
+
+// Design proposals under review (src/proposals): routes that exist in `astro dev`, and in a
+// build made with PUBLIC_PROPOSALS=true (pnpm proposals) to judge them on the real output.
+const proposals: AstroIntegration = {
+  name: "proposals",
+  hooks: {
+    "astro:config:setup": ({ command, injectRoute }) => {
+      if (command !== "dev" && process.env["PUBLIC_PROPOSALS"] !== "true") return;
+      injectRoute({ pattern: "/proposals/ascii", entrypoint: "./src/proposals/ascii/AsciiPage.astro" });
+    },
+  },
+};
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
@@ -14,6 +27,8 @@ export default defineConfig({
   trailingSlash: "always",
   // About 4 KB of CSS gzipped in all: inlining it removes the render-blocking request.
   build: { format: "directory", inlineStylesheets: "always" },
+  // Scoped styles through a class rather than a data attribute on every element: shorter HTML.
+  scopedStyleStrategy: "class",
   redirects: legacyRedirects,
   vite: {
     // The hero shader is built as one standalone ES module (see Hero.astro), loaded by an
@@ -26,24 +41,6 @@ export default defineConfig({
       PUBLIC_UMAMI_WEBSITE_ID: envField.string({ context: "client", access: "public", optional: true }),
     },
   },
-  security: {
-    csp: {
-      directives: [
-        "default-src 'self'",
-        "img-src 'self' data:",
-        "font-src 'self'",
-        "media-src 'self'",
-        "connect-src 'self' https://cloud.umami.is https://api-gateway.umami.dev",
-        "base-uri 'self'",
-        "form-action 'none'",
-        "object-src 'none'",
-      ],
-      scriptDirective: { resources: ["'self'", "https://cloud.umami.is"] },
-      // Inline style attributes (cell spans, image ratios) carry no script and are allowed;
-      // style elements stay limited to Astro's generated hashes.
-      styleDirective: { resources: ["'self'", { resource: "'unsafe-inline'", kind: "attribute" }] },
-    },
-  },
   integrations: [
     mdx(),
     sitemap({
@@ -51,6 +48,7 @@ export default defineConfig({
       filter: (page) =>
         !page.endsWith("/404/") && !Object.keys(legacyRedirects).some((path) => page.endsWith(`${path}/`)),
     }),
+    proposals,
   ],
   // The overlay sits on top of the sheets; Astro check and the CI cover what it reports.
   devToolbar: { enabled: false },

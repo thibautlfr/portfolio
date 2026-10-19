@@ -1,7 +1,8 @@
 // Playground previews: a loop plays while its card is hovered or focused, and
 // rewinds when left. Nothing plays on its own, so no pause control is needed
 // (WCAG 2.2.2), and nothing plays at all under reduced motion.
-if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+const bindLoopVideos = () => {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   for (const video of document.querySelectorAll<HTMLVideoElement>("[data-loop-video]")) {
     const card = video.closest("article") ?? video;
     const play = () => {
@@ -17,4 +18,8 @@ if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
     card.addEventListener("focusin", play);
     card.addEventListener("focusout", stop);
   }
-}
+};
+
+// A module runs once: the cards swapped in by later navigations are bound after each swap.
+bindLoopVideos();
+document.addEventListener("astro:after-swap", bindLoopVideos);

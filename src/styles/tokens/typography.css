@@ -20,11 +20,13 @@
     --font-size-step-1: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
     --font-size-step-2: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
     --font-size-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
+    --font-size-step-4: clamp(2rem, 1.55rem + 2.25vw, 3.5rem);
     --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
 
-    /* The email is set on one line: it never grows past this share of the viewport. */
-    --font-size-email: min(var(--font-size-step-2), 5.4vw);
-    --font-size-email-large: min(var(--font-size-step-3), 5.4vw);
+    /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
+       size container): about 13.5em wide, so 7cqi fills the cell. */
+    --font-size-email: min(var(--font-size-step-2), 7cqi);
+    --font-size-email-large: min(var(--font-size-step-3), 7cqi);
 
     /* Mono runs a little large next to the text face. */
     --font-size-data: 0.9em;

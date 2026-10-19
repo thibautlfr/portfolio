@@ -16,5 +16,8 @@
 
     /* Stacking: the skip link is the only element that overlaps the page. */
     --layer-skip-link: 10;
+
+    /* A page snapshot that must cover the other one during a transition. */
+    --layer-transition-top: 1;
   }
 }

@@ -29,3 +29,8 @@ export function formatDate(date: Date): string {
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
+
+/** "Vue 3, Three.js": a list that wraps between items, never inside one ("Vue" / "3"). */
+export function formatList(items: readonly string[]): string {
+  return items.map((item) => item.replaceAll(" ", " ")).join(", ");
+}

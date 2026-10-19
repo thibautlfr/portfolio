@@ -4,6 +4,7 @@ import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
+import { formatList } from "@/lib/format";
 
 interface Offer {
   title: string;
@@ -30,9 +31,9 @@ const { stack, languages, cvPath } = profile;
   <Cell span={4} class="facts">
     <FactList
       facts={[
-        { term: "Languages", value: stack.languages.join(", "), data: true },
-        { term: "Front-end", value: stack.frontEnd.join(", "), data: true },
-        { term: "Back-end", value: stack.backEnd.join(", "), data: true },
+        { term: "Languages", value: formatList(stack.languages), data: true },
+        { term: "Front-end", value: formatList(stack.frontEnd), data: true },
+        { term: "Back-end", value: formatList(stack.backEnd), data: true },
         { term: "Speaks", value: languages.join(", ") },
       ]}
     />
@@ -45,20 +46,28 @@ const { stack, languages, cvPath } = profile;
 </Sheet>
 
 <style>
+  /* The offer's name is a title, its text reads as body copy under it. */
   .offer {
     display: grid;
     align-content: start;
-    gap: var(--space-3);
+    gap: var(--space-4);
+    padding-block: var(--space-6) var(--space-8);
   }
 
   h3 {
-    font-size: var(--font-size-step-1);
+    font-size: var(--font-size-step-2);
+  }
+
+  .offer p {
+    max-inline-size: var(--layout-measure);
+    color: var(--color-text-muted);
   }
 
   .facts {
     display: grid;
     align-content: start;
     gap: var(--space-4);
+    padding-block: var(--space-6) var(--space-8);
   }
 
   .cv {
