@@ -47,7 +47,7 @@ Every collection has these three, which drive the home page without touching cod
 | `cover`      | image    | no       | PNG or JPEG, 16:10 works best; the page holds without it. The SVG covers in the repository are placeholders.                                           |
 | `preview`    | video    | no       | A short loop, see above.                                                                                                                               |
 | `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none. |
-| `award`      | string   | no       | One line, for example `Winner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                |
+| `award`      | string   | no       | One line, for example `Prizewinner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                           |
 | `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces).          |
 | `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                            |
 
