@@ -1,21 +1,30 @@
-// Steerkit, drawn by Steerkit: the published package runs every agent of these scenes, in the
-// shader's palette and the site's mono. Shots (the `shot` parameter of /media-kit/):
-//   stream  a crowd crossing the frame and parting around two drifting obstacles; one agent
-//           shows Reynolds' diagram. Cover and preview loop.
-//   arrive  one agent overshooting a target and turning back inside the slowing distance.
+// Steerkit's media, drawn by Steerkit: the published package runs every agent, on ink cells in
+// the shader's palette, inside sheets set in the site's own type. Shots (`shot` of /media-kit/):
+//   card    the title card: the mark, the name, what it is and three facts, over a faint crowd
+//           wandering on the white cell. The cover, and the first frame of the reel.
+//   reel    the preview loop: the card, then three use cases of the library, back to the card.
+//   arrive  one agent overshooting a target and turning back inside the slowing distance: the
+//           figure of the case study.
 import {
-  add,
+  addWithin,
+  alignment,
   arrive,
   avoidObstacles,
+  cohesion,
+  createGrid,
+  createNeighbors,
   createWanderState,
-  seek,
+  followPath,
+  keepAway,
+  queryGrid,
+  separation,
+  stayWithin,
   step,
+  updateGrid,
   wander,
   zero,
 } from "https://cdn.jsdelivr.net/npm/steerkit@0.4.0/+esm";
 
-// World units: the height is 10, whatever the ratio.
-const HEIGHT = 10;
 // Physics runs at a fixed step, so a frame drawn at any time is the same on every render.
 const HZ = 60;
 // Vectors are drawn as where the agent would be after this long (0.6 s in the demos, shorter
@@ -92,202 +101,80 @@ function drawDiagram(c, colors, unit, p, v, f, seconds = VECTOR_SECONDS) {
   drawArrow(c, vx, vy, dx, dy, colors.coral, 2.5, head);
 }
 
-function dataLine(c, kit, items, color) {
-  const { width, height, sizes, fonts } = kit;
-  const margin = Math.round(height * 0.055);
-  c.font = `400 ${sizes.label}px ${fonts.data}`;
-  c.fillStyle = color;
-  c.textBaseline = "alphabetic";
-  c.textAlign = "left";
-  c.fillText(items[0] ?? "", margin, height - margin);
-  c.textAlign = "right";
-  c.fillText(items[1] ?? "", width - margin, height - margin);
-}
-
 // ---------------------------------------------------------------------------------------------
+// Simulations. Each one is created at time 0 and stepped at a fixed rate; `timeline` replays it
+// to any time, from the start when asked for an earlier one, so a frame depends on its time only.
 
-function stream(kit) {
-  const { context: c, colors, params } = kit;
-  const unit = kit.height / HEIGHT;
-  const width = kit.width / unit;
-  const period = Number(params.get("period") ?? 6);
-  // Agents spawned per period. Each one only answers the obstacles and its own wander, never
-  // the others, so its path depends on its spawn slot alone: the agent of slot j in the next period
-  // runs the same path one period later, and the loop closes exactly.
-  const perPeriod = Number(params.get("count") ?? 320);
-  const avoidance = { radius: 0.12, lookAhead: 2, plane: "xy" };
-  const margin = 1;
-  const random = seeded(Number(params.get("seed") ?? 11));
-
-  // Two obstacles drifting on closed paths of one period.
-  const obstacles = [
-    {
-      position: vec(),
-      radius: 1.9,
-      at: (a) => [width * 0.6 + 0.4 * Math.sin(a + 0.8), HEIGHT * 0.46 + 0.7 * Math.sin(a)],
-    },
-    {
-      position: vec(),
-      radius: 0.9,
-      at: (a) => [width * 0.3 + 0.4 * Math.sin(a + 2.4), HEIGHT * 0.72 - 0.8 * Math.sin(a + 1.2)],
-    },
-  ];
-  const placeObstacles = (t) => {
-    const a = (2 * Math.PI * t) / period;
-    for (const obstacle of obstacles) [obstacle.position.x, obstacle.position.y] = obstacle.at(a);
-    return obstacles;
-  };
-
-  const dt = 1 / HZ;
-  const lifetime = 3 * period;
-  const paths = [];
-  for (let j = 0; j < perPeriod; j++) {
-    const spawn = ((j + random()) * period) / perPeriod;
-    const lane = 0.6 + random() * (HEIGHT - 1.2);
-    const speed = 2.6 + random() * 1.2;
-    const agent = { position: vec(-margin, lane), velocity: vec(speed, 0), maxSpeed: speed, maxForce: 6 };
-    const state = createWanderState(seeded(j * 7919 + 1));
-    const ahead = vec(width + 10, lane);
-    const [force, goal, away, roam] = [vec(), vec(), vec(), vec()];
-    const samples = [];
-    for (let age = 0; age < lifetime && agent.position.x < width + margin; age += dt) {
-      zero(force);
-      add(force, seek(agent, ahead, goal), 1);
-      add(force, avoidObstacles(agent, placeObstacles(spawn + age), avoidance, away), 3);
-      add(force, wander(agent, state, { radius: 1, distance: 2, jitter: 2, plane: "xy" }, dt, roam), 0.4);
-      // The force as step applies it, bounded by maxForce.
-      const { position: p, velocity: v } = agent;
-      const bound = Math.min(1, agent.maxForce / (Math.hypot(force.x, force.y) || 1));
-      samples.push(p.x, p.y, v.x, v.y, force.x * bound, force.y * bound);
-      step(agent, force, dt);
+function timeline(create) {
+  let sim = create();
+  let now = 0;
+  return (time) => {
+    if (time < now) {
+      sim = create();
+      now = 0;
     }
-    paths.push({ spawn, samples: Float32Array.from(samples), length: samples.length / 6 });
-  }
-
-  // The highlighted agent: by default, the one steered hardest as it reaches the big obstacle,
-  // in front of it and just outside it, where the diagram reads best.
-  const [big] = obstacles;
-  const lead =
-    params.get("lead") === null
-      ? paths.reduce(
-          (best, path, j) => {
-            let strongest = 0;
-            for (let k = 0; k < path.length; k++) {
-              const [x, y] = [path.samples[k * 6], path.samples[k * 6 + 1]];
-              const [ox, oy] = big.at((2 * Math.PI * (path.spawn + k * dt)) / period);
-              const d = Math.hypot(x - ox, y - oy);
-              if (x < ox && d > big.radius + 0.2 && d < big.radius + 1)
-                strongest = Math.max(strongest, Math.hypot(path.samples[k * 6 + 4], path.samples[k * 6 + 5]));
-            }
-            return strongest > best.strongest ? { j, strongest } : best;
-          },
-          { j: 0, strongest: 0 },
-        ).j
-      : Number(params.get("lead"));
-
-  // Every age at which slot j is alive at loop time u: one per period it has lived through.
-  const ages = (path, u) => {
-    const list = [];
-    for (let age = (((u - path.spawn) % period) + period) % period; age < path.length * dt; age += period)
-      list.push(age);
-    return list;
+    for (; now + 1 / HZ <= time; now += 1 / HZ) sim.step(1 / HZ);
+    return sim;
   };
-  const at = (path, age, j) => path.samples[Math.min(Math.round(age * HZ), path.length - 1) * 6 + j];
+}
 
-  const trail = 0.7;
-  const trailSteps = 14;
+const box = (x0, y0, x1, y1) => ({ min: vec(x0, y0), max: vec(x1, y1) });
+
+// The crowd behind the card: agents wandering inside the cell, faint.
+function wanderers(width, height, count) {
+  const random = seeded(3);
+  const bounds = box(0.2, 0.2, width - 0.2, height - 0.2);
+  const agents = Array.from({ length: count }, () => {
+    const angle = random() * Math.PI * 2;
+    return {
+      agent: {
+        position: vec(random() * width, random() * height),
+        velocity: vec(Math.cos(angle), Math.sin(angle)),
+        maxSpeed: 0.9 + random() * 0.5,
+        maxForce: 2,
+      },
+      state: createWanderState(random),
+      force: vec(),
+      inside: vec(),
+      roam: vec(),
+    };
+  });
   return {
-    duration: period,
-    frame(time) {
-      const u = ((time % period) + period) % period;
-      c.fillStyle = colors.ink;
-      c.fillRect(0, 0, kit.width, kit.height);
-
-      placeObstacles(u);
-      c.fillStyle = colors.deep;
-      for (const { position: o, radius } of obstacles) {
-        c.beginPath();
-        c.arc(o.x * unit, o.y * unit, radius * unit, 0, Math.PI * 2);
-        c.fill();
-      }
-
-      // Trails fade toward their tail: one stroke per step back in time, for the whole crowd.
-      const alive = [];
-      paths.forEach((path, j) => ages(path, u).forEach((age) => alive.push([path, age, j])));
-      c.lineWidth = 1;
-      c.lineCap = "round";
-      for (let s = trailSteps; s > 0; s--) {
-        c.strokeStyle = alpha(colors.teal, 0.55 * (1 - (s - 1) / trailSteps));
-        c.beginPath();
-        for (const [path, age] of alive) {
-          const a0 = age - (trail * s) / trailSteps;
-          const a1 = age - (trail * (s - 1)) / trailSteps;
-          if (a1 <= 0) continue;
-          c.moveTo(at(path, Math.max(a0, 0), 0) * unit, at(path, Math.max(a0, 0), 1) * unit);
-          c.lineTo(at(path, a1, 0) * unit, at(path, a1, 1) * unit);
-        }
-        c.stroke();
-      }
-      for (const [path, age, j] of alive) {
-        if (j === lead) continue;
-        drawAgent(
-          c,
-          at(path, age, 0) * unit,
-          at(path, age, 1) * unit,
-          Math.atan2(at(path, age, 3), at(path, age, 2)),
-          6,
-          colors.teal,
+    step(dt) {
+      for (const a of agents) {
+        zero(a.force);
+        addWithin(a.force, a.agent.maxForce, stayWithin(a.agent, bounds, { margin: 0.6, lookAhead: 0.8 }, a.inside));
+        addWithin(
+          a.force,
+          a.agent.maxForce,
+          wander(a.agent, a.state, { radius: 1, distance: 1.5, jitter: 2, plane: "xy" }, dt, a.roam),
         );
+        step(a.agent, a.force, dt);
       }
-
-      for (const age of ages(paths[lead], u)) {
-        const path = paths[lead];
-        const p = vec(at(path, age, 0), at(path, age, 1));
-        const v = vec(at(path, age, 2), at(path, age, 3));
-        drawDiagram(c, colors, unit, p, v, vec(at(path, age, 4), at(path, age, 5)));
-        drawAgent(c, p.x * unit, p.y * unit, Math.atan2(v.y, v.x), 9, colors.ivory);
-      }
-
-      if (!params.has("bare"))
-        dataLine(
-          c,
-          kit,
-          [`avoidObstacles(agent, obstacles, { radius: 0.12, lookAhead: 2 }, away)`, `${alive.length} agents`],
-          alpha(colors.ivory, 0.6),
-        );
+    },
+    draw(c, unit, color) {
+      for (const { agent: a } of agents)
+        drawAgent(c, a.position.x * unit, a.position.y * unit, Math.atan2(a.velocity.y, a.velocity.x), 8, color);
     },
   };
 }
 
-// ---------------------------------------------------------------------------------------------
-
-function arriveShot(kit) {
-  const { context: c, colors, params } = kit;
-  // Closer than the stream: the figure is shown at the width of the text.
-  const height = 5.6;
-  const unit = kit.height / height;
-  const width = kit.width / unit;
+// 01: one agent arriving on a target, with Reynolds' diagram.
+function arriving(width, height) {
   const slowingDistance = 2.2;
   const target = vec(width * 0.54, height * 0.57);
   const agent = { position: vec(-0.2, height * 0.98), velocity: vec(3.4, -0.6), maxSpeed: 3.4, maxForce: 2.4 };
   const force = vec();
-  const dt = 1 / HZ;
-  const duration = 4;
-  const frames = Math.round(duration * HZ);
-  const states = [];
-  for (let f = 0; f < frames; f++) {
-    arrive(agent, target, { slowingDistance }, force);
-    states.push({ p: { ...agent.position }, v: { ...agent.velocity }, f: { ...force } });
-    step(agent, force, dt);
-  }
-
+  const trail = [];
+  arrive(agent, target, { slowingDistance }, force);
   return {
-    duration,
-    frame(time) {
-      const index = Math.min(Math.round(time * HZ), frames - 1);
-      c.fillStyle = colors.ink;
-      c.fillRect(0, 0, kit.width, kit.height);
-
+    slowingDistance,
+    step(dt) {
+      trail.push(agent.position.x, agent.position.y);
+      step(agent, force, dt);
+      arrive(agent, target, { slowingDistance }, force);
+    },
+    draw(c, unit, colors) {
       const [tx, ty] = [target.x * unit, target.y * unit];
       c.fillStyle = alpha(colors.teal, 0.08);
       c.beginPath();
@@ -299,13 +186,11 @@ function arriveShot(kit) {
       c.stroke();
       c.setLineDash([]);
 
-      // The path so far, then the agent with its diagram.
       c.strokeStyle = alpha(colors.ivory, 0.25);
       c.lineWidth = 1.5;
       c.beginPath();
-      states
-        .slice(0, index + 1)
-        .forEach(({ p }, i) => (i ? c.lineTo(p.x * unit, p.y * unit) : c.moveTo(p.x * unit, p.y * unit)));
+      for (let i = 0; i < trail.length; i += 2) c[i ? "lineTo" : "moveTo"](trail[i] * unit, trail[i + 1] * unit);
+      c.lineTo(agent.position.x * unit, agent.position.y * unit);
       c.stroke();
 
       c.strokeStyle = colors.coral;
@@ -318,25 +203,374 @@ function arriveShot(kit) {
       c.arc(tx, ty, 4.5, 0, Math.PI * 2);
       c.fill();
 
-      const { p, v, f } = states[index];
-      drawDiagram(c, colors, unit, p, v, f, 0.6);
+      const { position: p, velocity: v } = agent;
+      drawDiagram(c, colors, unit, p, v, force, 0.6);
       drawAgent(c, p.x * unit, p.y * unit, Math.atan2(v.y, v.x), 11, colors.ivory);
+    },
+  };
+}
 
+// 02: a school that holds together and keeps away from a shark, its neighbors found through the
+// spatial grid.
+function schooling(width, height) {
+  const random = seeded(21);
+  const bounds = box(0.4, 0.4, width - 0.4, height - 0.4);
+  const neighborhood = { radius: 1.1 };
+  const apart = { radius: 0.45 };
+  const fish = Array.from({ length: 180 }, () => {
+    const angle = random() * Math.PI * 2;
+    return {
+      position: vec(width * (0.2 + random() * 0.3), height * (0.3 + random() * 0.4)),
+      velocity: vec(Math.cos(angle) * 2, Math.sin(angle) * 2),
+      maxSpeed: 2.6 + random() * 0.6,
+      maxForce: 7,
+      state: createWanderState(random),
+      force: vec(),
+    };
+  });
+  const shark = { position: vec(width * 0.85, height * 0.5), velocity: vec(-1.5, 0.4), maxSpeed: 2.3, maxForce: 2.5 };
+  const sharkState = createWanderState(seeded(5));
+  const keepOff = { radius: 2.4 };
+  const grid = createGrid({ cellSize: neighborhood.radius, plane: "xy" });
+  const near = createNeighbors();
+  const [force, f, center] = [vec(), vec(), vec()];
+  return {
+    keepOff,
+    step(dt) {
+      updateGrid(grid, fish);
+      for (const a of fish) {
+        zero(a.force);
+        const n = queryGrid(grid, a.position, neighborhood.radius, near);
+        addWithin(a.force, a.maxForce, stayWithin(a, bounds, { margin: 0.8, lookAhead: 0.6 }, f));
+        addWithin(a.force, a.maxForce, keepAway(a, shark.position, keepOff, f), 4);
+        addWithin(a.force, a.maxForce, separation(a, n, apart, f), 2);
+        addWithin(a.force, a.maxForce, alignment(a, n, neighborhood, f), 1);
+        addWithin(a.force, a.maxForce, cohesion(a, n, neighborhood, f), 0.8);
+        addWithin(
+          a.force,
+          a.maxForce,
+          wander(a, a.state, { radius: 1, distance: 2, jitter: 2, plane: "xy" }, dt, f),
+          0.3,
+        );
+      }
+      for (const a of fish) step(a, a.force, dt);
+      // The shark goes for the middle of the school, wandering on the way.
+      zero(center);
+      for (const a of fish)
+        [center.x, center.y] = [center.x + a.position.x / fish.length, center.y + a.position.y / fish.length];
+      zero(force);
+      addWithin(force, shark.maxForce, stayWithin(shark, bounds, { margin: 1, lookAhead: 1 }, f));
+      addWithin(force, shark.maxForce, arrive(shark, center, { slowingDistance: 1 }, f));
+      addWithin(
+        force,
+        shark.maxForce,
+        wander(shark, sharkState, { radius: 1, distance: 2, jitter: 2, plane: "xy" }, dt, f),
+        0.6,
+      );
+      step(shark, force, dt);
+    },
+    draw(c, unit, colors) {
+      const { position: p, velocity: v } = shark;
+      c.fillStyle = alpha(colors.teal, 0.08);
+      c.beginPath();
+      c.arc(p.x * unit, p.y * unit, keepOff.radius * unit, 0, Math.PI * 2);
+      c.fill();
+      c.strokeStyle = alpha(colors.ivory, 0.4);
+      c.lineWidth = 1;
+      c.setLineDash([5, 6]);
+      c.stroke();
+      c.setLineDash([]);
+      for (const a of fish)
+        drawAgent(c, a.position.x * unit, a.position.y * unit, Math.atan2(a.velocity.y, a.velocity.x), 7, colors.teal);
+      drawAgent(c, p.x * unit, p.y * unit, Math.atan2(v.y, v.x), 20, colors.ivory);
+    },
+  };
+}
+
+// 03: a crowd following a closed road around rocks, the forces summed by priority.
+function following(width, height) {
+  const random = seeded(8);
+  const road = [];
+  for (let i = 0; i < 64; i++) {
+    const a = (i / 64) * Math.PI * 2;
+    const wobble = 1 + 0.12 * Math.sin(3 * a) + 0.06 * Math.cos(5 * a);
+    road.push(vec(width / 2 + Math.cos(a) * width * 0.36 * wobble, height / 2 + Math.sin(a) * height * 0.33 * wobble));
+  }
+  const rocks = [
+    [0.5, 0.5, 1.5],
+    [0.22, 0.24, 0.45],
+    [0.8, 0.3, 0.5],
+    [0.33, 0.83, 0.4],
+    [0.7, 0.78, 0.55],
+  ].map(([x, y, r]) => ({ position: vec(width * x, height * y), radius: r }));
+  const lane = { radius: 0.45, lookAhead: 0.5, closed: true };
+  const crowd = Array.from({ length: 46 }, (_, i) => {
+    const point = road[Math.floor((i / 46) * road.length)];
+    return {
+      position: vec(point.x + (random() - 0.5) * 0.4, point.y + (random() - 0.5) * 0.4),
+      velocity: vec(),
+      maxSpeed: 2.2 + random() * 0.8,
+      maxForce: 5,
+      force: vec(),
+    };
+  });
+  const f = vec();
+  return {
+    lane,
+    step(dt) {
+      for (const a of crowd) {
+        zero(a.force);
+        addWithin(a.force, a.maxForce, avoidObstacles(a, rocks, { radius: 0.15, lookAhead: 0.8, plane: "xy" }, f));
+        addWithin(a.force, a.maxForce, separation(a, crowd, { radius: 0.5 }, f), 1.5);
+        addWithin(a.force, a.maxForce, followPath(a, road, lane, f));
+      }
+      for (const a of crowd) step(a, a.force, dt);
+    },
+    draw(c, unit, colors) {
+      c.strokeStyle = alpha(colors.ivory, 0.07);
+      c.lineWidth = lane.radius * 2 * unit;
+      c.lineJoin = "round";
+      c.beginPath();
+      road.forEach((p, i) => c[i ? "lineTo" : "moveTo"](p.x * unit, p.y * unit));
+      c.closePath();
+      c.stroke();
+      c.strokeStyle = alpha(colors.ivory, 0.3);
+      c.lineWidth = 1;
+      c.setLineDash([5, 6]);
+      c.stroke();
+      c.setLineDash([]);
+      c.fillStyle = colors.deep;
+      for (const { position: o, radius } of rocks) {
+        c.beginPath();
+        c.arc(o.x * unit, o.y * unit, radius * unit, 0, Math.PI * 2);
+        c.fill();
+      }
+      for (const a of crowd)
+        drawAgent(c, a.position.x * unit, a.position.y * unit, Math.atan2(a.velocity.y, a.velocity.x), 8, colors.ivory);
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Sheets, built in the kit's layer with its classes: the site's own type and hairlines.
+
+function element(tag, className, children = []) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  for (const child of [children].flat()) node.append(child);
+  return node;
+}
+
+const MARK =
+  '<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32"/><path d="M24 16 10 23.5l3.5-7.5L10 8.5Z"/></svg>';
+
+function mark() {
+  const node = element("span", "kit-mark");
+  node.innerHTML = MARK;
+  return node;
+}
+
+// A page of the reel: the ground and one sheet on it, so a page sliding in covers the last one.
+function sheet(kit, rows) {
+  const node = element("div", "kit-sheet", rows);
+  node.style.gridTemplateRows = rows.map((row) => (row.dataset.grow ? "minmax(0, 1fr)" : "auto")).join(" ");
+  const page = element("div", "kit-page", node);
+  kit.layer.append(page);
+  return page;
+}
+
+// cubic-bezier(0.16, 1, 0.3, 1), the site's --ease-out, solved for x by bisection.
+function easeOut(x) {
+  const curve = (a, b, t) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+  let [low, high] = [0, 1];
+  for (let i = 0; i < 30; i++) {
+    const mid = (low + high) / 2;
+    if (curve(0.16, 0.3, mid) < x) low = mid;
+    else high = mid;
+  }
+  return curve(1, 1, (low + high) / 2);
+}
+
+function row(cells, grow = false) {
+  const node = element("div", "kit-row", cells);
+  if (grow) node.dataset.grow = "true";
+  return node;
+}
+
+function fact(label, value, data = false) {
+  return element("div", "kit-cell kit-fact", [
+    element("p", "kit-label", label),
+    element("p", data ? "kit-data kit-strong" : "kit-text", value),
+  ]);
+}
+
+function card(kit) {
+  const main = element("div", "kit-cell kit-card", [
+    element("p", "kit-label", "Open source library · MIT · v0.4"),
+    element("div", "kit-heading", [
+      element("div", "kit-name", [mark(), element("h1", "kit-display", "steerkit")]),
+      element("p", "kit-lede", "Steering behaviors for games, as small typed functions."),
+    ]),
+  ]);
+  const node = sheet(kit, [
+    row([main], true),
+    row([
+      fact("Install", "npm i steerkit", true),
+      fact("Core", "TypeScript, zero dependency"),
+      fact("Adapter", "Three.js, steerkit/three"),
+    ]),
+  ]);
+  const canvas = kit.canvasIn(main);
+  main.prepend(canvas.context.canvas);
+  const unit = canvas.height / 10;
+  const crowd = timeline(() => wanderers(canvas.width / unit, 10, 70));
+  return {
+    node,
+    draw(time) {
+      const c = canvas.context;
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      crowd(4 + time).draw(c, unit, kit.colors.line);
+    },
+  };
+}
+
+function useCase(kit, { number, title, code, aside, create, height, start = 0, speed = 1 }) {
+  const ink = element("div", "kit-cell kit-flush kit-ink");
+  const node = sheet(kit, [
+    row([
+      element("div", "kit-cell kit-case", [
+        element("div", "", [
+          element("p", "kit-data", number),
+          element("h2", "kit-title", title),
+          element("p", "kit-data kit-code", code),
+        ]),
+        element("p", "kit-label kit-aside", aside),
+      ]),
+    ]),
+    row([ink], true),
+    row([
+      element("div", "kit-cell kit-foot", [
+        element("p", "kit-text kit-name-small", [mark(), "steerkit"]),
+        element("p", "kit-data", "steerkit.thibaut-lefrancois.com"),
+      ]),
+    ]),
+  ]);
+  const canvas = kit.canvasIn(ink);
+  const unit = canvas.height / height;
+  const sim = timeline(() => create(canvas.width / unit, height));
+  return {
+    node,
+    draw(time) {
+      const c = canvas.context;
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      sim(start + Math.max(time, 0) * speed).draw(c, unit, kit.colors);
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------------------------
+
+function cardShot(kit) {
+  const { draw } = card(kit);
+  return { duration: 6, frame: draw };
+}
+
+function reel(kit) {
+  // Pages change as the site's do: the next one slides up over the current one.
+  const slide = 0.55;
+  const parts = [
+    { length: 1.2, ...card(kit) },
+    {
+      length: 2,
+      ...useCase(kit, {
+        number: "01",
+        title: "Arrive, and stop. By name.",
+        code: "arrive(agent, target, { slowingDistance: 2.2 }, force)",
+        aside: "Velocity, desired velocity and the steering force between them.",
+        create: arriving,
+        height: 5.6,
+        start: 1.2,
+      }),
+    },
+    {
+      length: 2,
+      ...useCase(kit, {
+        number: "02",
+        title: "A school of fish, and a shark.",
+        code: "separation + alignment + cohesion + keepAway",
+        aside: "180 fish, their neighbors found through the spatial grid.",
+        create: schooling,
+        height: 10,
+        start: 4,
+      }),
+    },
+    {
+      length: 2,
+      ...useCase(kit, {
+        number: "03",
+        title: "Follow a path, dodge the rocks.",
+        code: "avoidObstacles + separation + followPath",
+        aside: "Summed by priority with addWithin().",
+        create: following,
+        height: 10,
+        start: 3,
+      }),
+    },
+  ];
+  let offset = 0;
+  for (const part of parts) [part.begin, offset] = [offset, offset + part.length];
+  const duration = offset;
+
+  return {
+    duration,
+    frame(time) {
+      const t = ((time % duration) + duration) % duration;
+      parts.forEach((part, i) => {
+        // The card slides in again over the last page at the end, where the loop starts over.
+        const closing = i === 0 && t > duration - slide;
+        const local = closing ? t - duration : t - part.begin;
+        const next = parts[i + 1];
+        const covered = next ? t >= next.begin + slide : t >= duration;
+        const visible = closing || (local >= 0 && !covered && !(i === parts.length - 1 && t > duration));
+        const entering =
+          i > 0 || closing ? Math.min(Math.max((closing ? t - duration + slide : local) / slide, 0), 1) : 1;
+        part.node.style.visibility = visible ? "visible" : "hidden";
+        part.node.style.zIndex = String(closing ? parts.length : i);
+        part.node.style.transform = `translateY(${(1 - easeOut(entering)) * 100}%)`;
+        if (visible) part.draw(local);
+      });
+    },
+  };
+}
+
+function arriveShot(kit) {
+  const { context: c, colors, params } = kit;
+  // Closer than the reel: the figure is shown at the width of the text.
+  const height = 5.6;
+  const unit = kit.height / height;
+  const sim = timeline(() => arriving(kit.width / unit, height));
+  return {
+    duration: 4,
+    frame(time) {
+      c.fillStyle = colors.ink;
+      c.fillRect(0, 0, kit.width, kit.height);
+      const state = sim(time);
+      state.draw(c, unit, colors);
       if (!params.has("bare")) {
         const margin = Math.round(kit.height * 0.075);
         c.font = `400 ${kit.sizes.text}px ${kit.fonts.data}`;
         c.fillStyle = alpha(colors.ivory, 0.85);
         c.textBaseline = "top";
-        c.fillText(`arrive(agent, target, { slowingDistance: ${slowingDistance} }, force)`, margin, margin);
+        c.fillText(`arrive(agent, target, { slowingDistance: ${state.slowingDistance} }, force)`, margin, margin);
       }
     },
   };
 }
 
-const shots = { stream, arrive: arriveShot };
+const shots = { card: cardShot, reel, arrive: arriveShot };
 
 export default function setup(kit) {
-  const shot = shots[kit.params.get("shot") ?? "stream"];
+  const shot = shots[kit.params.get("shot") ?? "card"];
   if (!shot) throw new Error(`steerkit scene: unknown shot ${kit.params.get("shot")}`);
   return shot(kit);
 }

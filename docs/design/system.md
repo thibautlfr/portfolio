@@ -99,7 +99,7 @@ Project visuals at 16:10, experiments at 4:3, the portrait square and in black a
 
 Project media are made for this site, in its art direction; a project's own branding, screenshots in its own type and colours included, is never reused as it is. Two treatments:
 
-- **Thibaut's own code** (a library, an experiment, a personal project): a scene written for the site that runs the project's real code, drawn on ink in the shader's palette (teal for the many, ivory for the one in focus, coral for what acts on it), with data in Fragment Mono. Steerkit's cover is the reference.
+- **Thibaut's own code** (a library, an experiment, a personal project): the cover is a title card set as a sheet (the project's mark redrawn like the site's favicon, a dark square and a light sign; the name in Headline; what it is; a row of facts), and the preview loop runs through a few use cases, one page each: a heading cell (number, title, the call in mono) over an ink cell where the project's real code runs, in the shader's palette (teal for the many, ivory for the one in focus, coral for what acts on it). Pages change by sliding up, as the site's do. Steerkit is the reference.
 - **Client work**: the real capture, set in the sheet: a white cell with a hairline on the sage ground, and an optional row in mono that carries real data (the address, the viewport), never decoration.
 
 Both are composed on `/media-kit/` (see [`architecture.md`](../architecture.md#project-media)). The checklist below applies to them as to any surface.
