@@ -91,7 +91,7 @@ Project visuals at 16:10, experiments at 4:3, the portrait square and in black a
 
 ## The shader
 
-The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts one second after the largest paint (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
+The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts after the largest paint and a short idle wait, half a second at most (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
 
 ## Anti AI-look checklist
 
