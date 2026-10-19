@@ -23,16 +23,19 @@ const { facts } = Astro.props;
 </dl>
 
 <style>
+  /* Terms share one column, as wide as the longest term. The size is a variant: secondary
+     metadata by default, body size where the list is the content (--facts-size). */
   .facts {
     display: grid;
-    gap: var(--space-2);
-    font-size: var(--font-size-step-minus-1);
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--space-2) var(--space-4);
+    font-size: var(--facts-size, var(--font-size-step-minus-1));
   }
 
   .fact {
     display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: var(--space-3);
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
   }
 
   dt {
@@ -41,6 +44,7 @@ const { facts } = Astro.props;
 
   .data {
     font-family: var(--font-data);
+    font-size: var(--font-size-data);
     font-variant-numeric: tabular-nums;
   }
 </style>

@@ -30,8 +30,9 @@
     /* In the contact section the address is the answer and the display line: it fills its cell. */
     --font-size-email-large: min(var(--font-size-step-5), 7cqi);
 
-    /* Mono runs a little large next to the text face. */
-    --font-size-data: 0.9em;
+    /* Mono at the size of the text around it: Fragment Mono's x-height is already 6% under
+       Stack Sans Text's, and any reduction makes data read lighter than its label. */
+    --font-size-data: 1em;
 
     --line-height-tight: 0.9;
     --line-height-title: 1.05;
