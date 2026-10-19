@@ -4,7 +4,6 @@ import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
-import { formatList } from "@/lib/format";
 
 interface Offer {
   title: string;
@@ -14,9 +13,11 @@ interface Offer {
 interface Props {
   title: string;
   offers: Offer[];
+  /** Title of the facts cell, at the offers' level so the three columns read as peers. */
+  factsTitle: string;
 }
 
-const { title, offers } = Astro.props;
+const { title, offers, factsTitle } = Astro.props;
 const { stack, languages, cvPath } = profile;
 ---
 
@@ -29,11 +30,12 @@ const { stack, languages, cvPath } = profile;
     </Cell>
   ))}
   <Cell span={4} class="facts">
+    <h3>{factsTitle}</h3>
     <FactList
       facts={[
-        { term: "Languages", value: formatList(stack.languages), data: true },
-        { term: "Front-end", value: formatList(stack.frontEnd), data: true },
-        { term: "Back-end", value: formatList(stack.backEnd), data: true },
+        { term: "Languages", value: stack.languages },
+        { term: "Front-end", value: stack.frontEnd },
+        { term: "Back-end", value: stack.backEnd },
         { term: "Speaks", value: languages.join(", ") },
       ]}
     />
@@ -63,7 +65,10 @@ const { stack, languages, cvPath } = profile;
     color: var(--color-text-muted);
   }
 
+  /* The facts are this cell's content, not metadata: body size, like the offers' text. */
   .facts {
+    --facts-size: var(--font-size-step-0);
+
     display: grid;
     align-content: start;
     gap: var(--space-4);

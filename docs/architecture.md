@@ -28,7 +28,7 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList, TagList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
 │   ├── note/                 # NoteHeader, NoteListItem
@@ -89,7 +89,7 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 - Stack Sans Headline (700) and Text (400 to 500), Latin subset.
 - Fragment Mono, Latin subset.
 
-`scripts/fonts.sh` documents and reruns the process (`uvx --from fonttools`, no project dependency). Astro's Fonts API serves them through the local provider, generates metric-adjusted fallbacks, and preloads only the wordmark.
+`scripts/fonts.sh` documents and reruns the process (`uvx --from fonttools`, no project dependency). Astro's Fonts API serves them through the local provider, generates metric-adjusted fallbacks, and preloads the faces of the first viewport: body text everywhere, the wordmark and the email on the home page, Headline on inner pages. Every face swaps in: `font-display: optional` was tried for body text and mono and kept Arial and Courier New on screen on most visits.
 
 ## Client JavaScript
 

@@ -79,19 +79,17 @@ export default defineConfig({
       name: "Stack Sans Text",
       cssVariable: "--font-stack-sans-text",
       fallbacks: ["sans-serif"],
-      // Body text: never preloaded and never swapped in late, so it cannot delay the first
-      // paint nor move the layout. A slow first visit shows the metric-matched fallback.
-      options: {
-        variants: [{ src: [fontFile("stack-sans-text")], weight: "400 500", style: "normal", display: "optional" }],
-      },
+      // Body text: preloaded on every page and swapped in. display: optional kept the fallback
+      // (Arial) on most visits, since the file rarely arrived within its 100ms window.
+      options: { variants: [{ src: [fontFile("stack-sans-text")], weight: "400 500", style: "normal" }] },
     },
     {
       provider: fontProviders.local(),
       name: "Fragment Mono",
       cssVariable: "--font-fragment-mono",
       fallbacks: ["monospace"],
-      // Data only: a system monospace is fine when the file is late, and never swaps in later.
-      options: { variants: [{ src: [fontFile("fragment-mono")], weight: 400, style: "normal", display: "optional" }] },
+      // Swapped in like the text: Courier New, the fallback, is too thin to stand in for it.
+      options: { variants: [{ src: [fontFile("fragment-mono")], weight: 400, style: "normal" }] },
     },
   ],
 });

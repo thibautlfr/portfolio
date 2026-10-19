@@ -2,13 +2,15 @@
 import { profile } from "@/data/profile";
 
 const year = new Date().getFullYear();
+const legalPath = "/legal-notice/";
+const onLegalNotice = Astro.url.pathname.replace(/\/?$/, "/") === legalPath;
 ---
 
 <footer class="site-footer">
   <p>
     &copy; {year} {profile.name}
   </p>
-  <a href="/legal-notice/">Legal notice</a>
+  {onLegalNotice ? <span aria-current="page">Legal notice</span> : <a href={legalPath}>Legal notice</a>}
 </footer>
 
 <style>

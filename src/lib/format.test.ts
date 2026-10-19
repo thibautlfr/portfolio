@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatContext, formatDate, formatList, isoDate } from "./format";
+import { formatContext, formatDate, formatHandle, isoDate } from "./format";
 
 describe("formatContext", () => {
   it("names the context and adds the year when known", () => {
@@ -17,8 +17,9 @@ describe("dates", () => {
   });
 });
 
-describe("formatList", () => {
-  it("keeps each item on one line and wraps between items", () => {
-    expect(formatList(["Vue 3", "Three.js"])).toBe("Vue\u00a03, Three.js");
+describe("formatHandle", () => {
+  it("takes the last path segment, with or without a trailing slash", () => {
+    expect(formatHandle("https://linkedin.com/in/thibaut-lefrancois")).toBe("thibaut-lefrancois");
+    expect(formatHandle("https://www.instagram.com/thibautlfr/")).toBe("thibautlfr");
   });
 });

@@ -28,10 +28,10 @@ const { hero = false, ...seo } = Astro.props;
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Faces set in the first viewport are preloaded so they are in place for the first paint;
-         body text is display: optional and never waits (see astro.config.ts). -->
+         the mono, a few short strings, swaps in when it arrives (see astro.config.ts). -->
     <Font cssVariable="--font-archivo-wordmark" preload={hero} />
     <Font cssVariable="--font-stack-sans-headline" preload={!hero} />
-    <Font cssVariable="--font-stack-sans-text" />
+    <Font cssVariable="--font-stack-sans-text" preload />
     <Font cssVariable="--font-stack-sans-notch" preload={hero} />
     <Font cssVariable="--font-fragment-mono" />
     {PUBLIC_UMAMI_WEBSITE_ID && (

@@ -1,0 +1,33 @@
+---
+interface Props {
+  /** Technologies, most important first. */
+  items: readonly string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul role="list" class="tags">
+  {items.map((item) => (
+    <li>{item}</li>
+  ))}
+</ul>
+
+<style>
+  /* Each item framed by a hairline, like a cell of the sheet; small, so a long stack stays a
+     block under its label rather than a paragraph. */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  li {
+    padding-inline: var(--space-2);
+    border: var(--border-hairline);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-strong);
+    line-height: var(--line-height-lede);
+    white-space: nowrap;
+  }
+</style>

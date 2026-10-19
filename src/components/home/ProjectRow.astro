@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import FactList from "@/components/ui/FactList.astro";
 import Media from "@/components/ui/Media.astro";
-import { formatContext, formatList } from "@/lib/format";
+import { formatContext } from "@/lib/format";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -26,7 +26,7 @@ const { title, summary, award, context, year, role, stack, cover } = project.dat
       facts={[
         { term: "Context", value: formatContext(context, year) },
         { term: "Role", value: role },
-        { term: "Stack", value: formatList(stack), data: true },
+        { term: "Stack", value: stack },
       ]}
     />
   </div>
