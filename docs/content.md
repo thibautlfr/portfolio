@@ -121,8 +121,6 @@ import demo from "./demo.mp4";
 
 Name, role, positioning, email, location, stack, socials, collaborations and legal facts live in [`src/data/profile.ts`](../src/data/profile.ts), typed and read everywhere else. The CV link appears once `cvPath` is set and the PDF is in `public/cv/`. `availability` is shown in the hero above the email; set it to `undefined` when not taking missions. `collaborations` are the clients and partners named in a row under the About offers (the name as a link, then `credit`; `detail` is used in `llms.txt`). Word them so they stay true once the work is over, and name a company only with its agreement.
 
-A collaboration can carry a `testimonial`: `{ quote, author, role }`, the words exactly as the client wrote them, published with their agreement. It is shown under the client's name in the About section, and on every case study whose `client.name` is the collaboration's `name`, after the body. Nothing renders while it is absent; never paraphrase or invent one. The Raccourci Agency entry holds a commented example, ready for the quote asked for at the end of the Youbook mission.
-
 ## Before launch
 
 Placeholder copy uses lorem ipsum on purpose: the deploy job refuses to publish while `src/content` contains it.

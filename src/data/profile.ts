@@ -15,15 +15,6 @@ const socials: readonly Social[] = [
   { label: "Instagram", url: "https://www.instagram.com/thibautlfr/" },
 ];
 
-/** Words a client or partner wrote about the work, quoted as written and published with their
-    agreement. Never paraphrased, never invented. */
-interface Testimonial {
-  quote: string;
-  author: string;
-  /** The author's role at the time, for example "Technical lead". */
-  role: string;
-}
-
 /** A client or partner, named in a row under the About offers. Worded so it stays true once
     the work is over. */
 interface Collaboration {
@@ -33,18 +24,14 @@ interface Collaboration {
   credit: string;
   /** The group it belongs to, or what it is (llms.txt). */
   detail?: string;
-  /** Shown under the name in the About section, and on the case study whose `client.name` matches. */
-  testimonial?: Testimonial;
 }
 
-const collaborations: Readonly<Record<string, Collaboration>> = {
+const collaborations = {
   raccourci: {
     name: "Raccourci Agency",
     url: "https://www.raccourci.fr",
     credit: "Youbook, for Groupe Yoni's tourism software",
     detail: "Groupe Yoni",
-    // Asked for at the end of the Youbook mission. Paste it as written, once it is agreed:
-    // testimonial: { quote: "…", author: "First Last", role: "Technical lead" },
   },
   areti: {
     name: "Areti",
@@ -52,7 +39,7 @@ const collaborations: Readonly<Record<string, Collaboration>> = {
     credit: "Development partner of the studio",
     detail: "a creative and technical studio",
   },
-};
+} satisfies Record<string, Collaboration>;
 
 export const profile = {
   name: "Thibaut Lefrançois",

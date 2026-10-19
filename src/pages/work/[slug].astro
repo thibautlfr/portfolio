@@ -8,10 +8,8 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
-import Testimonial from "@/components/ui/Testimonial.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
-import { findCollaboration } from "@/lib/collaborations";
 import { selectPublished } from "@/lib/content";
 import { formatClient, formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
@@ -36,7 +34,6 @@ const { Content } = await render(project);
 const site = Astro.site ?? Astro.url;
 const url = new URL(`/work/${project.id}/`, site).href;
 const source = links.find((link) => link.kind === "source");
-const testimonial = findCollaboration(Object.values(profile.collaborations), client)?.testimonial;
 ---
 
 <BaseLayout
@@ -103,11 +100,6 @@ const testimonial = findCollaboration(Object.values(profile.collaborations), cli
           <Content components={{ Figure, Video }} />
         </div>
       </Cell>
-      {client && testimonial && (
-        <Cell class="testimonial-cell">
-          <Testimonial {...testimonial} organisation={client.name} />
-        </Cell>
-      )}
       {next && next.id !== project.id && (
         <Cell as="footer" class="next">
           <p class="next-label">Next case study</p>
@@ -170,12 +162,6 @@ const testimonial = findCollaboration(Object.values(profile.collaborations), cli
 
   .body {
     padding-block: var(--space-8) var(--space-16);
-  }
-
-  .testimonial-cell {
-    --testimonial-size: var(--font-size-step-2);
-
-    padding-block: var(--space-8);
   }
 
   .next {

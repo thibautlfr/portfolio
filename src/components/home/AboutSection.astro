@@ -3,7 +3,6 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
-import Testimonial from "@/components/ui/Testimonial.astro";
 import { profile } from "@/data/profile";
 
 interface Offer {
@@ -61,11 +60,6 @@ const clients = Object.values(profile.collaborations);
               {client.name}
             </a>
             <p class="client-credit">{client.credit}</p>
-            {client.testimonial && (
-              <div class="client-testimonial">
-                <Testimonial {...client.testimonial} organisation={client.name} />
-              </div>
-            )}
           </li>
         ))}
       </ul>
@@ -122,10 +116,6 @@ const clients = Object.values(profile.collaborations);
   .clients-title {
     font-family: var(--font-text);
     font-weight: var(--font-weight-strong);
-  }
-
-  .client-testimonial {
-    margin-block-start: var(--space-4);
   }
 
   .client-name {

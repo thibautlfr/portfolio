@@ -28,14 +28,13 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList, Testimonial
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
 │   ├── note/                 # NoteHeader, NoteListItem
 │   └── mdx/                  # Components available inside MDX bodies: Figure, Video
 ├── lib/                      # Plain TypeScript, no Astro imports where avoidable, unit tested
 │   ├── content.ts            # Queries: draft filtering, featured and order sorting, in one place
-│   ├── collaborations.ts     # Ties a case study to its collaboration (testimonials)
 │   ├── media.ts              # Resolves colocated videos to built URLs
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   └── format.ts             # Dates

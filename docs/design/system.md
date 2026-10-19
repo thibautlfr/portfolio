@@ -90,7 +90,6 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable    |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
 | `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |
-| `Testimonial`  | A client's words in the text face, then author, role and company in muted grey, no marks |
 
 The development page `/styleguide/` shows every token and base component.
 
