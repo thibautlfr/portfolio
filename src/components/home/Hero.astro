@@ -9,6 +9,7 @@ import heroBootScript from "@/scripts/hero-shader/boot-inline.js?raw";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
+import ScrambleText from "@/components/ui/ScrambleText.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
 import TagList from "@/components/ui/TagList.astro";
@@ -63,12 +64,14 @@ const stack = Object.values(profile.stack).flat();
     <EmailLink />
   </Cell>
 
-  <Cell span={4} class="hero-base">
+  <Cell span={4} class="hero-base" data-scramble-trigger>
     <p class="label">Base</p>
     <p>
       {profile.location.city}, {profile.location.country}
     </p>
-    <p class="data coordinates">{profile.location.coordinates}</p>
+    <p class="data coordinates">
+      <ScrambleText text={profile.location.coordinates} digitsOnly />
+    </p>
   </Cell>
   <Cell span={4} class="hero-mobility">
     <p class="label">Mobility</p>
@@ -82,6 +85,9 @@ const stack = Object.values(profile.stack).flat();
 
 <!-- Inline boot step (see boot-inline.js). -->
 <script is:inline set:html={heroBootScript} />
+<script>
+  import "@/scripts/scramble";
+</script>
 <style>
   /* Below 60rem the sheet becomes two columns so the portrait can sit beside
      the base; the pitch comes right after the name, before the shader. The
