@@ -26,7 +26,9 @@
     /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
        size container): about 13.5em wide, so 7cqi fills the cell. */
     --font-size-email: min(var(--font-size-step-2), 7cqi);
-    --font-size-email-large: min(var(--font-size-step-3), 7cqi);
+
+    /* In the contact section the address is the answer and the display line: it fills its cell. */
+    --font-size-email-large: min(var(--font-size-step-5), 7cqi);
 
     /* Mono runs a little large next to the text face. */
     --font-size-data: 0.9em;
