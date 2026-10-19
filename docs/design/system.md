@@ -97,6 +97,13 @@ The development page `/styleguide/` shows every token and base component.
 
 Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows.
 
+Project media are made for this site, in its art direction; a project's own branding, screenshots in its own type and colours included, is never reused as it is. Two treatments:
+
+- **Thibaut's own code** (a library, an experiment, a personal project): a scene written for the site that runs the project's real code, drawn on ink in the shader's palette (teal for the many, ivory for the one in focus, coral for what acts on it), with data in Fragment Mono. Steerkit's cover is the reference.
+- **Client work**: the real capture, set in the sheet: a white cell with a hairline on the sage ground, and an optional row in mono that carries real data (the address, the viewport), never decoration.
+
+Both are composed on `/media-kit/` (see [`architecture.md`](../architecture.md#project-media)). The checklist below applies to them as to any surface.
+
 ## The shader
 
 The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts after the largest paint and a short idle wait, half a second at most (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).

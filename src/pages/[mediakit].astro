@@ -1,0 +1,104 @@
+---
+// Development-only composition page for project media: covers, preview loops, figures and
+// playground thumbnails are drawn here, in the site's own tokens, fonts and components, so
+// their art direction cannot drift from the site. The make-media tooling drives it; opened by
+// hand, it shows the piece live. The route only exists under `astro dev`.
+//
+//   /media-kit/?ratio=16:10&src=/path/to/capture.png&data=Left&data=Right   a capture in the sheet
+//   /media-kit/?ratio=16:10&scene=/media/steerkit/scene.js&shot=crowd      a scene module
+import { Font } from "astro:assets";
+
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import "@/styles/global.css";
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { mediakit: "media-kit" } }] : [];
+}
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Media kit</title>
+    <Font cssVariable="--font-stack-sans-headline" preload />
+    <Font cssVariable="--font-stack-sans-text" preload />
+    <Font cssVariable="--font-fragment-mono" preload />
+  </head>
+  <body>
+    <div class="stage" data-media-stage>
+      <canvas class="scene" data-media-scene hidden></canvas>
+      <Sheet as="div" class="frame" data-media-frame hidden>
+        <Cell flush class="window" data-media-window />
+        <Cell class="data" data-media-data hidden />
+      </Sheet>
+    </div>
+    <!-- Served by the dev server as it is: a bundled script would leave an orphan chunk in builds. -->
+    <script is:inline type="module" src="/src/scripts/media-kit.ts"></script>
+  </body>
+</html>
+
+<style>
+  body {
+    display: grid;
+    place-items: center;
+    min-block-size: 100vh;
+    background: var(--color-ground);
+  }
+
+  .stage {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-ground);
+  }
+
+  .scene {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  /* A capture in the sheet: one white cell on the ground, the capture flush in it, and an
+     optional row of data under a hairline. */
+  .frame {
+    position: absolute;
+    inset: var(--frame-margin, var(--space-12));
+    grid-template-rows: minmax(0, 1fr) auto;
+    margin: 0;
+  }
+
+  .frame[hidden] {
+    display: none;
+  }
+
+  .window {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .window :global(img),
+  .window :global(video) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: var(--window-position, top);
+  }
+
+  .data {
+    display: flex;
+    gap: var(--space-6);
+    justify-content: space-between;
+    padding-block: var(--space-3);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    color: var(--color-text-muted);
+  }
+
+  .data[hidden] {
+    display: none;
+  }
+</style>

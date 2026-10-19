@@ -52,6 +52,8 @@ src/
     ├── index.astro
     ├── 404.astro
     ├── legal-notice.astro
+    ├── [styleguide].astro    # Tokens and components, dev only
+    ├── [mediakit].astro      # Composition page for project media, dev only (see Project media)
     ├── work/[slug].astro
     ├── notes/index.astro
     ├── notes/[slug].astro
@@ -61,7 +63,7 @@ src/
 
 `src/proposals/` holds design proposals under review: the dynamic ASCII hero (`/proposals/ascii/`). It exists under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322). The pages are registered by an integration in `astro.config.ts`. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly. **Before launch (the merge of `v2` into `main`), the ASCII proposal and all of its plumbing must be removed**: the folder, the integration in `astro.config.ts`, the `proposals` script in `package.json`, the entry in `knip.config.ts` and this paragraph.
 
-Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `docs/`, `.github/workflows/`.
+Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `media/` (see [Project media](#project-media)), `docs/`, `.github/workflows/`.
 
 ## Conventions
 
@@ -110,6 +112,17 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 **Scripts under the router.** A bundled module runs once per visit, not once per page. A script that binds to elements of the page binds again after `astro:after-swap` (or `astro:page-load`), and a script that keeps running stops on `astro:before-swap`: the hero shader disposes of its WebGL context there. Inline scripts run again on every page that contains them.
 
 Scroll reveals use CSS scroll-driven animations behind `@supports`.
+
+## Project media
+
+Covers, preview loops, body figures and playground thumbnails are drawn in the site's art direction (see [`design/system.md`](design/system.md#images)), on one development page, `/media-kit/` (`src/pages/[mediakit].astro` and `src/scripts/media-kit.ts`). It reads the real tokens, fonts and components, so a piece of media cannot drift from the site. Like `/styleguide/`, it exists only under `astro dev`; its script is loaded as it is from the dev server, so a build carries nothing of it.
+
+The page composes one piece at the ratio of its `ratio` parameter, filling the window, in one of two ways:
+
+- `src`: a capture (image or video) set in the sheet, a white cell with a hairline on the ground, with optional `data` items in mono under it.
+- `scene`: a scene module, a plain ES module that receives the canvas, the colour roles, the shader's palette (`src/scripts/hero-shader/palette.ts`), the font stacks and the type scale, and draws the piece at any time `t`. Opened without `render`, it plays live.
+
+Each entry's sources live in `media/<slug>/`: `media.mjs`, the recipe (captures to take, outputs to write next to the entry), and its scenes. A scene imports the project's own published package from a CDN at a pinned version, never from `package.json`. The rendering itself (headless Chrome through `playwright-core`, then ffmpeg) runs from a personal Claude Code skill outside the repository, so it adds no dependency here; it reads the specs of [`content.md`](content.md#images-and-video) at every run. `media/` is formatted and linted with the rest, and ignored by knip.
 
 ## Tooling
 
