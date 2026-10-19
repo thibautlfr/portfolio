@@ -175,6 +175,13 @@ let drawAt: ((time: number) => void) | undefined;
 async function start(): Promise<Ready> {
   const stage = document.querySelector<HTMLElement>("[data-media-stage]");
   if (!stage) throw new Error("media kit: no stage");
+  // Nothing to compose: show the list of recipes instead.
+  if (!params.has("scene") && !params.has("src")) {
+    const index = document.querySelector<HTMLElement>("[data-media-index]");
+    if (index) index.hidden = false;
+    stage.hidden = true;
+    return { mode: "frame", duration: undefined, window: undefined };
+  }
   sizeStage(stage);
   await document.fonts.ready;
 
