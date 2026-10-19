@@ -65,9 +65,7 @@ const source = links.find((link) => link.kind === "source");
 >
   <article class="page">
     <Sheet as="div">
-      <Cell>
-        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
-      </Cell>
+      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
       <Cell span={cover ? 7 : 12} as="header" class="title-block">
         <h1>{title}</h1>
         <p class="summary">{summary}</p>

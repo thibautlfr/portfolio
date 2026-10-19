@@ -80,4 +80,6 @@ Lifecycle rules: starts after load on idle, pauses off-screen and in hidden tabs
 
 No header and no navigation bar, as in the V1 layout (decided at V1a). The home page is a single scroll; the hero carries the name and the email, and inner pages link back to the home from their own title block and footer.
 
+Amended on 2026-10-19: the breadcrumb trail of inner pages stays pinned one gutter below the top of the viewport, where it sits when the page opens, so the way back stays in reach on a long case study. It is the first cell of the page's sheet, not a header: it holds the trail and nothing else.
+
 ![Mobile reference](direction-mobile.webp)

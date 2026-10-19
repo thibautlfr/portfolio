@@ -14,9 +14,7 @@ const { legal, email } = profile;
 >
   <div class="page">
     <Sheet aria-labelledby="legal-title">
-      <Cell>
-        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Legal notice" }]} />
-      </Cell>
+      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Legal notice" }]} />
       <Cell as="header" class="title-block">
         <h1 id="legal-title">Legal notice</h1>
         <p>Who publishes this website, who hosts it, and what happens to your data.</p>

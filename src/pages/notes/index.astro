@@ -26,9 +26,7 @@ const site = Astro.site ?? Astro.url;
 >
   <div class="page">
     <Sheet aria-labelledby="notes-title">
-      <Cell>
-        <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Notes" }]} />
-      </Cell>
+      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Notes" }]} />
       <Cell as="header" class="title-block">
         <h1 id="notes-title">Notes</h1>
         <p>Experiments, things learned, and posts first shared on X and LinkedIn.</p>

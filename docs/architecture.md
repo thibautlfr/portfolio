@@ -24,7 +24,7 @@ src/
 │   ├── fonts/                # Instanced and subset woff2 files (see Fonts)
 │   └── images/               # Site-level images: portrait, avatar, static shader frame
 ├── layouts/
-│   └── BaseLayout.astro      # Document shell: head, skip link, main, footer (no header by design)
+│   └── BaseLayout.astro      # Document shell: head, skip link, main, footer (no header by design; inner pages pin their breadcrumbs)
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
