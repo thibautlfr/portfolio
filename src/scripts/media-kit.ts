@@ -26,6 +26,13 @@ interface Kit {
   fonts: Record<"title" | "text" | "data", string>;
   /** The type scale resolved at this stage size, in pixels. */
   sizes: Record<"label" | "text" | "lede" | "title" | "display", number>;
+  /**
+   * A layer over the canvas for text and sheets, set in the site's own type: build it with the
+   * kit-* classes of the page (kit-sheet, kit-cell, kit-title...), never with raw styles.
+   */
+  layer: HTMLElement;
+  /** A canvas filling `element` (a cell of the layer), scaled to CSS pixels. */
+  canvasIn(element: HTMLElement): { context: CanvasRenderingContext2D; width: number; height: number };
 }
 
 /** What a scene module's default export returns. */
@@ -98,6 +105,7 @@ async function readFonts() {
   await Promise.all([
     document.fonts.load(`700 16px ${fonts.title}`),
     document.fonts.load(`400 16px ${fonts.text}`),
+    document.fonts.load(`500 16px ${fonts.text}`),
     document.fonts.load(`400 16px ${fonts.data}`),
   ]);
   return fonts;
@@ -154,6 +162,19 @@ async function sceneMode(stage: HTMLElement, url: string) {
     readFonts(),
     import(/* @vite-ignore */ url) as Promise<{ default: (kit: Kit) => Scene | Promise<Scene> }>,
   ]);
+  const layer = stage.querySelector<HTMLElement>("[data-media-layer]");
+  if (!layer) throw new Error("media kit: no layer");
+  const canvasIn = (element: HTMLElement) => {
+    const inner = Object.assign(document.createElement("canvas"), { className: "kit-canvas" });
+    element.append(inner);
+    const box = element.getBoundingClientRect();
+    inner.width = Math.round(box.width * pixelRatio);
+    inner.height = Math.round(box.height * pixelRatio);
+    const innerContext = inner.getContext("2d");
+    if (!innerContext) throw new Error("media kit: no canvas");
+    innerContext.scale(pixelRatio, pixelRatio);
+    return { context: innerContext, width: box.width, height: box.height };
+  };
   const kit: Kit = {
     canvas,
     context,
@@ -164,8 +185,12 @@ async function sceneMode(stage: HTMLElement, url: string) {
     colors: readColors(),
     fonts,
     sizes: readSizes(),
+    layer,
+    canvasIn,
   };
   const scene = await module.default(kit);
+  // Text the scene set in the layer may use faces or weights not loaded yet.
+  await document.fonts.ready;
   return { scene, context };
 }
 

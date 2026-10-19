@@ -81,6 +81,7 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     </nav>
     <div class="stage" data-media-stage>
       <canvas class="scene" data-media-scene hidden></canvas>
+      <div class="layer" data-media-layer></div>
       <Sheet as="div" class="frame" data-media-frame hidden>
         <Cell flush class="window" data-media-window />
         <Cell class="data" data-media-data hidden />
@@ -134,6 +135,188 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     block-size: 100%;
   }
 
+  /* The layer a scene builds its sheets in, over the canvas. The kit-* classes repeat the
+     Sheet and Cell components and the site's type roles, from the same tokens. */
+  .layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .layer :global(.kit-page) {
+    position: absolute;
+    inset: 0;
+    background: var(--color-ground);
+  }
+
+  .layer :global(.kit-sheet) {
+    position: absolute;
+    inset: var(--space-8);
+    display: grid;
+    border-block-start: var(--border-hairline);
+    border-inline-start: var(--border-hairline);
+  }
+
+  .layer :global(.kit-row) {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  .layer :global(.kit-cell) {
+    position: relative;
+    min-inline-size: 0;
+    padding: var(--space-6);
+    overflow: hidden;
+    background: var(--color-surface);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+  }
+
+  .layer :global(.kit-flush) {
+    padding: 0;
+  }
+
+  .layer :global(.kit-ink) {
+    background: var(--color-shader-ground);
+  }
+
+  .layer :global(.kit-canvas) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .layer :global(.kit-title) {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-3);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-title);
+    letter-spacing: var(--letter-spacing-title);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-display) {
+    font-family: var(--font-title);
+    font-size: var(--font-size-media-name);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-title);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-lede) {
+    font-size: var(--font-size-step-2);
+    line-height: var(--line-height-lede);
+    color: var(--color-text-muted);
+  }
+
+  .layer :global(.kit-text) {
+    font-size: var(--font-size-step-0);
+    font-weight: var(--font-weight-strong);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-label) {
+    font-size: var(--font-size-step-minus-1);
+    color: var(--color-text-muted);
+  }
+
+  /* A project's mark, set in the text like the site's own favicon: a dark square, a light sign. */
+  .layer :global(.kit-mark) {
+    display: inline-block;
+    flex: none;
+    inline-size: 0.78em;
+    block-size: 0.78em;
+  }
+
+  .layer :global(.kit-mark svg) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    fill: var(--color-text);
+  }
+
+  .layer :global(.kit-mark path) {
+    fill: var(--color-surface);
+  }
+
+  /* A title card: a label at the top, the name and what it is at the bottom. */
+  .layer :global(.kit-card) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    justify-content: space-between;
+    padding: var(--space-12);
+  }
+
+  .layer :global(.kit-card > :not(canvas)),
+  .layer :global(.kit-case),
+  .layer :global(.kit-foot) {
+    position: relative;
+  }
+
+  .layer :global(.kit-heading) {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-start: auto;
+  }
+
+  .layer :global(.kit-name) {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .layer :global(.kit-name .kit-mark) {
+    font-size: var(--font-size-media-name);
+  }
+
+  .layer :global(.kit-fact) {
+    display: grid;
+    gap: var(--space-1);
+    padding-inline: var(--space-12);
+  }
+
+  /* The heading cell of a use case: number, title and code on the left, a note on the right. */
+  .layer :global(.kit-case) {
+    display: flex;
+    gap: var(--space-8);
+    align-items: end;
+    justify-content: space-between;
+  }
+
+  .layer :global(.kit-case .kit-title) {
+    margin-block: var(--space-1) var(--space-3);
+  }
+
+  .layer :global(.kit-aside) {
+    max-inline-size: 18rem;
+    text-align: end;
+  }
+
+  .layer :global(.kit-foot) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-3);
+  }
+
+  .layer :global(.kit-name-small) {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+  }
+
+  .layer :global(.kit-data) {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
   /* A capture in the sheet: one white cell on the ground, the capture flush in it, and an
      optional row of data under a hairline. */
   .frame {
@@ -174,5 +357,15 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
 
   .data[hidden] {
     display: none;
+  }
+
+  /* Data that is the content of its cell (an install command, a call), not a note on it. */
+  .layer :global(.kit-data.kit-strong) {
+    font-size: var(--font-size-step-0);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-data.kit-code) {
+    color: var(--color-text);
   }
 </style>

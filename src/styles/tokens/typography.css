@@ -23,6 +23,9 @@
     --font-size-step-4: clamp(2rem, 1.55rem + 2.25vw, 3.5rem);
     --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
 
+    /* The name on a project's title card, drawn in the media kit (src/pages/[mediakit].astro). */
+    --font-size-media-name: calc(var(--font-size-step-5) * 1.6);
+
     /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
        size container): about 13.5em wide, so 7cqi fills the cell. */
     --font-size-email: min(var(--font-size-step-2), 7cqi);
