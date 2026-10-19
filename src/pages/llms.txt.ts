@@ -17,6 +17,9 @@ export const GET: APIRoute = async ({ site }) => {
     "",
     `Contact: ${profile.email}. Languages: ${profile.languages.join(", ")}.`,
     `Stack: ${Object.values(profile.stack).flat().join(", ")}.`,
+    `Works with: ${Object.values(profile.collaborations)
+      .map(({ name, url, detail }) => `[${name}](${url})${detail ? ` (${detail})` : ""}`)
+      .join(", ")}.`,
     "",
     "## Case studies",
     "",

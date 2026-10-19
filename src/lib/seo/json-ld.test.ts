@@ -43,6 +43,25 @@ describe("work", () => {
     expect(data.keywords).toBe("TypeScript, Three.js");
     expect(data).not.toHaveProperty("dateCreated");
     expect(data).not.toHaveProperty("image");
+    expect(data).not.toHaveProperty("producer");
+  });
+
+  it("names the client as producer, inside its group", () => {
+    const data = work({
+      type: "WebApplication",
+      name: "Youbook",
+      description: "A marketplace.",
+      url: `${site}work/youbook/`,
+      authorUrl: site,
+      keywords: ["Kotlin"],
+      producer: { name: "Raccourci Agency", url: "https://www.raccourci.fr", group: "Groupe Yoni" },
+    });
+    expect(data.producer).toEqual({
+      "@type": "Organization",
+      name: "Raccourci Agency",
+      url: "https://www.raccourci.fr",
+      parentOrganization: { "@type": "Organization", name: "Groupe Yoni" },
+    });
   });
 });
 

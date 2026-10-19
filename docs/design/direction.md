@@ -60,7 +60,7 @@ Three Radix roles fail WCAG 2.2 AA and are replaced: teal-11 as body text on sag
 
 ## Motion
 
-Dry and short: 140ms with `cubic-bezier(0.2, 0, 0, 1)`. On hover a project title underlines and its image frame turns teal. The shader is the only continuous motion on the page.
+Dry and short: 140ms with `cubic-bezier(0.2, 0, 0, 1)` for feedback. Lines are drawn rather than switched: on hover a link's line runs in from the left in 360ms and out to the right, and a project row draws its title's line while its frame turns teal and its preview plays. Mono data (handles, coordinates) resolves for a moment when pointed at. Every motion answers the visitor and stops; the shader is the only continuous motion on the page.
 
 ## Shader
 

@@ -46,13 +46,9 @@ const { title, description, pubDate } = note.data;
     font-size: var(--font-size-step-1);
   }
 
+  /* No line at rest: it is drawn on hover or focus. */
   .title a {
-    text-decoration: none;
-  }
-
-  .title a:hover,
-  .title a:focus-visible {
-    text-decoration: underline;
+    --link-rest: 0;
   }
 
   /* The description is read, not scanned: body size, grey under the title. */

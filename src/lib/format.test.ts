@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { formatContext, formatDate, formatHandle, isoDate } from "./format";
+import { formatClient, formatContext, formatDate, formatHandle, isoDate } from "./format";
 
 describe("formatContext", () => {
   it("names the context and adds the year when known", () => {
     expect(formatContext("hackathon", 2024)).toBe("Hackathon, 2024");
     expect(formatContext("open-source")).toBe("Open source");
+  });
+});
+
+describe("formatClient", () => {
+  it("names the company, then its group when it has one", () => {
+    expect(formatClient({ name: "Raccourci Agency", group: "Groupe Yoni" })).toBe("Raccourci Agency, Groupe Yoni");
+    expect(formatClient({ name: "Areti" })).toBe("Areti");
   });
 });
 

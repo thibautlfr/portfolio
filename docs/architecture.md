@@ -28,7 +28,7 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, TextLink, Media, FactList, TagList
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectHeader, ProjectFacts, ProjectPager
 │   ├── note/                 # NoteHeader, NoteListItem
@@ -40,7 +40,8 @@ src/
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
 │   ├── hero-shader/          # boot-inline.js (inlined, decides when), index.ts, renderer.ts, warp.frag
-│   ├── loop-video.ts         # Playground previews: play on hover or focus
+│   ├── loop-video.ts         # Project and playground previews: play on hover or focus
+│   ├── scramble.ts           # Mono data resolves when pointed at (handles, coordinates)
 │   └── back-link.ts          # A breadcrumb back to the previous page acts as history.back()
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
@@ -99,7 +100,8 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 | -------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------- |
 | `ClientRouter` | Page transitions that do not flash           | Module on every page (5.7 KB)                                                                            | 6 KB gzip  |
 | `hero-shader`  | The signature domain warp                    | Boot step inlined in the page (no request); the module (2.6 KB) after `load`, the largest paint and idle | 6 KB gzip  |
-| `loop-video`   | Playground previews on hover or focus        | Module                                                                                                   | 1 KB gzip  |
+| `loop-video`   | Project and playground previews on hover     | Module, on pages with a preview                                                                          | 1 KB gzip  |
+| `scramble`     | Handles and coordinates resolve on hover     | Module, home page                                                                                        | 1 KB gzip  |
 | `back-link`    | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip  |
 | Umami          | Cookieless analytics                         | `defer`, third party                                                                                     | about 2 KB |
 

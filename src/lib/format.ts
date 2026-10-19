@@ -13,6 +13,16 @@ export function formatContext(context: ProjectContext, year?: number): string {
   return year ? `${contextLabels[context]}, ${year}` : contextLabels[context];
 }
 
+interface Client {
+  name: string;
+  group?: string | undefined;
+}
+
+/** "Raccourci Agency, Groupe Yoni": the company, then the group it belongs to. */
+export function formatClient(client: Client): string {
+  return client.group ? `${client.name}, ${client.group}` : client.name;
+}
+
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",

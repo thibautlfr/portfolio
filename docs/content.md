@@ -36,20 +36,21 @@ Every collection has these three, which drive the home page without touching cod
 
 `src/content/projects/<slug>/index.mdx`, one case study page at `/work/<slug>/`.
 
-| Field        | Type     | Required | Constraint and purpose                                                                                                                                 |
-| ------------ | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `title`      | string   | yes      | 60 characters at most.                                                                                                                                 |
-| `summary`    | string   | yes      | One sentence, 160 characters at most. Shown on the home row and used as the meta description.                                                          |
-| `role`       | string   | yes      | Thibaut's role, for example `Full-stack developer`, `Author`.                                                                                          |
-| `context`    | enum     | yes      | `client`, `open-source`, `personal` or `hackathon`.                                                                                                    |
-| `year`       | integer  | no       | Year of delivery. Leave it out rather than guess.                                                                                                      |
-| `stack`      | string[] | yes      | At least one item, most important first. Set in mono on the site.                                                                                      |
-| `cover`      | image    | no       | PNG or JPEG, 16:10 works best; the page holds without it. The SVG covers in the repository are placeholders.                                           |
-| `preview`    | video    | no       | A short loop, see above.                                                                                                                               |
-| `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none. |
-| `award`      | string   | no       | One line, for example `Winner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                |
-| `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces).          |
-| `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                            |
+| Field        | Type     | Required | Constraint and purpose                                                                                                                                            |
+| ------------ | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`      | string   | yes      | 60 characters at most.                                                                                                                                            |
+| `summary`    | string   | yes      | One sentence, 160 characters at most. Shown on the home row and used as the meta description.                                                                     |
+| `role`       | string   | yes      | Thibaut's role, for example `Full-stack developer`, `Author`.                                                                                                     |
+| `context`    | enum     | yes      | `client`, `open-source`, `personal` or `hackathon`.                                                                                                               |
+| `client`     | object   | no       | `{ name, url, group }` for client work the client agreed to be named for: shown as a fact, and as the producer in structured data. `group` is the parent company. |
+| `year`       | integer  | no       | Year of delivery. Leave it out rather than guess.                                                                                                                 |
+| `stack`      | string[] | yes      | At least one item, most important first. Set in mono on the site.                                                                                                 |
+| `cover`      | image    | no       | PNG or JPEG, 16:10 works best; the page holds without it. The SVG covers in the repository are placeholders.                                                      |
+| `preview`    | video    | no       | A short loop, see above.                                                                                                                                          |
+| `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none.            |
+| `award`      | string   | no       | One line, for example `Prizewinner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                      |
+| `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces).                     |
+| `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                                       |
 
 **Body.** The case study is written for a technical reader (a CTO, a lead developer), in five sections with exactly these headings, in this order:
 
@@ -118,7 +119,7 @@ import demo from "./demo.mp4";
 
 ## Identity
 
-Name, role, positioning, email, location, stack, socials and legal facts live in [`src/data/profile.ts`](../src/data/profile.ts), typed and read everywhere else. The CV link appears once `cvPath` is set and the PDF is in `public/cv/`.
+Name, role, positioning, email, location, stack, socials, collaborations and legal facts live in [`src/data/profile.ts`](../src/data/profile.ts), typed and read everywhere else. The CV link appears once `cvPath` is set and the PDF is in `public/cv/`. `availability` is shown in the hero above the email; set it to `undefined` when not taking missions. `collaborations` are the clients and partners named in a row under the About offers (the name as a link, then `credit`; `detail` is used in `llms.txt`). Word them so they stay true once the work is over, and name a company only with its agreement.
 
 ## Before launch
 

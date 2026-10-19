@@ -13,7 +13,12 @@ const { id } = Astro.props;
   <h2 {id} class="section-title">
     <slot />
   </h2>
-  {Astro.slots.has("aside") && <slot name="aside" />}
+  <!-- Wrapped so the link stays an inline box: its line sits under the text, not the flex item. -->
+  {Astro.slots.has("aside") && (
+    <p>
+      <slot name="aside" />
+    </p>
+  )}
 </Cell>
 
 <style>

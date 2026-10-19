@@ -1,6 +1,7 @@
 ---
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
+import ScrambleText from "@/components/ui/ScrambleText.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
 import { formatHandle } from "@/lib/format";
@@ -25,9 +26,13 @@ const { title, socialsLabel } = Astro.props;
     <ul role="list" aria-label={socialsLabel}>
       {profile.socials.map((social) => (
         <li>
-          <a href={social.url} rel="me">
-            <span class="network">{social.label}</span>
-            <span class="handle">{formatHandle(social.url)}</span>
+          <a href={social.url} rel="me" data-scramble-trigger>
+            <span class="network">
+              <span class="link-line">{social.label}</span>
+            </span>
+            <span class="handle">
+              <ScrambleText text={formatHandle(social.url)} />
+            </span>
           </a>
         </li>
       ))}
@@ -81,21 +86,11 @@ const { title, socialsLabel } = Astro.props;
     gap: var(--space-1) var(--space-4);
     block-size: 100%;
     padding: var(--space-3) var(--space-4);
-    text-decoration: none;
   }
 
   .network {
     font-size: var(--font-size-step-1);
     font-weight: var(--font-weight-strong);
-    text-decoration: underline;
-    text-decoration-color: var(--color-accent);
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.2em;
-    transition: text-decoration-thickness var(--duration-quick) var(--ease-snap);
-  }
-
-  .socials a:hover .network {
-    text-decoration-thickness: 2px;
   }
 
   .handle {
