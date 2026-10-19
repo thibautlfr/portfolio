@@ -69,7 +69,7 @@ The one breakpoint is 60rem. Sheets are separated by `--space-12`.
 | `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
 | `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Page transitions are View Transitions run by Astro's `ClientRouter`; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
+Page transitions are View Transitions run by Astro's `ClientRouter`, in the sheet style: the next page slides up over the current one, which lifts and darkens slightly, and going back runs it in reverse; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
 
 ## Components
 

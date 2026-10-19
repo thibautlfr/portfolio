@@ -15,7 +15,6 @@ const proposals: AstroIntegration = {
   hooks: {
     "astro:config:setup": ({ command, injectRoute }) => {
       if (command !== "dev" && process.env["PUBLIC_PROPOSALS"] !== "true") return;
-      injectRoute({ pattern: "/proposals/shaders", entrypoint: "./src/proposals/hero-shaders/ShadersPage.astro" });
       injectRoute({ pattern: "/proposals/ascii", entrypoint: "./src/proposals/ascii/AsciiPage.astro" });
     },
   },

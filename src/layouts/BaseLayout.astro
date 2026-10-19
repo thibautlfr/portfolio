@@ -7,8 +7,6 @@ import SeoHead from "@/components/seo/SeoHead.astro";
 import SiteFooter from "@/components/site/SiteFooter.astro";
 import SkipLink from "@/components/site/SkipLink.astro";
 import type { Seo } from "@/lib/seo/types";
-import TransitionPicker from "@/proposals/page-transitions/TransitionPicker.astro";
-import { proposalsEnabled } from "@/proposals/page-transitions";
 import "@/styles/global.css";
 
 interface Props extends Seo {
@@ -41,7 +39,6 @@ const { hero = false, ...seo } = Astro.props;
     )}
     <!-- Page transitions: same-document View Transitions, see docs/architecture.md. -->
     <ClientRouter />
-    {proposalsEnabled && <TransitionPicker part="head" />}
   </head>
   <body>
     <SkipLink target="main" />
@@ -49,6 +46,5 @@ const { hero = false, ...seo } = Astro.props;
       <slot />
     </main>
     <SiteFooter />
-    {proposalsEnabled && <TransitionPicker part="body" />}
   </body>
 </html>

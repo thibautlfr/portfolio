@@ -10,4 +10,5 @@
 @import "./tokens/motion.css";
 @import "./base/elements.css";
 @import "./base/prose.css";
+@import "./base/transitions.css";
 @import "./utilities.css";

@@ -56,7 +56,7 @@
 }
 
 /* Scroll reveals: CSS only, skipped under reduced motion, and content stays visible where
-   the browser lacks support. Page transitions come from Astro's ClientRouter (BaseLayout). */
+   the browser lacks support. Page transitions are in transitions.css. */
 @keyframes reveal-rise {
   from {
     opacity: 0;

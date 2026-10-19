@@ -45,7 +45,7 @@ src/
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
 │   ├── tokens/               # color, typography, space, layout, motion
-│   ├── base/                 # reset, elements, prose
+│   ├── base/                 # reset, elements, prose, transitions
 │   └── utilities.css         # visually-hidden, and nothing else unless it earns its place
 └── pages/
     ├── index.astro
@@ -58,7 +58,7 @@ src/
     └── og/[...path].png.ts   # Open Graph images, rendered at build time
 ```
 
-`src/proposals/` holds design proposals under review: hero shaders (`/proposals/shaders/`), the dynamic ASCII hero (`/proposals/ascii/`) and page transitions (a picker in the corner of every page). They exist under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322), which is the one to judge transitions on: in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes view transitions flash. The pages are registered by an integration in `astro.config.ts`. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly.
+`src/proposals/` holds design proposals under review: the dynamic ASCII hero (`/proposals/ascii/`). It exists under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322). The pages are registered by an integration in `astro.config.ts`. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly. **Before launch (the merge of `v2` into `main`), the ASCII proposal and all of its plumbing must be removed**: the folder, the integration in `astro.config.ts`, the `proposals` script in `package.json`, the entry in `knip.config.ts` and this paragraph.
 
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `docs/`, `.github/workflows/`.
 
@@ -103,7 +103,7 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 | `back-link`    | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip  |
 | Umami          | Cookieless analytics                         | `defer`, third party                                                                                     | about 2 KB |
 
-**Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little.
+**Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little. The animation itself, the sheet, is in `src/styles/base/transitions.css`: the next page slides up over the current one, and going back lifts it off. View transitions are judged on a production build (`pnpm build && pnpm preview`): in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes them flash.
 
 **Scripts under the router.** A bundled module runs once per visit, not once per page. A script that binds to elements of the page binds again after `astro:after-swap` (or `astro:page-load`), and a script that keeps running stops on `astro:before-swap`: the hero shader disposes of its WebGL context there. Inline scripts run again on every page that contains them.
 

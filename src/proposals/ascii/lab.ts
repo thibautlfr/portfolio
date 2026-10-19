@@ -1,6 +1,6 @@
 // Runs the ASCII proposals: pass 1 computes the warp field per character cell into a small
 // texture, pass 2 draws each cell's character from a glyph atlas in Fragment Mono.
-import common from "../hero-shaders/common.glsl?raw";
+import common from "./common.glsl?raw";
 import fieldBody from "./field.frag?raw";
 import glyphSource from "./glyphs.frag?raw";
 
