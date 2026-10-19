@@ -22,6 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+/CLAUDE.md
+/.claude
 
 # test artifacts
 test-results/
