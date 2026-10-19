@@ -34,13 +34,14 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 
 ## Type
 
-| Token             | Face                | Weight     | Use                                                    |
-| ----------------- | ------------------- | ---------- | ------------------------------------------------------ |
-| `--font-wordmark` | Archivo, width 125% | 800        | The name, and only the name                            |
-| `--font-title`    | Stack Sans Headline | 700        | Titles, project names, the footer email on inner pages |
-| `--font-text`     | Stack Sans Text     | 400 to 500 | Everything else                                        |
-| `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                     |
-| `--font-data`     | Fragment Mono       | 400        | Coordinates, dates, handles, code                      |
+| Token             | Face                | Weight     | Use                                                                   |
+| ----------------- | ------------------- | ---------- | --------------------------------------------------------------------- |
+| `--font-wordmark` | Archivo, width 125% | 800        | The name, and only the name                                           |
+| `--font-title`    | Stack Sans Headline | 700        | Titles, project names, the footer email on inner pages                |
+| `--font-text`     | Stack Sans Text     | 300 to 600 | Everything else; case study and note bodies at 300, their bold at 600 |
+| `--font-code`     | System monospace    | 400        | Code: SF Mono, Menlo, Consolas, the faces code is read in             |
+| `--font-email`    | Stack Sans Notch    | 700        | The email address, at display size                                    |
+| `--font-data`     | Fragment Mono       | 400        | Coordinates, dates, handles, figures                                  |
 
 Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (unused for now, kept to complete the scale), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width: up to `step-2` in the hero, up to `step-5` in the contact section, where it is the display line and the question above it is a `step-2` title. `step-minus-1` in muted grey is for labels, captions and metadata (dates, kinds, handles); a sentence meant to be read, such as a note or experiment description, is at `step-0`, in grey when it sits under a title. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
@@ -54,10 +55,14 @@ Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all)
 | `--layout-columns`          | 12 from 60rem; one column below                                                 |
 | `--layout-gutter`           | 0.75 to 2 rem                                                                   |
 | `--layout-measure`          | 36rem, the longest line of running text                                         |
+| `--layout-measure-wide`     | 44rem, case study bodies beside their section titles                            |
 | `--border-hairline`         | 1px solid line                                                                  |
 | `--hero-shader-height`      | 15 to 22 rem                                                                    |
+| `--trail-clearance`         | The gutter plus 4rem: where anchors land below the pinned breadcrumb trail      |
 
 The one breakpoint is 60rem. Sheets are separated by `--space-12`.
+
+On inner pages the breadcrumb trail is pinned one gutter below the top of the viewport, on one line (the current page gives way with an ellipsis). A band of ground above it hides the page scrolling under it, so the gutter stays empty and the trail never moves.
 
 ## Motion
 
@@ -78,24 +83,38 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 
 ## Components
 
-| Component      | Role                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `Sheet`        | A block of cells: draws the top and left hairlines                                       |
-| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media |
-| `SectionTitle` | The title cell of a section, with an optional aside link                                 |
-| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`              |
-| `TagList`      | Technologies as small tags framed by a hairline, in the text face                        |
-| `Media`        | Images as AVIF with a hairline frame and an optional ratio                               |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus  |
-| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable    |
-| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                       |
-| `Breadcrumbs`  | The way back home from inner pages (there is no header)                                  |
+| Component      | Role                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| `Sheet`        | A block of cells: draws the top and left hairlines                                          |
+| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media    |
+| `SectionTitle` | The title cell of a section, with an optional aside link                                    |
+| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                 |
+| `TagList`      | Technologies as small tags framed by a hairline, in the text face                           |
+| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                  |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus     |
+| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable       |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                          |
+| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top |
+| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                  |
+| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                |
+| `SectionIndex` | A case study's sections, numbered like their titles, kept in view beside the body           |
+
+Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
+
+A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
 
 The development page `/styleguide/` shows every token and base component.
 
 ## Images
 
 Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows.
+
+Project media are made for this site, in its art direction; a project's own branding, screenshots in its own type and colours included, is never reused as it is. Two treatments:
+
+- **Thibaut's own code** (a library, an experiment, a personal project): the cover is a title card set as a sheet (the project's mark redrawn like the site's favicon, a dark square and a light sign; the name in Headline; what it is; a row of facts), and the preview loop runs through a few use cases, one page each: a heading cell (number, title, the call in mono) over an ink cell where the project's real code runs, in the shader's palette (teal for the many, ivory for the one in focus, coral for what acts on it). Pages change by sliding up, as the site's do. Steerkit is the reference.
+- **Client work**: the real capture, set in the sheet: a white cell with a hairline on the sage ground, and an optional row in mono that carries real data (the address, the viewport), never decoration.
+
+Both are composed on `/media-kit/` (see [`architecture.md`](../architecture.md#project-media)). The checklist below applies to them as to any surface.
 
 ## The shader
 

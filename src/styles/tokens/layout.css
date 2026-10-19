@@ -6,15 +6,32 @@
     --layout-columns: 12;
     --layout-gutter: clamp(0.75rem, 0.4rem + 1.8vw, 2rem);
     --layout-measure: 36rem;
+
+    /* Case study bodies, beside their section titles: a longer line, about 75 characters. */
+    --layout-measure-wide: 44rem;
     --hero-shader-height: clamp(15rem, 34vh, 22rem);
 
     /* Artworks hang at one height, each at its own ratio; the minimum keeps a 4:5 poster within a phone cell. */
     --artwork-height: clamp(18rem, 90vw, 28rem);
-    --border-hairline: 1px solid var(--color-line);
+    --border-width-hairline: 1px;
+    --border-hairline: var(--border-width-hairline) solid var(--color-line);
+
+    /* Pulls a cell onto the hairline above it, so its own top line covers that one. */
+    --border-hairline-overlap: calc(-1 * var(--border-width-hairline));
     --focus-ring: 2px solid var(--color-focus);
     --focus-offset: 2px;
 
-    /* Stacking: the skip link is the only element that overlaps the page. */
+    /* Inner pages keep their breadcrumb trail pinned one gutter below the top, as it sits
+       when the page opens: anchors land below it, with room to spare (the bar is about 3rem
+       tall, on one line). The band above it reaches out over the gutters and the sheet's
+       hairline to the edges of the viewport. */
+    --trail-clearance: calc(var(--layout-gutter) + 4rem);
+    --trail-band-bleed: calc(-1 * (var(--layout-gutter) + var(--border-width-hairline)));
+    --trail-index-offset: calc(var(--trail-clearance) + var(--space-6));
+
+    /* Stacking: the pinned breadcrumb trail covers the page scrolling under it, and the
+       skip link covers everything. */
+    --layer-trail: 2;
     --layer-skip-link: 10;
 
     /* A page snapshot that must cover the other one during a transition. */

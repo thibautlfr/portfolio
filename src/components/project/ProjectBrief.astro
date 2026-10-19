@@ -1,0 +1,101 @@
+---
+// The opening of a case study, read in thirty seconds: the decisions, then the measured figures
+// when the project has some. Two cells of the page's sheet; either one takes the full width
+// alone.
+import Cell from "@/components/ui/Cell.astro";
+import CodeText from "@/components/ui/CodeText.astro";
+
+interface Props {
+  decisions?: string[] | undefined;
+  figures?: { items: { value: string; label: string }[]; source: string } | undefined;
+}
+
+const { decisions, figures } = Astro.props;
+const span = decisions && figures ? 6 : 12;
+---
+
+{decisions && (
+  <Cell {span} class="brief">
+    <h2>Decisions</h2>
+    <ol role="list" class="decisions">
+      {decisions.map((decision) => (
+        <li>
+          <span>
+            <CodeText text={decision} />
+          </span>
+        </li>
+      ))}
+    </ol>
+  </Cell>
+)}
+{figures && (
+  <Cell {span} class="brief">
+    <h2>Figures</h2>
+    <dl class="figures">
+      {figures.items.map(({ value, label }) => (
+        <div class="figure">
+          <dt>{value}</dt>
+          <dd>
+            <CodeText text={label} />
+          </dd>
+        </div>
+      ))}
+    </dl>
+    <p class="source">{figures.source}</p>
+  </Cell>
+)}
+
+<style>
+  .brief {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding-block: var(--space-8);
+  }
+
+  h2 {
+    font-size: var(--font-size-step-1);
+  }
+
+  .decisions {
+    display: grid;
+    gap: var(--space-3);
+    counter-reset: decision;
+  }
+
+  .decisions li {
+    display: grid;
+    grid-template-columns: var(--space-8) minmax(0, 1fr);
+    counter-increment: decision;
+  }
+
+  .decisions li::before {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    content: counter(decision);
+  }
+
+  .figures {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* Values in mono, aligned in their own column: data set as data. */
+  .figure {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: baseline;
+  }
+
+  dt {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .source {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

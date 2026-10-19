@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatClient, formatContext, formatDate, formatHandle, isoDate } from "./format";
+import { formatClient, formatContext, formatDate, formatHandle, isoDate, splitCode } from "./format";
 
 describe("formatContext", () => {
   it("names the context and adds the year when known", () => {
@@ -28,5 +28,17 @@ describe("formatHandle", () => {
   it("takes the last path segment, with or without a trailing slash", () => {
     expect(formatHandle("https://linkedin.com/in/thibaut-lefrancois")).toBe("thibaut-lefrancois");
     expect(formatHandle("https://www.instagram.com/thibautlfr/")).toBe("thibautlfr");
+  });
+});
+
+describe("splitCode", () => {
+  it("sets what sits between backticks as code", () => {
+    expect(splitCode("`blend` reads well, `add` allocates nothing")).toEqual([
+      { text: "blend", code: true },
+      { text: " reads well, ", code: false },
+      { text: "add", code: true },
+      { text: " allocates nothing", code: false },
+    ]);
+    expect(splitCode("No code here")).toEqual([{ text: "No code here", code: false }]);
   });
 });

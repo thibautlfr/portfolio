@@ -57,6 +57,19 @@ const projects = defineCollection({
         )
         .default([]),
       award: z.string().optional(),
+      // The opening of the case study: what was decided, then what was measured. Backticks set
+      // an identifier as code.
+      decisions: z.array(z.string().max(140)).min(2).max(4).optional(),
+      figures: z
+        .object({
+          items: z
+            .array(z.object({ value: z.string().max(12), label: z.string().max(110) }))
+            .min(2)
+            .max(4),
+          /** Where the figures come from and under which conditions. */
+          source: z.string().max(160),
+        })
+        .optional(),
       schemaType: z.enum(["CreativeWork", "SoftwareSourceCode", "WebApplication", "VideoGame"]).default("CreativeWork"),
       seo: z
         .object({

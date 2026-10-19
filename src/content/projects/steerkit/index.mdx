@@ -1,33 +1,97 @@
 ---
 title: Steerkit
-summary: Craig Reynolds' steering behaviors as small typed functions. Engine agnostic, zero allocation per frame, with interactive demos.
+summary: Craig Reynolds' steering behaviors as small typed functions for JavaScript and Three.js, with no allocation per frame and a live demo for each one.
 role: Author
 context: open-source
-stack: [TypeScript, Three.js]
+year: 2026
+stack: [TypeScript, Three.js, Canvas 2D, Vite, Vitest, fast-check]
 cover:
-  src: ./cover.svg
-  alt: Placeholder for the Steerkit demo visual.
+  src: ./cover.png
+  alt: The steerkit title card, set as a sheet of white cells. A dark square with a light arrow stands beside the name in bold, above the line "Steering behaviors for games, as small typed functions", with faint grey arrows wandering behind. A row of facts below reads npm i steerkit, TypeScript with zero dependency, and the Three.js adapter.
+preview: ./preview.mp4
+links:
+  - { label: Interactive demos, url: "https://steerkit.thibaut-lefrancois.com", kind: demo }
+  - { label: Source on GitHub, url: "https://github.com/thibautlfr/steerkit", kind: source }
+  - { label: npm package, url: "https://www.npmjs.com/package/steerkit", kind: live }
+decisions:
+  - Any `{ x, y, z }` is a vector, so `THREE.Vector3` and an engine's own types pass as they are.
+  - Every behavior writes into an `out` vector passed last, so nothing is allocated per call.
+  - "Two forms per combinator: `blend` and `prioritize` read well, `zero` and `add` allocate nothing."
+  - Three.js stays in an optional `steerkit/three` entry, and the core has no dependency.
+figures:
+  items:
+    - { value: 0.7 ms, label: "a frame of 1,000 boids with the spatial grid, against 12 ms scanning the whole crowd" }
+    - {
+        value: 1 KiB,
+        label: "of garbage per frame for 1,000 agents with `zero` and `add`, against 190 KiB with `blend`",
+      }
+    - { value: 4.1 kB, label: "the whole library, minified and brotlied; `seek` alone is 170 B" }
+    - { value: "18", label: "behaviors, each with its own interactive demo" }
+  source: Node 26 on an M1 Pro, from the repository's benchmark and size budget.
 schemaType: SoftwareSourceCode
 featured: true
 order: 20
 ---
 
+import arriveFrame from "./arrive.png";
+
 ## Context
 
-Steerkit implements seek, arrive, wander and keepAway as plain functions, with an optional Three.js adapter. Placeholder text.
+Steerkit started as the flight of the fairies in [Ocarina](/work/ocarina/): a few hundred lines of vector maths that made them fly to a target, slow down, hover and keep out of the camera's way. I wanted the same motion in other projects and found **nothing small enough to take along**. [Yuka](https://github.com/Mugen87/yuka), the closest library, is a complete game AI framework built around its own vector, vehicle and entity manager. So I extracted the module into a library of its own, with Craig Reynolds' [GDC 1999 paper](https://www.red3d.com/cwr/steer/gdc99/) as its specification, and used it to ship a package the way I would want to depend on one.
 
 ## Constraints
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder: the real constraints are written later.
+- A behavior runs for every agent, every frame. With a thousand agents at 60 fps, any object created per call is **garbage the collector has to sweep**, and its pauses show as stutters.
+- It had to work on the vectors a project already has: `THREE.Vector3`, plain objects, another engine's types. No runtime dependency.
+- Steering is tuned by eye. Without seeing the forces, **every parameter is a guess**.
+- A project that only needs `seek` should not pay for flocking.
 
 ## Approach
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Any `{ x, y, z }` is a vector. TypeScript's structural typing lets **`THREE.Vector3` pass as it is**, so an agent can lend its mesh's own `position` and `step` moves the mesh directly. A vector class of my own would have meant copying in and out every frame.
+
+Every behavior takes the agent first and writes its force into **an `out` vector passed last**, which it returns. Returning a new vector reads a little better and allocates on every call. Inputs are all read before `out` is written, so `out` may be any of them, and a test checks it.
+
+```ts
+import { arrive, blend, keepAway, step } from "steerkit";
+
+const fairy = {
+  position: mesh.position, // a THREE.Vector3, as it is
+  velocity: new THREE.Vector3(),
+  maxSpeed: 2,
+  maxForce: 4,
+};
+const [force, goal, away] = [vec(), vec(), vec()]; // created once
+
+// Every frame
+blend(
+  force,
+  [arrive(fairy, target, { slowingDistance: 1.2 }, goal), 1],
+  [keepAway(fairy, camera, { radius: 1 }, away), 2],
+);
+step(fairy, force, dt);
+```
+
+Combining forces is where reading well and allocating nothing pull apart. `blend` and `prioritize` take their forces as arguments and create small arrays on each call; `zero`, `add` and `addWithin` write the same sums without them. I **kept both forms** and documented when to switch, so three agents get the readable one and a crowd the other. Three.js lives in an optional `steerkit/three` entry, with `three` as an optional peer: the core never imports it.
+
+Each behavior has its own demo page, prerendered for search and link previews, with the forces drawn and a slider for every parameter. A Copy prompt button hands a coding agent the goal, the values picked on the page and a link to `llms.txt`, whose API section is generated from the library's sources with the TypeScript compiler. The README's examples run as tests, so neither can drift from the code.
+
+<Figure
+  src={arriveFrame}
+  alt="An arrow-shaped agent just past a target at the center of a dashed circle, under the call arrive(agent, target, { slowingDistance: 2.2 }, force). An ivory arrow points ahead of it, a short dashed teal arrow and a coral arrow point back toward the target."
+  caption="arrive(), drawn from the forces the library returns. The steering force (coral) is the desired velocity (dashed teal) minus the velocity (ivory): it turns the agent back, and within the dashed circle the desired speed drops until it stops on the target."
+/>
 
 ## Engineering notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation.
+Zero allocation is **only a promise until it is measured**. The allocation test reads V8's `total_allocated_bytes` around 50,000 calls of each behavior and fails when a call allocates an object. It found what reading the code did not: `Math.hypot` allocates a temporary array when V8 does not optimize the call away, so norms use `Math.sqrt`, and `Math.random` allocates too, so the tests use a seeded generator on a typed array.
+
+The subtle case was **boxing**. V8 stores a number on the heap when it crosses a call it did not inline, and in a large frame its inlining budget runs out. `keepAway` called `flee`, allocated nothing on its own and leaked inside a crowd. It now computes its force in locals, and the loops over neighbors call no helper at all. For 1,000 agents combining `wander`, `arrive` and `keepAway`, garbage fell from about 5 KiB to about 1 KiB per frame.
+
+A test only catches this when the code runs the way a frame does, so a plain Node benchmark is the second check, each variant in its own process to keep the JIT from tuning shared functions for whichever ran first. On an M1 Pro with Node 26, the readable `blend` leaves about 190 KiB of garbage per frame for 1,000 agents, against about 1 KiB with `zero` and `add`. For 1,000 boids, a spatial grid sorted once per frame, after Matthias Müller's [Ten Minute Physics](https://matthias-research.github.io/pages/tenMinutePhysics/), takes a frame **from 12 ms to 0.7 ms**.
+
+Property tests with fast-check throw random and extreme values at every function and check that outputs stay finite, speeds under `maxSpeed` and forces under `maxForce`.
 
 ## Outcome
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Steerkit is on npm at 0.4, under the MIT license: 18 behaviors, the combinators, a spatial grid and the Three.js adapter, 4.1 kB minified and brotlied in all and 170 B for `seek` alone. **Ocarina's fairies now fly on it**: `arrive`, `brake`, `keepAway` and `step` replaced the hand-written forces, and `faceVelocity` the hand-rolled turning. Releases go through Changesets and are staged on npm with provenance, then approved with two-factor authentication before anyone can install them.

@@ -8,8 +8,15 @@
     --font-email: var(--font-stack-sans-notch);
     --font-data: var(--font-fragment-mono);
 
+    /* Code is read like in an editor: the system's own monospace (SF Mono, Menlo, Consolas),
+       which needs no download and is the face developers already read code in. */
+    --font-code: ui-monospace, "SF Mono", sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
+
+    /* Running text in case studies and notes is set light, so the words set in bold carry. */
+    --font-weight-light: 300;
     --font-weight-text: 400;
     --font-weight-strong: 500;
+    --font-weight-bold: 600;
     --font-weight-title: 700;
     --font-weight-wordmark: 800;
     --font-stretch-wordmark: 125%;
@@ -22,6 +29,9 @@
     --font-size-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
     --font-size-step-4: clamp(2rem, 1.55rem + 2.25vw, 3.5rem);
     --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
+
+    /* The name on a project's title card, drawn in the media kit (src/pages/[mediakit].astro). */
+    --font-size-media-name: calc(var(--font-size-step-5) * 1.6);
 
     /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
        size container): about 13.5em wide, so 7cqi fills the cell. */

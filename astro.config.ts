@@ -30,6 +30,9 @@ export default defineConfig({
   // Scoped styles through a class rather than a data attribute on every element: shorter HTML.
   scopedStyleStrategy: "class",
   redirects: legacyRedirects,
+  // Code blocks look like an editor, VS Code's default dark theme: the one place the site does
+  // not set its own colours, so a developer reads the code at a glance.
+  markdown: { shikiConfig: { theme: "dark-plus" } },
   vite: {
     // The hero shader is built as one standalone ES module (see Hero.astro), loaded by an
     // inline boot step: no script request competes with the first paint.
@@ -81,7 +84,7 @@ export default defineConfig({
       fallbacks: ["sans-serif"],
       // Body text: preloaded on every page and swapped in. display: optional kept the fallback
       // (Arial) on most visits, since the file rarely arrived within its 100ms window.
-      options: { variants: [{ src: [fontFile("stack-sans-text")], weight: "400 500", style: "normal" }] },
+      options: { variants: [{ src: [fontFile("stack-sans-text")], weight: "300 600", style: "normal" }] },
     },
     {
       provider: fontProviders.local(),

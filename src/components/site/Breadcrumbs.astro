@@ -1,5 +1,8 @@
 ---
-// Inner pages have no header: the trail is how they lead back home.
+import Cell from "@/components/ui/Cell.astro";
+
+// Inner pages have no header: the trail is how they lead back home. It is the first cell of
+// the page's sheet and stays pinned to the top of the viewport while the page scrolls.
 interface Crumb {
   label: string;
   href?: string;
@@ -12,7 +15,7 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<nav aria-label="Breadcrumb">
+<Cell as="nav" class="trail" aria-label="Breadcrumb">
   <ol role="list">
     {items.map((item) => (
       <li>
@@ -26,18 +29,58 @@ const { items } = Astro.props;
       </li>
     ))}
   </ol>
-</nav>
+</Cell>
 
 <script>
   import "@/scripts/back-link";
 </script>
 
 <style>
+  /* One line at every width, so the bar keeps a known height: the current page gives way
+     with an ellipsis, the links before it never do. It pins one gutter below the top, where
+     it opens, so it never moves; the top hairline sits over the sheet's own and becomes the
+     bar's edge once it is pinned. */
+  .trail.cell {
+    position: sticky;
+    inset-block-start: var(--layout-gutter);
+    z-index: var(--layer-trail);
+    margin-block-start: var(--border-hairline-overlap);
+    padding-block: var(--space-3);
+    border-block-start: var(--border-hairline);
+  }
+
+  /* The ground above the pinned bar: the page scrolls under it, so the gutter stays empty. */
+  .trail.cell::before {
+    content: "";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline: var(--trail-band-bleed);
+    block-size: var(--layout-gutter);
+    margin-block-end: var(--border-width-hairline);
+    background: var(--color-ground);
+  }
+
+  :global(html) {
+    scroll-padding-block-start: var(--trail-clearance);
+  }
+
   ol {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--space-2);
     font-size: var(--font-size-step-minus-1);
+    line-height: var(--line-height-text);
+    white-space: nowrap;
+  }
+
+  li {
+    flex: none;
+  }
+
+  li:last-child {
+    flex: 0 1 auto;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   li:not(:last-child)::after {

@@ -16,7 +16,7 @@ The frame stays quiet and precise; colour comes from the works: the hero shader,
 | -------- | ------------------- | ---------------------- | ------------------------------------------------------ |
 | Wordmark | Archivo             | weight 800, width 125% | The name in the hero, nothing else                     |
 | Titles   | Stack Sans Headline | weight 700             | Section titles, project titles, the large footer email |
-| Text     | Stack Sans Text     | weight 400 to 500      | Body, captions, labels, navigation                     |
+| Text     | Stack Sans Text     | weight 300 to 600      | Body, captions, labels, navigation; long reads at 300  |
 | Email    | Stack Sans Notch    | weight 700             | The email address only, at display size                |
 | Data     | Fragment Mono       | 400                    | Coordinates, dates, measurements. Never decoration     |
 
@@ -79,5 +79,7 @@ Lifecycle rules: starts after load on idle, pauses off-screen and in hidden tabs
 ## Navigation
 
 No header and no navigation bar, as in the V1 layout (decided at V1a). The home page is a single scroll; the hero carries the name and the email, and inner pages link back to the home from their own title block and footer.
+
+Amended on 2026-10-19: the breadcrumb trail of inner pages stays pinned one gutter below the top of the viewport, where it sits when the page opens, so the way back stays in reach on a long case study. It is the first cell of the page's sheet, not a header: it holds the trail and nothing else.
 
 ![Mobile reference](direction-mobile.webp)

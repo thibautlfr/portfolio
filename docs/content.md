@@ -49,18 +49,58 @@ Every collection has these three, which drive the home page without touching cod
 | `preview`    | video    | no       | A short loop, see above.                                                                                                                                          |
 | `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none.            |
 | `award`      | string   | no       | One line, for example `Prizewinner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                      |
+| `decisions`  | string[] | no       | 2 to 4 lines of 140 characters at most: the opening of the page, see [The opening](#the-opening).                                                                 |
+| `figures`    | object   | no       | `{ items, source }`: 2 to 4 `{ value, label }` (value 12 characters, label 110) and where they come from, see [The opening](#the-opening).                        |
 | `schemaType` | enum     | no       | Structured data type: `CreativeWork` (default), `SoftwareSourceCode` (libraries), `WebApplication` (products), `VideoGame` (playable pieces).                     |
 | `seo`        | object   | no       | `title` (60) and `description` (160) when the defaults from `title` and `summary` are not right for search.                                                       |
 
-**Body.** The case study is written for a technical reader (a CTO, a lead developer), in five sections with exactly these headings, in this order:
+### Writing a case study
 
-1. `## Context`: who it was for and the problem, in two or three sentences.
-2. `## Constraints`: what made it hard (scale, deadlines, legacy, performance, confidentiality).
-3. `## Approach`: the decisions and why they were taken.
-4. `## Engineering notes`: the interesting technical detail (types, architecture, performance numbers that can be shared).
-5. `## Outcome`: what shipped and what it changed. No invented metrics.
+The body is read by a technical reader (a CTO, a lead developer) deciding whether to trust Thibaut with their own project. The header above it already gives the title, the summary, the facts and the cover, so the body never repeats them. It has five sections, with exactly these headings, in this order:
 
-Client work under NDA shows no code, no source links, no figures and no competitor names.
+| Section                | Answers                                                                                                                                                                   | Length     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `## Context`           | Who it was for, the problem, where the project came from.                                                                                                                 | 60 to 120  |
+| `## Constraints`       | What made it hard: scale, performance, deadlines, legacy, confidentiality, or a rule set on purpose. Each one with the reason it mattered. A short list is fine here.     | 60 to 150  |
+| `## Approach`          | The decisions, each with the option it beat and why. The heart of the page.                                                                                               | 200 to 350 |
+| `## Engineering notes` | One or two details worth a lead developer's time, told as a problem, what was found and the fix, with numbers when they can be shared.                                    | 150 to 350 |
+| `## Outcome`           | What shipped, who uses it, what it changed. When there is no metric, say what exists: versions, a production use, a prize. Mention what comes next only if it is planned. | 50 to 120  |
+
+Lengths are in words. A featured case study runs 600 to 1,100 words; a hackathon or a small project can stay near 400, with the five headings kept.
+
+On the page, the sections are numbered 01 to 05, each title in a narrow column beside its text and listed again beside the body on wide screens, so a reader can go straight to Approach.
+
+#### The opening
+
+Between the header and the body, two blocks let a reader judge the project in thirty seconds. Both are optional; either one takes the full width alone, and without them the page goes straight to the body.
+
+- `decisions`: two to four of the choices told in Approach, one line each, with the reason in the same line: "Every behavior writes into an `out` vector passed last, so nothing is allocated per call." Every project has some, client work under NDA included, as long as no name or figure slips in. Backticks set an identifier as code.
+- `figures`: two to four measured values from Engineering notes or Outcome, each `value` short and set in mono (`0.7 ms`, `4.1 kB`, `18`), each `label` saying what was measured and against what. `source` gives where they come from and the conditions ("Node 26 on an M1 Pro, from the repository's benchmark"). The rules of **Numbers** below apply. Leave the block out rather than fill it: client work under NDA never has it, a hackathon rarely does, and a personal project often needs its figures measured first.
+
+**Voice.** First person singular, sober: "I extracted the module", not "the module was extracted", and "we" only for a team, saying who did what. Past tense for what was done, present tense for what the work does. Short paragraphs, facts before adjectives. The writing rules of [`CLAUDE.md`](../CLAUDE.md) and the anti AI-look checklist of [`design/system.md`](design/system.md) apply: no em dash, no "it's not X, it's Y", no forced triads, no rhetorical question, no one-line moral to close a section.
+
+**Bold.** The body is set light, so bold carries: one or two phrases per section, the ones a reader skimming the page should catch (a decision, a constraint, a measured result). A phrase, never a whole paragraph, and never a label at the start of one.
+
+**Decisions.** A decision is written as what was chosen, against what, and why: "Behaviors write into an `out` vector passed last instead of returning a new one, so a crowd of a thousand agents never wakes the garbage collector up." Without its reason, it is a feature list.
+
+**Numbers.** Every figure comes from a source that can be pointed to (a benchmark, a test, analytics, the client) and carries its conditions: "1,000 boids on an M1 Pro: 12 ms per frame scanning the whole crowd, 0.7 ms with the grid." Leave out vanity numbers, such as stars or downloads in the first days of a release, and never round a figure to make it sound better.
+
+**Code.** For open-source and personal work only, and only where it shows what prose cannot, such as the shape of an API. Two blocks at most, about 15 lines each, with a language tag. A case study is not documentation: link to the documentation instead.
+
+**Media.** One to three `Figure` or `Video` in the body, in Approach or Engineering notes, next to the paragraph they illustrate. The caption adds a fact instead of naming the picture: "arrive(), with a 120 px slowing radius", not "Screenshot of the demo".
+
+**Links.** In the body, link the first mention of a reference worth following: a paper, a standard, a library the work is compared with. The project's own links (live, source, demo) go in the frontmatter `links`, not in the text.
+
+**How it was built.** Leave out the tools used to write the code, coding agents included: the page is about the decisions and the result.
+
+**By context.**
+
+- `client`: the client is named only with their agreement, in the `client` field. Under NDA, the page shows no code, no source links, no figures and no competitor names. It stays `draft: true` until the client has approved the text.
+- `open-source`: link the source and the demos; code is welcome within the limits above.
+- `hackathon`: the time box is the first constraint. Say what Thibaut built and what the team did; the prize goes in `award`.
+- `personal`: say what the project explores and why it exists.
+
+### Media in the body
 
 The body is MDX and can show captioned media next to the text. Import the files placed in the entry's folder, then use the two components, which are available without importing them:
 
@@ -68,7 +108,11 @@ The body is MDX and can show captioned media next to the text. Import the files 
 import pipeline from "./pipeline.png";
 import demo from "./demo.mp4";
 
-<Figure src={pipeline} alt="Providers normalised into one OCTO schema." caption="The ingestion pipeline." />
+<Figure
+  src={pipeline}
+  alt="Diagram of the ingestion pipeline: each provider mapped to one OCTO schema."
+  caption="Providers are normalised before anything else reads them."
+/>
 
 <Video
   src={demo}
@@ -116,6 +160,32 @@ import demo from "./demo.mp4";
 | `tags`        | string[] | no       | Lowercase. Used in structured data; there are no tag pages.                                   |
 | `source`      | object   | no       | `{ platform, url }` with `platform` `x` or `linkedin`, when the note started as a post there. |
 | `cover`       | image    | no       | Also used for the note's Open Graph image.                                                    |
+
+### Writing a note
+
+A note tells one thing worth knowing: a technical finding (a bug and its cause, an API detail, a measured number), a decision and the option it beat, or what happened behind a project (a personal piece, a shader, a poster, a work in progress). It is written for a developer who arrived looking for that answer, and stays readable by someone deciding whether to work with Thibaut: the first one leaves with the answer, the second sees how Thibaut reasons.
+
+The page shows the title, the date and the source link above the body. The `description` appears only in lists, search results and the feed, so the body can open on the point directly, without restating the title.
+
+**Length.** 150 to 1,200 words, set by the subject: a finding can hold in 200 words, a decision or the story behind a project in 600 to 1,000. The note stops when the point is made, with no closing summary.
+
+**Shape.** No fixed headings. The first paragraph says what the note is about and why it matters, before any background. Under about 500 words, no headings at all; above, `##` headings only where a reader would want to jump, each one saying what its part says rather than labelling it ("Background", "Conclusion").
+
+**Voice.** First person singular, conversational: the way Thibaut would explain it to a colleague, with freer sentences than a case study and a dry joke when one comes on its own. An opinion is given as an opinion, and a wrong turn taken along the way can be told. Facts still come before adjectives. The writing rules of [`CLAUDE.md`](../CLAUDE.md) and the anti AI-look checklist of [`design/system.md`](design/system.md) apply as they do to a case study: no em dash, no "it's not X, it's Y", no forced triads, no rhetorical question, no one-line moral to close.
+
+**Title and description.** The title says what the reader learns or what happened, plainly rather than cleverly: "Why the hero shader stays still on software renderers" rather than "The GPU that was not there". The `description` gives the answer in one or two sentences; it is the meta description and the RSS summary.
+
+**Numbers, code and media.** As in a case study: every figure has a source and its conditions, and is never rounded to sound better. Code is welcome where it shows the problem or the fix, in short blocks with a language tag. A note drawn from client work shows no code and no figures, and names the client only with their agreement. An `index.mdx` note can use `Figure` and `Video` (see [Media in the body](#media-in-the-body)).
+
+**Links.** Link the first mention of a reference worth following, and the case study (`/work/<slug>/`) when the note comes from a project that has one.
+
+**Tags.** Two to four, lowercase, the words a reader would search for: `webgl`, `css`, `astro`.
+
+**Source.** When a note grows out of an X or LinkedIn post, set `source` and develop the post: add the context, the example, the code or the figure that a post could not carry. The post is the starting point, not the text.
+
+**Dates.** `pubDate` is the day the note is published, not the day of the work it tells about. `updatedDate` marks a change of substance, such as a corrected figure or a new part, never a typo.
+
+**How it was built.** Leave out the tools used to write the code, coding agents included.
 
 ## Identity
 

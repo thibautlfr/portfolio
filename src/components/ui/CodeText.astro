@@ -1,0 +1,23 @@
+---
+// A line of frontmatter text where `backticks` mark identifiers, set as code like inline code in
+// the prose.
+import { splitCode } from "@/lib/format";
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+{splitCode(text).map(({ text: part, code }) => (code ? <code>{part}</code> : part))}
+
+<style>
+  code {
+    padding-inline: var(--space-1);
+    font-family: var(--font-code);
+    outline: var(--border-hairline);
+    background: var(--color-ground);
+    box-decoration-break: clone;
+  }
+</style>
