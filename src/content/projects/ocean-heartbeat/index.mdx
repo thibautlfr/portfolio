@@ -1,35 +1,74 @@
 ---
 title: Ocean Heartbeat
-summary: An immersive 3D piece on the parallels between the human body and the ocean, built in one night with retro post-processing.
-role: 3D and front-end
+summary: An underwater 3D scene where a heart, a brain and kidneys stand for the ocean's own systems, built overnight for the Nuit de l'Info 2024.
+role: 3D and front-end developer
 context: hackathon
 year: 2024
-stack: [React Three Fiber, GSAP, Zustand]
+stack: [React Three Fiber, Three.js, drei, react-postprocessing, GSAP, Zustand, Tailwind CSS, Vite]
 cover:
-  src: ./cover.svg
-  alt: Placeholder for the Ocean Heartbeat scene visual.
+  src: ./cover.png
+  alt: The Ocean Heartbeat scene in a white frame. A red low-poly heart floats over a sandy seabed between grey-blue rocks and seaweed, under deep blue water, with the label "LE COEUR" and an arrow below it and three small icons in a corner.
+gallery:
+  - src: ./panels.png
+    alt: The heart clicked, outlined in white, between its two translucent panels. In French, the left one compares ocean currents to a circulatory system, the right one the thermohaline circulation to the heart keeping the body's temperature stable.
+  - src: ./retro-mode.png
+    alt: The same seabed in retro mode, pixelated into large square blocks, the red heart and the rocks reduced to coarse steps of colour.
+preview: ./preview.mp4
+links:
+  - { label: Explore the scene, url: "https://ocean-heartbeat.thibaut-lefrancois.com", kind: live }
+  - { label: Source on GitHub, url: "https://github.com/colindmg/ocean-heartbeat", kind: source }
 award: Prizewinner, “On veut du gros pixel” challenge, Nuit de l'Info 2024
+decisions:
+  - The seabed is built from free low-poly models, 716 KB for the eleven the scene loads, since a night left no time to model.
+  - The three organs are mounted once and swapped by scale with GSAP, so a switch never waits on the network.
+  - Caustics are a looping video cast by a spotlight, instead of a water shader the night had no room for.
+  - Retro mode swaps the post-processing chain for one `Pixelation` pass and leaves the scene untouched.
 schemaType: CreativeWork
 featured: true
 order: 40
 ---
 
+import retro from "./retro.png";
+
 ## Context
 
-Built overnight for the Nuit de l'Info 2024. Placeholder text.
+The [Nuit de l'Info](https://www.nuitdelinfo.com/) is a French student hackathon held overnight. Its 2024 national challenge asked for an educational web app showing how each part of the human body finds an echo in the ocean. Colin Demouge and I entered as a team of two, on the national challenge and five side challenges set by partners, one of which asked for a retro gaming element.
+
+We answered with a scene rather than a page. **An organ turns slowly on the seabed**, and two panels draw its parallel with the ocean: the heart with the currents that carry heat around the planet, the brain with the ocean as a store of climate data, the kidneys with its filtering.
 
 ## Constraints
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder: the real constraints are written later.
+- **One night.** The first scene commit landed at 21:28 on 5 December, the handover at 7:40 the next morning. Whatever could not be finished by then had to be dropped early.
+- **Two people in one repository.** We worked on separate branches and merged into `main` through the night, so the code had to split cleanly: one component per model, one store for the state both halves read.
+- **A jury on any laptop.** The scene is judged in a browser on hardware we would never see, so **weight and frame cost came before detail**.
+- **The challenges' own rules.** The national one wanted a deployed URL and the source; the retro one wanted the element reachable from the page, with instructions.
 
 ## Approach
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+We split the work by layer. Colin set up the scene, the sand, the fog, the post-processing, the loader, the sound and the interface over the canvas. I took what sits in the scene: the models, their layout on the seabed, the hover on the organ, the camera's framing and the anglerfish crossing the background.
+
+**I built the seabed from free low-poly models** instead of modelling anything. A night left no time to model, and low poly holds together under fog and blur where models of mixed detail would not. Each GLB became a small React component, placed by hand around the organ. The eleven models the scene loads weigh 716 KB in all.
+
+The organ on show is one of three, and **all three are mounted from the start**, at the same spot. Choosing one scales it to full size with GSAP over a second, on `power4.out`, while the others shrink to zero. Loading each organ on demand would have meant a wait at every switch, and a second loader we had no time to design. On hover, drei's screen-space `Outlines` draws a white edge around the organ to show it can be clicked, and a click opens its two panels.
+
+The camera eases toward a position read from the pointer and keeps looking at the organ, so the scene answers the hand without orbit controls a visitor would have to learn.
+
+Retro mode was Colin's, and it won the prize of the “On veut du gros pixel” challenge. The normal chain runs a water distortion and a tilt-shift blur after tone mapping; the arcade button swaps both for **a single `Pixelation` pass**, at a granularity of 15. The scene, its lights and its interactions stay as they are, so the mode cost one flag in the store and one condition in the post-processing component.
+
+<Figure
+  src={retro}
+  alt="The low-poly heart on the seabed among teal rocks, split down the middle by a coral line. The left half is pixelated into large square blocks; the right half shows the same scene with its facets intact."
+  caption="The project's own models, redrawn here in this site's colours. Left of the line, one Pixelation pass at granularity 15, about 96 blocks across a 1440 px window."
+/>
+
+We cut what did not fit. The lungs became the brain, a kelp model went, and the kidneys arrived five minutes before the handover.
 
 ## Engineering notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation.
+Light on a seabed shimmers, and the usual way to draw that is a caustics shader. Colin found a cheaper way: three.js lets a spotlight project a texture, so **a looping video of caustics becomes the light's `map`**, through drei's `useVideoTexture`, with `decay` at 0 so it reaches the sand at full strength from ten units up. I moved it into its own component when we split the scene. It cost no shader work, one light and a video decode per frame. It pays in weight instead: at 2.5 MB, the video is the heaviest file of the site, ahead of the sand's normal map (1.2 MB) and the ambient sound (1.1 MB).
+
+Looking at the code again, two motions are written per frame rather than per second. The anglerfish moves 0.03 units along its path on every frame, and the camera covers 2.5% of the distance to its target on every frame. On a 60 Hz screen they look as we tuned them; **on a 120 Hz screen the fish swims twice as fast** and the camera follows the pointer more tightly. Both fixes are a line each: multiply the step by the frame's `delta`, and turn the camera's factor into `1 - Math.exp(-k * delta)`, which gives the same easing at any frame rate. The fish's sideways sway already used `delta`, so on a fast screen it no longer matches its own forward speed.
 
 ## Outcome
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+We handed the project in at 7:40 on 6 December, deployed on Netlify with its source public, as the national challenge asked. **It won the prize of the “On veut du gros pixel” challenge** for its retro mode. The scene is still online as it was handed in: the loader, the ambient sound, the three organs with their panels, the retro mode and a credits page.
