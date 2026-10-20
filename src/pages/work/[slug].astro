@@ -66,37 +66,39 @@ const source = links.find((link) => link.kind === "source");
   <article class="page">
     <Sheet as="div">
       <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
-      <Cell span={cover ? 7 : 12} as="header" class="title-block">
-        <h1>{title}</h1>
-        <p class="summary">{summary}</p>
-        {award && <p class="award">{award}</p>}
-        <div class="facts">
-          <FactList
-            facts={[
-              { term: "Context", value: formatContext(context, year) },
-              ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
-              { term: "Role", value: role },
-              { term: "Stack", value: stack },
-            ]}
-          />
-          {links.length > 0 && (
-            <ul role="list" class="links">
-              {links.map((link) => (
-                <li>
-                  <a href={link.url} data-umami-event={`project-${link.kind}`}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+      <Cell as="header" class:list={["title-block", { "has-cover": cover }]}>
+        <div class="intro">
+          <h1>{title}</h1>
+          <p class="summary">{summary}</p>
+          {award && <p class="award">{award}</p>}
+          <div class="facts">
+            <FactList
+              facts={[
+                { term: "Context", value: formatContext(context, year) },
+                ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
+                { term: "Role", value: role },
+                { term: "Stack", value: stack },
+              ]}
+            />
+            {links.length > 0 && (
+              <ul role="list" class="links">
+                {links.map((link) => (
+                  <li>
+                    <a href={link.url} data-umami-event={`project-${link.kind}`}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
+        {cover && (
+          <figure class="cover">
+            <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 50vw, 100vw" priority />
+          </figure>
+        )}
       </Cell>
-      {cover && (
-        <Cell span={5} flush as="figure" class="cover">
-          <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 42vw, 100vw" priority />
-        </Cell>
-      )}
       {(decisions || figures) && <ProjectBrief {decisions} {figures} />}
       <Cell span={9} class="body">
         <div class="prose">
@@ -125,9 +127,14 @@ const source = links.find((link) => link.kind === "source");
 
   .title-block {
     display: grid;
-    align-content: start;
-    gap: var(--space-4);
+    gap: var(--space-12);
     padding-block: var(--space-12) var(--space-8);
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
   }
 
   h1 {
@@ -142,7 +149,7 @@ const source = links.find((link) => link.kind === "source");
   }
 
   .award {
-    justify-self: start;
+    align-self: start;
     padding: var(--space-1) var(--space-2);
     border: 1px solid var(--color-accent);
     font-size: var(--font-size-step-minus-1);
@@ -166,9 +173,21 @@ const source = links.find((link) => link.kind === "source");
     font-weight: var(--font-weight-strong);
   }
 
-  /* The cover keeps its ratio at the top of its cell, however tall the title block runs. */
-  .cover {
-    align-self: start;
+  /* On wide screens the cover shares the header with the title, half each. The text runs
+     the cover's height: title and summary at the top, facts and links at the bottom. */
+  @media (width >= 60rem) {
+    .title-block.has-cover {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .has-cover .facts {
+      margin-block-start: auto;
+      padding-block-start: var(--space-4);
+    }
+
+    .cover {
+      align-self: start;
+    }
   }
 
   /* The body is ruled and numbered like a specification: each section's title in a narrow
@@ -250,11 +269,6 @@ const source = links.find((link) => link.kind === "source");
     /* A section's first block sits on the same row as its title. */
     .body :global(.prose > h2:not(:first-child) + *) {
       margin-block-start: var(--space-16);
-    }
-
-    .body :global(.prose > figure),
-    .body :global(.prose > pre) {
-      max-inline-size: none;
     }
 
     .sections {

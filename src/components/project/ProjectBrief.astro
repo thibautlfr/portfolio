@@ -75,22 +75,28 @@ const span = decisions && figures ? 6 : 12;
     content: counter(decision);
   }
 
+  /* Values in mono, each framed as a small cell of the sheet, in a column as wide as the
+     longest one: data set as data. */
   .figures {
     display: grid;
-    gap: var(--space-3);
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--space-3) var(--space-4);
   }
 
-  /* Values in mono, aligned in their own column: data set as data. */
   .figure {
     display: grid;
-    grid-template-columns: 6rem minmax(0, 1fr);
-    gap: var(--space-4);
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     align-items: baseline;
   }
 
   dt {
+    justify-self: start;
+    padding-inline: var(--space-2);
+    outline: var(--border-hairline);
+    background: var(--color-ground);
     font-family: var(--font-data);
-    font-size: var(--font-size-step-1);
+    font-size: var(--font-size-step-0);
     font-variant-numeric: tabular-nums;
   }
 

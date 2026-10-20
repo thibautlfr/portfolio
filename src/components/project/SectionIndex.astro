@@ -9,7 +9,7 @@ const { headings } = Astro.props;
 const number = (index: number) => String(index + 1).padStart(2, "0");
 ---
 
-<nav aria-label="Sections">
+<nav aria-label="Sections" data-section-index>
   <ol role="list">
     {headings.map((heading, index) => (
       <li>
@@ -45,6 +45,7 @@ const number = (index: number) => String(index + 1).padStart(2, "0");
   .index {
     color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
+    transition: color var(--duration-quick) var(--ease-snap);
   }
 
   a {
@@ -62,4 +63,20 @@ const number = (index: number) => String(index + 1).padStart(2, "0");
   a:focus-visible {
     color: var(--color-text);
   }
+
+  /* The section being read: its title darkens and its line is drawn, its number with it. */
+  a[aria-current] {
+    --link-draw: 100%;
+    --link-from: left;
+
+    color: var(--color-text);
+  }
+
+  li:has(a[aria-current]) .index {
+    color: var(--color-text);
+  }
 </style>
+
+<script>
+  import "@/scripts/section-index";
+</script>
