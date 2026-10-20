@@ -46,6 +46,8 @@ const projects = defineCollection({
       year: year.optional(),
       stack: z.array(z.string()).min(1),
       cover: picture(image).optional(),
+      // Up to two more views of the project, under the cover on the case study page only.
+      gallery: z.array(picture(image)).min(1).max(2).optional(),
       preview: video.optional(),
       links: z
         .array(
