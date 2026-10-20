@@ -83,21 +83,21 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 
 ## Components
 
-| Component      | Role                                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| `Sheet`        | A block of cells: draws the top and left hairlines                                          |
-| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media    |
-| `SectionTitle` | The title cell of a section, with an optional aside link                                    |
-| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                 |
-| `TagList`      | Technologies as small tags framed by a hairline, in the text face                           |
-| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                  |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus     |
-| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable       |
-| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                          |
-| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top |
-| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                  |
-| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                |
-| `SectionIndex` | A case study's sections, numbered like their titles, kept in view beside the body           |
+| Component      | Role                                                                                                        |
+| -------------- | ----------------------------------------------------------------------------------------------------------- |
+| `Sheet`        | A block of cells: draws the top and left hairlines                                                          |
+| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media                    |
+| `SectionTitle` | The title cell of a section, with an optional aside link                                                    |
+| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                                 |
+| `TagList`      | Technologies as small tags framed by a hairline, in the text face                                           |
+| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                                  |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus                     |
+| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable                       |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                          |
+| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top                 |
+| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                                  |
+| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                                |
+| `SectionIndex` | A case study's sections, numbered like their titles, kept in view beside the body; marks the one being read |
 
 Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 
