@@ -4,8 +4,8 @@ import { getCollection, render, type CollectionEntry } from "astro:content";
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import ProjectBrief from "@/components/project/ProjectBrief.astro";
-import SectionIndex from "@/components/project/SectionIndex.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import ArticleBody from "@/components/ui/ArticleBody.astro";
 import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Media from "@/components/ui/Media.astro";
@@ -48,7 +48,6 @@ const {
   seo,
 } = project.data;
 const { Content, headings } = await render(project);
-const sections = headings.filter((heading) => heading.depth === 2);
 
 const site = Astro.site ?? Astro.url;
 const url = new URL(`/work/${project.id}/`, site).href;
@@ -122,14 +121,9 @@ const source = links.find((link) => link.kind === "source");
         )}
       </Cell>
       {(decisions || figures) && <ProjectBrief {decisions} {figures} />}
-      <Cell span={9} class="body">
-        <div class="prose">
-          <Content components={{ Figure, Video }} />
-        </div>
-      </Cell>
-      <Cell span={3} class="sections">
-        <SectionIndex headings={sections} />
-      </Cell>
+      <ArticleBody {headings}>
+        <Content components={{ Figure, Video }} />
+      </ArticleBody>
       {next && next.id !== project.id && (
         <Cell as="footer" class="next">
           <p class="next-label">Next case study</p>
@@ -221,93 +215,6 @@ const source = links.find((link) => link.kind === "source");
 
     .cover {
       align-self: start;
-    }
-  }
-
-  /* The body is ruled and numbered like a specification: each section's title in a narrow
-     column, its text beside it, a hairline between sections. */
-  .body {
-    padding-block: var(--space-12) var(--space-16);
-  }
-
-  .body :global(.prose) {
-    container-type: inline-size;
-    counter-reset: section;
-    max-inline-size: none;
-    font-size: var(--font-size-step-0);
-    line-height: var(--line-height-text);
-  }
-
-  .body :global(.prose > h2) {
-    position: relative;
-    counter-increment: section;
-    margin-block-start: var(--space-16);
-    font-size: var(--font-size-step-1);
-    line-height: var(--line-height-title);
-    scroll-margin-block-start: var(--space-8);
-  }
-
-  .body :global(.prose > h2:first-child),
-  .body :global(.prose > h2:first-child + *) {
-    margin-block-start: 0;
-  }
-
-  /* The section's number, as in the list of sections beside the text. */
-  .body :global(.prose > h2::before) {
-    display: block;
-    margin-block-end: var(--space-1);
-    color: var(--color-text-muted);
-    font-family: var(--font-text);
-    font-size: var(--font-size-step-minus-1);
-    font-weight: var(--font-weight-text);
-    font-variant-numeric: tabular-nums;
-    content: counter(section, decimal-leading-zero);
-  }
-
-  /* The rule above a section runs across both columns of the body. */
-  .body :global(.prose > h2::after) {
-    --rule-offset: calc(-1 * var(--space-8));
-
-    position: absolute;
-    inset-block-start: var(--rule-offset);
-    inset-inline-start: 0;
-    inline-size: 100cqi;
-    border-block-start: var(--border-hairline);
-    content: "";
-  }
-
-  .body :global(.prose > h2:first-child::after) {
-    content: none;
-  }
-
-  .sections {
-    display: none;
-  }
-
-  @media (width >= 60rem) {
-    .body :global(.prose) {
-      display: grid;
-      grid-template-columns: repeat(9, minmax(0, 1fr));
-      column-gap: var(--space-8);
-    }
-
-    .body :global(.prose > *) {
-      grid-column: 3 / -1;
-      max-inline-size: var(--layout-measure-wide);
-    }
-
-    .body :global(.prose > h2) {
-      grid-column: 1 / span 2;
-    }
-
-    /* A section's first block sits on the same row as its title. */
-    .body :global(.prose > h2:not(:first-child) + *) {
-      margin-block-start: var(--space-16);
-    }
-
-    .sections {
-      display: block;
-      padding-block: var(--space-12);
     }
   }
 

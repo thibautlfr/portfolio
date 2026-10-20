@@ -28,9 +28,9 @@ src/
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
-│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList, CodeText
+│   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ScrambleText, FactList, TagList, CodeText, ArticleBody, SectionIndex
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
-│   ├── project/              # Case study parts: ProjectBrief (decisions and figures), SectionIndex
+│   ├── project/              # Case study parts: ProjectBrief (decisions and figures)
 │   ├── note/                 # NoteHeader, NoteListItem
 │   └── mdx/                  # Components available inside MDX bodies: Figure, Video
 ├── lib/                      # Plain TypeScript, no Astro imports where avoidable, unit tested
@@ -43,7 +43,7 @@ src/
 │   ├── loop-video.ts         # Project and playground previews: play on hover or focus
 │   ├── scramble.ts           # Mono data resolves when pointed at (handles, coordinates)
 │   ├── back-link.ts          # A breadcrumb back to the previous page acts as history.back()
-│   └── section-index.ts      # A case study's list of sections marks the one being read
+│   └── section-index.ts      # The list of sections beside a long read marks the one being read
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
 │   ├── tokens/               # color, typography, space, layout, motion
@@ -107,7 +107,7 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 | `loop-video`    | Project and playground previews on hover     | Module, on pages with a preview                                                                          | 1 KB gzip  |
 | `scramble`      | Handles and coordinates resolve on hover     | Module, home page                                                                                        | 1 KB gzip  |
 | `back-link`     | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip  |
-| `section-index` | The section being read, beside a case study  | Module, case study pages                                                                                 | 1 KB gzip  |
+| `section-index` | The section being read, beside a long read   | Module, case studies and notes with sections                                                             | 1 KB gzip  |
 | Umami           | Cookieless analytics                         | `defer`, third party                                                                                     | about 2 KB |
 
 **Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little. The animation itself, the sheet, is in `src/styles/base/transitions.css`: the next page slides up over the current one, and going back lifts it off. View transitions are judged on a production build (`pnpm build && pnpm preview`): in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes them flash.
