@@ -180,7 +180,9 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     background: var(--color-shader-ground);
   }
 
-  .layer :global(.kit-canvas) {
+  /* A canvas, or a still image (an entry's cover opening a reel), filling its cell or page. */
+  .layer :global(.kit-canvas),
+  .layer :global(.kit-still) {
     position: absolute;
     inset: 0;
     inline-size: 100%;

@@ -30,8 +30,23 @@ interface Props {
 }
 
 const { project, next } = Astro.props;
-const { title, summary, role, context, client, year, stack, cover, links, award, decisions, figures, schemaType, seo } =
-  project.data;
+const {
+  title,
+  summary,
+  role,
+  context,
+  client,
+  year,
+  stack,
+  cover,
+  gallery,
+  links,
+  award,
+  decisions,
+  figures,
+  schemaType,
+  seo,
+} = project.data;
 const { Content, headings } = await render(project);
 const sections = headings.filter((heading) => heading.depth === 2);
 
@@ -96,6 +111,13 @@ const source = links.find((link) => link.kind === "source");
         {cover && (
           <figure class="cover">
             <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 50vw, 100vw" priority />
+            {gallery && (
+              <div class="gallery">
+                {gallery.map((picture) => (
+                  <Media src={picture.src} alt={picture.alt} ratio="16 / 10" sizes="(width >= 60rem) 25vw, 50vw" />
+                ))}
+              </div>
+            )}
           </figure>
         )}
       </Cell>
@@ -171,6 +193,18 @@ const source = links.find((link) => link.kind === "source");
   .links a {
     color: var(--color-link);
     font-weight: var(--font-weight-strong);
+  }
+
+  /* The gallery: the other views, side by side under the cover, at its ratio. */
+  .cover {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   /* On wide screens the cover shares the header with the title, half each. The text runs

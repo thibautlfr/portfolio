@@ -46,6 +46,7 @@ Every collection has these three, which drive the home page without touching cod
 | `year`       | integer  | no       | Year of delivery. Leave it out rather than guess.                                                                                                                 |
 | `stack`      | string[] | yes      | At least one item, most important first. Set in mono on the site.                                                                                                 |
 | `cover`      | image    | no       | PNG or JPEG, 16:10 works best; the page holds without it. The SVG covers in the repository are placeholders.                                                      |
+| `gallery`    | list     | no       | One or two more images, `{ src, alt }` each, shown under the cover on the case study page only (the home row keeps the cover). 16:10, like the cover.             |
 | `preview`    | video    | no       | A short loop, see above.                                                                                                                                          |
 | `links`      | list     | no       | `{ label, url, kind }`: `label` is the link text shown (free text), with `kind` one of `live`, `source`, `demo`, `article`. Client work may have none.            |
 | `award`      | string   | no       | One line, for example `Prizewinner, “On veut du gros pixel” challenge, Nuit de l'Info 2024`.                                                                      |
