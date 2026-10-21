@@ -71,16 +71,26 @@ const { legal, email } = profile;
       </Cell>
       <Cell span={8} class="statement">
         <p>
-          This website sets no cookie and stores nothing on your device. Audience is measured with Umami Cloud, run by
-          Umami Software, Inc., with the data hosted in the European Union, in Frankfurt. Each visit records the page,
-          the referring site, the browser, the operating system, the device type and the approximate location. Your IP
-          address is used to tell visits apart and to find the country, and is not kept with the statistics. The figures
-          are only read as totals, to know which pages are visited. They are not shared, and are kept for six months.
+          This website sets no cookie, and stores nothing on your device unless you turn the count off. Audience is
+          measured with Umami Cloud, run by Umami Software, Inc., with the data hosted in the European Union, in
+          Frankfurt. Each visit records the page, the referring site, the browser, the operating system, the device type
+          and the approximate location. Your IP address is used to tell visits apart and to find the country, and is not
+          kept with the statistics. The figures are only read as totals, to know which pages are visited. They are not
+          shared, and are kept for six months.
         </p>
         <p>
-          To opt out, block <code>cloud.umami.is</code>, as most content blockers do, or write to{" "}
-          <a href={`mailto:${email}`}>{email}</a>. Emails you send are only used to answer you.
+          To opt out, block <code>cloud.umami.is</code>, as most content blockers do.
         </p>
+        <!-- Shown by the script, which needs storage to keep the choice; it remembers it in this browser only. -->
+        <div class="opt-out" data-analytics-opt-out aria-live="polite" hidden>
+          <p data-opt-out-state="counted">
+            Visits from this browser are counted. <button type="button">Stop counting them</button>
+          </p>
+          <p data-opt-out-state="stopped" hidden>
+            Visits from this browser are no longer counted. <button type="button">Count them again</button>
+          </p>
+        </div>
+        <p>Emails you send are only used to answer you.</p>
       </Cell>
 
       <Cell span={4} class="topic">
@@ -88,8 +98,7 @@ const { legal, email } = profile;
       </Cell>
       <Cell span={8} class="statement">
         <p>
-          {`All content on this website (text, images, source code, graphic elements) is the property of ${legal.publisher} unless stated otherwise.`}
-          Any reproduction without prior authorisation is prohibited.
+          {`All content on this website (text, images, source code, graphic elements) is the property of ${legal.publisher} unless stated otherwise. Any reproduction without prior authorisation is prohibited.`}
         </p>
       </Cell>
 
@@ -105,6 +114,10 @@ const { legal, email } = profile;
     </Sheet>
   </div>
 </BaseLayout>
+
+<script>
+  import "@/scripts/analytics-opt-out";
+</script>
 
 <style>
   .page {
@@ -144,6 +157,17 @@ const { legal, email } = profile;
 
   .statement > * {
     max-inline-size: var(--layout-measure);
+  }
+
+  /* A button set as a quiet link, like the lens demo's reset. */
+  .opt-out button {
+    padding: 0;
+    border: 0;
+    background: none;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
   }
 
   .facts {
