@@ -104,7 +104,7 @@ Code is the one exception to the site's palette: blocks use VS Code's default da
 
 A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The measured figures are framed as small cells of the sheet, in mono. Images, videos and code blocks in the body take the width of the text. The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
 
-A note uses the same body (`ArticleBody`): the text in the same columns, its `##` headings numbered and set beside it, the index shown once it has two sections. Its title block holds the title at `step-4`, a sentence rather than a name, then the dates as facts and the link to the original post.
+A note uses the same body (`ArticleBody`): the text in the same columns, its `##` headings numbered and set beside it, the index shown once it has two sections. Its title block holds the title at `step-4`, a sentence rather than a name, then the dates as facts and the link to the original post. On wide screens it takes the body's columns: the title runs across the section titles and the text, and the dates sit at its foot over the list of sections.
 
 The development page `/styleguide/` shows every token and base component.
 
