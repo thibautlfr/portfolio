@@ -34,8 +34,15 @@ const { hero = false, ...seo } = Astro.props;
     <Font cssVariable="--font-stack-sans-text" preload />
     <Font cssVariable="--font-stack-sans-notch" preload={hero} />
     <Font cssVariable="--font-fragment-mono" />
+    {/* Tracking is limited to the production domain, so Lighthouse runs on localhost count nothing. */}
     {PUBLIC_UMAMI_WEBSITE_ID && (
-      <script is:inline defer src="https://cloud.umami.is/script.js" data-website-id={PUBLIC_UMAMI_WEBSITE_ID} />
+      <script
+        is:inline
+        defer
+        src="https://cloud.umami.is/script.js"
+        data-website-id={PUBLIC_UMAMI_WEBSITE_ID}
+        data-domains={Astro.site?.hostname}
+      />
     )}
     <!-- Page transitions: same-document View Transitions, see docs/architecture.md. -->
     <ClientRouter />
