@@ -1,7 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 
-import Media from "@/components/ui/Media.astro";
+import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 
 interface Props {
   src: ImageMetadata;
@@ -13,7 +13,7 @@ const { src, alt, caption } = Astro.props;
 ---
 
 <figure>
-  <Media {src} {alt} sizes="(width >= 60rem) 44rem, 100vw" />
+  <ZoomMedia {src} {alt} {caption} sizes="(width >= 60rem) 44rem, 100vw" />
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 

@@ -1,0 +1,167 @@
+---
+import type { ComponentProps } from "astro/types";
+import { getImage } from "astro:assets";
+
+import Media from "./Media.astro";
+
+type Props = ComponentProps<typeof Media> & {
+  /** Shown under the image in the viewer. */
+  caption?: string | undefined;
+};
+
+const { caption, ...media } = Astro.props;
+const { src } = media;
+
+// The viewer loads the largest useful width only when opened, up to the 2400 px a source may
+// have (docs/content.md). SVG placeholders stay vector.
+const LARGE_WIDTHS = [960, 1600, 2400];
+const large =
+  src.format === "svg"
+    ? undefined
+    : await getImage({
+        src,
+        format: "avif",
+        widths: [...LARGE_WIDTHS.filter((width) => width < src.width), Math.min(src.width, 2400)],
+      });
+---
+
+<!-- The image is a button that opens it in the viewer (image-viewer.ts): its name is the
+     image's alt, after what the button does. -->
+<button
+  type="button"
+  class="zoom"
+  aria-haspopup="dialog"
+  data-viewer-src={large?.src ?? src.src}
+  data-viewer-srcset={large?.srcSet.attribute}
+  data-viewer-caption={caption}
+>
+  <span class="visually-hidden">View larger:</span>
+  <Media {...media} />
+</button>
+
+<script>
+  import "@/scripts/image-viewer";
+</script>
+
+<style>
+  .zoom {
+    display: block;
+    inline-size: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  /* As in a project row, the frame turns teal on hover, at the pace of a line being drawn. */
+  .zoom :global(.media) {
+    transition-duration: var(--duration-draw);
+  }
+
+  .zoom:hover :global(.media) {
+    outline-color: var(--color-accent);
+  }
+</style>
+
+<!-- The viewer is built by the script, outside any component, so its styles are global. It
+     slides up over the page like a new sheet, the way pages do, and back down when closed. -->
+<style is:global>
+  .viewer {
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    max-block-size: none;
+    margin: 0;
+    padding: var(--layout-gutter);
+    border: 0;
+    border-block-start: var(--border-hairline);
+    background: var(--color-ground);
+    color: var(--color-text);
+    cursor: zoom-out;
+    transition:
+      translate var(--duration-draw) var(--ease-out),
+      display var(--duration-draw) allow-discrete,
+      overlay var(--duration-draw) allow-discrete;
+  }
+
+  .viewer:not([open]) {
+    translate: 0 100%;
+  }
+
+  @starting-style {
+    .viewer[open] {
+      translate: 0 100%;
+    }
+  }
+
+  .viewer[open] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--space-4);
+  }
+
+  /* The page stays visible behind the sheet while it slides. */
+  .viewer::backdrop {
+    background: transparent;
+  }
+
+  .viewer-image {
+    place-self: center;
+    inline-size: auto;
+    max-block-size: 100%;
+    object-fit: contain;
+    outline: var(--border-hairline);
+    background: var(--color-surface);
+  }
+
+  .viewer-image[data-loading] {
+    visibility: hidden;
+  }
+
+  /* A swipe goes to the next image: the browser keeps the pinch, the script takes the pan. */
+  .viewer[data-viewer-many] {
+    touch-action: pinch-zoom;
+  }
+
+  .viewer-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .viewer-controls {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    margin-inline-start: auto;
+  }
+
+  .viewer-count {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .viewer:not([data-viewer-many]) [data-viewer-step],
+  .viewer:not([data-viewer-many]) .viewer-count {
+    display: none;
+  }
+
+  .viewer-control {
+    padding: var(--space-2) 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  html:has(.viewer[open]) {
+    overflow: hidden;
+  }
+</style>

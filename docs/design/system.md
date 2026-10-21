@@ -92,6 +92,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `TagList`      | Technologies as small tags framed by a hairline, in the text face                                 |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                                        |
 | `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus           |
+| `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape       |
 | `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable             |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                |
 | `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top       |
@@ -111,7 +112,7 @@ The development page `/styleguide/` shows every token and base component.
 
 ## Images
 
-Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows and linked experiments.
+Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows, linked experiments and on images that open larger. A case study's cover and gallery and the figures of a body open in a viewer: a sheet of ground that slides up over the page like a new page, the image at the largest width built for it, its caption under it, with the count in mono, Previous, Next and Close. The images of the page form one series: the buttons, the arrow keys or a swipe go from one to the next, around the end. A click anywhere else or Escape closes it. The home page has none: the viewer's markup, styles and script would push its HTML past the first round trip on 4G and cost about 150 ms of LCP.
 
 Every project media sits in the site's frame, but not every one wears its art direction. The cover is how a project is recognised on the home page, so it shows the project as it is; the preview loop and the body media explain how it works, so they are drawn in the site's own language. A cover that is only a title card in the site's style makes every project look like a product of the same range.
 
