@@ -69,7 +69,7 @@ The body is read by a technical reader (a CTO, a lead developer) deciding whethe
 
 Lengths are in words. A featured case study runs 600 to 1,100 words; a hackathon or a small project can stay near 400, with the five headings kept.
 
-On the page, the sections are numbered 01 to 05, each title in a narrow column beside its text and listed again beside the body on wide screens, so a reader can go straight to Approach.
+On the page, the sections are numbered 01 to 05, each title in a narrow column beside its text and listed again beside the body on wide screens and at its head on narrow ones, so a reader can go straight to Approach.
 
 #### The opening
 

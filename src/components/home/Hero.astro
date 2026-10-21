@@ -3,9 +3,8 @@ import { Image } from "astro:assets";
 
 import shaderFrame from "@/assets/images/shader-frame.jpg";
 // Built by Vite as a standalone ES module (vite.worker.format is "es"); only its URL ships in
-// the page, so nothing is requested before the inline boot step below decides to load it.
+// the page, so nothing is requested before the boot step below decides to load it.
 import shaderModule from "@/scripts/hero-shader/index.ts?worker&url";
-import heroBootScript from "@/scripts/hero-shader/boot-inline.js?raw";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
@@ -52,8 +51,11 @@ const stack = Object.values(profile.stack).flat();
       <canvas class="shader-canvas" data-hero-shader-canvas aria-hidden="true"></canvas>
     </div>
     <figcaption>
-      <span>I like it when the details are alive. Hover to check.</span>
-      <button type="button" data-hero-shader-toggle aria-pressed="false" hidden>
+      <span>
+        I like it when the details are alive. <span class="hint hint--pointer">Hover to check.</span>
+        <span class="hint hint--touch">Tap to check.</span>
+      </span>
+      <button type="button" class="tap" data-hero-shader-toggle aria-pressed="false" hidden>
         Pause animation
       </button>
     </figcaption>
@@ -86,8 +88,12 @@ const stack = Object.values(profile.stack).flat();
   </Cell>
 </Sheet>
 
-<!-- Inline boot step (see boot-inline.js). -->
-<script is:inline set:html={heroBootScript} />
+<script>
+  // The boot step (see boot.ts): minified and inlined by the build, so it costs no request
+  // and few bytes in the page.
+  import "@/scripts/hero-shader/boot";
+</script>
+
 <style>
   /* Below 60rem the sheet becomes two columns so the portrait can sit beside
      the base; the pitch comes right after the name, before the shader. The
@@ -217,6 +223,27 @@ const stack = Object.values(profile.stack).flat();
     gap: var(--space-6);
   }
 
+  /* The invitation names the gesture of the device, and shows only once the shader answers
+     it: a still frame (reduced motion, no WebGL2) does not. Its place is kept until then, so
+     the caption never moves. */
+  .hint--touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .hint--pointer {
+      display: none;
+    }
+
+    .hint--touch {
+      display: inline;
+    }
+  }
+
+  .hero-shader:not(:global(.is-live)) .hint {
+    visibility: hidden;
+  }
+
   figcaption button {
     padding: 0;
     border: 0;
@@ -226,6 +253,13 @@ const stack = Object.values(profile.stack).flat();
     text-decoration-color: var(--color-accent);
     text-underline-offset: 0.2em;
     cursor: pointer;
+  }
+
+  /* The button stays hidden until the shader runs, but keeps its place: on a phone it wraps
+     onto a line of its own, and appearing would push the page down after a restored scroll. */
+  figcaption button[hidden] {
+    display: inline-block;
+    visibility: hidden;
   }
 
   .contact {

@@ -14,12 +14,14 @@ const { project } = Astro.props;
 const { title, summary, award, context, client, year, role, stack, cover, preview } = project.data;
 ---
 
-<!-- The whole row is the hover target: it draws the title's line, frames the cover in teal and
-     plays the preview loop over it. -->
-<li class:list={["row", { "row--text": !cover }]} data-loop-video-trigger>
+<!-- The whole row is the link and the hover target: it draws the title's line, frames the cover
+     in teal and plays the preview loop over it. -->
+<li class:list={["row", "card", { "row--text": !cover }]} data-loop-video-trigger>
   <div class="row-main">
     <h3 class="row-title">
-      <a href={`/work/${project.id}/`}>{title}</a>
+      <a class="card-link" href={`/work/${project.id}/`}>
+        {title}
+      </a>
     </h3>
     <p class="row-summary">{summary}</p>
     {award && <p class="row-award">{award}</p>}
@@ -85,12 +87,7 @@ const { title, summary, award, context, client, year, role, stack, cover, previe
   }
 
   /* Hover keeps the white cell: teal-11 links fail on any tinted ground. The frame turns teal
-     while the title's line is drawn, at the same pace. */
-  .row:hover .row-title a {
-    --link-draw: 100%;
-    --link-from: left;
-  }
-
+     while the title's line is drawn (.card), at the same pace. */
   .row :global(.media) {
     transition-duration: var(--duration-draw);
   }

@@ -7,9 +7,10 @@ import ProjectBrief from "@/components/project/ProjectBrief.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
 import ArticleBody from "@/components/ui/ArticleBody.astro";
 import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import FactList from "@/components/ui/FactList.astro";
-import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
+import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
 import { selectPublished } from "@/lib/content";
@@ -98,8 +99,9 @@ const source = links.find((link) => link.kind === "source");
               <ul role="list" class="links">
                 {links.map((link) => (
                   <li>
-                    <a href={link.url} data-umami-event={`project-${link.kind}`}>
+                    <a class="tap" href={link.url} data-umami-event={`project-${link.kind}`}>
                       {link.label}
+                      <ExternalMark href={link.url} />
                     </a>
                   </li>
                 ))}
@@ -109,11 +111,11 @@ const source = links.find((link) => link.kind === "source");
         </div>
         {cover && (
           <figure class="cover">
-            <Media src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 50vw, 100vw" priority />
+            <ZoomMedia src={cover.src} alt={cover.alt} ratio="16 / 10" sizes="(width >= 60rem) 50vw, 100vw" priority />
             {gallery && (
               <div class="gallery">
                 {gallery.map((picture) => (
-                  <Media src={picture.src} alt={picture.alt} ratio="16 / 10" sizes="(width >= 60rem) 25vw, 50vw" />
+                  <ZoomMedia src={picture.src} alt={picture.alt} ratio="16 / 10" sizes="(width >= 60rem) 25vw, 50vw" />
                 ))}
               </div>
             )}
@@ -125,10 +127,12 @@ const source = links.find((link) => link.kind === "source");
         <Content components={{ Figure, Video }} />
       </ArticleBody>
       {next && next.id !== project.id && (
-        <Cell as="footer" class="next">
+        <Cell as="footer" class="next card">
           <p class="next-label">Next case study</p>
           <p class="next-title">
-            <a href={`/work/${next.id}/`}>{next.data.title}</a>
+            <a class="card-link" href={`/work/${next.id}/`}>
+              {next.data.title}
+            </a>
           </p>
         </Cell>
       )}
@@ -178,10 +182,11 @@ const source = links.find((link) => link.kind === "source");
     margin-block-start: var(--space-4);
   }
 
+  /* Rows far enough apart that the links' touch targets (.tap) do not overlap. */
   .links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-6) var(--space-4);
   }
 
   .links a {

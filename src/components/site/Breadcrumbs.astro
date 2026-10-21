@@ -20,7 +20,7 @@ const { items } = Astro.props;
     {items.map((item) => (
       <li>
         {item.href ? (
-          <a href={item.href} data-back-link>
+          <a class="tap" href={item.href} data-back-link>
             {item.label}
           </a>
         ) : (

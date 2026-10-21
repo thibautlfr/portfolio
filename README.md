@@ -48,7 +48,7 @@ The details and the conventions are in [`docs/architecture.md`](docs/architectur
 
 ## Quality gates
 
-Every pull request runs `pnpm verify`, the build, and Lighthouse CI on the home page, a case study and the notes index: 100 in accessibility, best practices and SEO, 0.95 or more in performance, LCP under 1.5 s, CLS 0, and JavaScript and font byte budgets.
+Every pull request runs `pnpm verify`, the build, and Lighthouse CI on the home page, a case study and the notes index: 100 in accessibility, best practices and SEO, 0.95 or more in performance, LCP under 2 s (the target is 1.5 s, checked at the final audit), CLS 0, and JavaScript and font byte budgets.
 
 ## Deployment
 

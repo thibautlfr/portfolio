@@ -1,4 +1,4 @@
-// The live hero shader. Hero.astro's inline boot step imports this module only
+// The live hero shader. The boot step (boot.ts) imports this module only
 // when it may run (no reduced motion, no Save-Data), after load, the largest
 // paint and idle; it then starts itself. It pauses off-screen and in hidden
 // tabs, exposes a pause control, and stops when the router swaps the page away.
@@ -15,6 +15,8 @@ const RESOLUTION_SCALE = 0.75;
 const EASING = 0.05;
 // Starts where the composition reads well, so the first live frame matches the static one.
 const START_TIME = 12;
+// How long a tap keeps the warp pulled toward it, in milliseconds.
+const TOUCH_HOLD = 1500;
 
 async function startHeroShader(root: HTMLElement) {
   const canvas = root.querySelector<HTMLCanvasElement>("[data-hero-shader-canvas]");
@@ -68,17 +70,28 @@ async function startHeroShader(root: HTMLElement) {
   intersectionObserver.observe(root);
   document.addEventListener("visibilitychange", sync);
 
+  let release = 0;
+  const point = (event: PointerEvent) => {
+    clearTimeout(release);
+    const rect = canvas.getBoundingClientRect();
+    target.x = (event.clientX - rect.left) / rect.width;
+    target.y = 1 - (event.clientY - rect.top) / rect.height;
+    target.presence = 1;
+  };
+  root.addEventListener("pointermove", point, { passive: true });
+  // A tap sends no move: the touch itself is the point.
+  root.addEventListener("pointerdown", point, { passive: true });
   root.addEventListener(
-    "pointermove",
+    "pointerleave",
     (event) => {
-      const rect = canvas.getBoundingClientRect();
-      target.x = (event.clientX - rect.left) / rect.width;
-      target.y = 1 - (event.clientY - rect.top) / rect.height;
-      target.presence = 1;
+      clearTimeout(release);
+      // A finger leaves as soon as it lifts, before the warp has eased toward it: the touch is
+      // held for a moment, so a tap shows.
+      if (event.pointerType === "touch") release = window.setTimeout(() => (target.presence = 0), TOUCH_HOLD);
+      else target.presence = 0;
     },
     { passive: true },
   );
-  root.addEventListener("pointerleave", () => (target.presence = 0), { passive: true });
   const onScroll = () => {
     const rect = canvas.getBoundingClientRect();
     frame.scroll = Math.min(Math.max(-rect.top / rect.height, 0), 1);
@@ -90,6 +103,7 @@ async function startHeroShader(root: HTMLElement) {
     "astro:before-swap",
     () => {
       cancelAnimationFrame(request);
+      clearTimeout(release);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener("visibilitychange", sync);

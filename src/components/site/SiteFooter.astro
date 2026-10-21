@@ -10,7 +10,15 @@ const onLegalNotice = Astro.url.pathname.replace(/\/?$/, "/") === legalPath;
   <p>
     &copy; {year} {profile.name}
   </p>
-  <p>{onLegalNotice ? <span aria-current="page">Legal notice</span> : <a href={legalPath}>Legal notice</a>}</p>
+  <p>
+    {onLegalNotice ? (
+      <span aria-current="page">Legal notice</span>
+    ) : (
+      <a class="tap" href={legalPath}>
+        Legal notice
+      </a>
+    )}
+  </p>
 </footer>
 
 <style>

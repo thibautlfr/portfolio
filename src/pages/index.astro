@@ -67,9 +67,19 @@ const person = await author(Astro.site ?? Astro.url);
   }
 
   /* Sections below the hero are laid out when they come near the viewport, not on the first
-     render: the first paint only pays for the hero. Their last measured size is kept. */
-  .page > :global(:not(:first-child)) {
+     render: the first paint only pays for the hero. Their last measured size is kept. Only on
+     a page loaded by the browser: one brought back by the router is new, has no size kept,
+     and its scroll is restored at once, so sections still at their placeholder height would
+     put the visitor far below where they left. */
+  :global(:root:not([data-routed])) .page > :global(:not(:first-child)) {
     content-visibility: auto;
     contain-intrinsic-block-size: auto 40rem;
   }
 </style>
+
+<script>
+  // The router copies the attributes of the incoming <html> onto the current one.
+  document.addEventListener("astro:before-swap", (event) => {
+    event.newDocument.documentElement.dataset.routed = "";
+  });
+</script>

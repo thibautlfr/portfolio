@@ -8,4 +8,50 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
+  /* A link or a button set small, alone on its line (a breadcrumb, a footer link, a pause
+     button): its hit area reaches 44px tall over the space around it, so a thumb finds it,
+     and nothing on the page moves. */
+  .tap {
+    position: relative;
+  }
+
+  /* Centred on the control by its auto margins, whatever the height of its own box. */
+  .tap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    block-size: var(--tap-size);
+    margin-block: auto;
+  }
+
+  /* A card that leads somewhere is clickable all over: its title link (.card-link) keeps its
+     own name for screen readers, and its ::after covers the card (.card). Hovering anywhere
+     draws the title's line, and the focus ring frames the whole card, inside its hairlines so
+     the next cell never covers it. A card holds no other link. */
+  .card {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-card-link);
+  }
+
+  .card-link:focus-visible {
+    outline: none;
+  }
+
+  .card:hover .card-link {
+    --link-draw: 100%;
+    --link-from: left;
+  }
+
+  .card:has(.card-link:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: calc(-2 * var(--focus-offset));
+  }
 }

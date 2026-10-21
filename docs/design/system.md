@@ -59,8 +59,9 @@ Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all)
 | `--border-hairline`         | 1px solid line                                                                  |
 | `--hero-shader-height`      | 15 to 22 rem                                                                    |
 | `--trail-clearance`         | The gutter plus 4rem: where anchors land below the pinned breadcrumb trail      |
+| `--tap-size`                | 2.75rem (44px): the touch target of a small link or button (`.tap`)             |
 
-The one breakpoint is 60rem. Sheets are separated by `--space-12`.
+The one breakpoint is 60rem. Sheets are separated by `--space-12`. A link or button set small and alone on its line (the breadcrumb, the footer's legal notice, a section's aside link, a project's links, the pause button) carries `.tap`: its hit area reaches 44px tall over the space around it, and nothing moves.
 
 On inner pages the breadcrumb trail is pinned one gutter below the top of the viewport, on one line (the current page gives way with an ellipsis). A band of ground above it hides the page scrolling under it, so the gutter stays empty and the trail never moves.
 
@@ -75,7 +76,7 @@ On inner pages the breadcrumb trail is pinned one gutter below the top of the vi
 | `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
 | `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest; a project row draws its title's line when any part of the row is hovered, while its cover frame turns teal at the same pace and its preview loop plays. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
+Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest. A card that leads somewhere (a project row, an experiment with a link, a note, the next case study) is clickable all over: its title stays the link's name, hovering any part of it draws the title's line, and the focus ring frames the whole card, inside its hairlines. A project row or an experiment also turns its image frame teal at the same pace and plays its preview loop. A link that leaves the site (a project's live site or source, an experiment, a client, a network, the original post of a note) ends with a small drawn arrow pointing up and out, and still opens in the same tab: the back button returns to the page where it was left. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
 
 Data in mono that a visitor points at resolves like a reading: the social handles and the hero coordinates scramble for 420ms, each character through others of its own kind (digits through digits), then settle from left to right. Punctuation and symbols hold still. Only there, only with a mouse, never under reduced motion: it is a signature, and repeated everywhere it would become a tic.
 
@@ -83,27 +84,29 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 
 ## Components
 
-| Component      | Role                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| `Sheet`        | A block of cells: draws the top and left hairlines                                                |
-| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media          |
-| `SectionTitle` | The title cell of a section, with an optional aside link                                          |
-| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                       |
-| `TagList`      | Technologies as small tags framed by a hairline, in the text face                                 |
-| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                        |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus           |
-| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable             |
-| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                |
-| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top       |
-| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                        |
-| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                      |
-| `ArticleBody`  | The body of a case study or a note, ruled like a specification, with its `SectionIndex` beside it |
-| `SectionIndex` | The body's sections, numbered like their titles, kept in view beside it; marks the one being read |
-| `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it          |
+| Component      | Role                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `Sheet`        | A block of cells: draws the top and left hairlines                                                      |
+| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media                |
+| `SectionTitle` | The title cell of a section, with an optional aside link                                                |
+| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                             |
+| `TagList`      | Technologies as small tags framed by a hairline, in the text face                                       |
+| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                              |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus                 |
+| `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape             |
+| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable                   |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                      |
+| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top             |
+| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                              |
+| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                            |
+| `ArticleBody`  | The body of a case study or a note, ruled like a specification, with its `SectionIndex` beside it       |
+| `SectionIndex` | The body's sections, numbered like their titles, kept in view beside it; marks the one being read       |
+| `ExternalMark` | Inside a link that leaves the site: a drawn arrow in the link's colour, and the fact for screen readers |
+| `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it                |
 
 Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 
-A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The measured figures are framed as small cells of the sheet, in mono. Images, videos and code blocks in the body take the width of the text. The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens.
+A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The measured figures are framed as small cells of the sheet, in mono. Images, videos and code blocks in the body take the width of the text. The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens, or at the head of the body on narrow ones, one full touch target per section.
 
 A note uses the same body (`ArticleBody`): the text in the same columns, its `##` headings numbered and set beside it, the index shown once it has two sections. Its title block holds the title at `step-4`, a sentence rather than a name, then the dates as facts and the link to the original post. On wide screens it takes the body's columns: the title runs across the section titles and the text, and the dates sit at its foot over the list of sections.
 
@@ -111,7 +114,7 @@ The development page `/styleguide/` shows every token and base component.
 
 ## Images
 
-Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows.
+Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows, linked experiments and on images that open larger. A case study's cover and gallery and the figures of a body open in a viewer: a sheet of ground that slides up over the page like a new page, the image at the largest width built for it, its caption under it, with the count in mono, Previous, Next and Close. The images of the page form one series: the buttons, the arrow keys or a swipe go from one to the next, around the end. A click anywhere else or Escape closes it. The home page has none: the viewer's markup, styles and script would push its HTML past the first round trip on 4G and cost about 150 ms of LCP.
 
 Every project media sits in the site's frame, but not every one wears its art direction. The cover is how a project is recognised on the home page, so it shows the project as it is; the preview loop and the body media explain how it works, so they are drawn in the site's own language. A cover that is only a title card in the site's style makes every project look like a product of the same range.
 
@@ -123,7 +126,7 @@ Both are composed on `/media-kit/` (see [`architecture.md`](../architecture.md#p
 
 ## The shader
 
-The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts after the largest paint and a short idle wait, half a second at most (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
+The domain warp from the V1 hero: five colours folding, pulled toward a slow wandering point that the cursor replaces, or a tap for a moment and a half. Its caption invites the gesture of the device ("Hover to check." or "Tap to check.") once the shader is live, and never over the still frame. WebGL2, one fullscreen triangle, 2.6 KB gzipped. It starts after the largest paint and a short idle wait, half a second at most (two seconds after load at most, for pages opened in a background tab, which report no largest paint), pauses off-screen and in hidden tabs, has a pause button, and gives way to its still frame under reduced motion, Save-Data, without WebGL2 or without a GPU (a software renderer would block the main thread on every frame).
 
 ## Anti AI-look checklist
 

@@ -34,8 +34,8 @@ export default defineConfig({
   // not set its own colours, so a developer reads the code at a glance.
   markdown: { shikiConfig: { theme: "dark-plus" } },
   vite: {
-    // The hero shader is built as one standalone ES module (see Hero.astro), loaded by an
-    // inline boot step: no script request competes with the first paint.
+    // The hero shader is built as one standalone ES module (see Hero.astro), loaded by a
+    // boot step inlined by the build: no script request competes with the first paint.
     worker: { format: "es" },
   },
   env: {
