@@ -3,9 +3,8 @@ import { Image } from "astro:assets";
 
 import shaderFrame from "@/assets/images/shader-frame.jpg";
 // Built by Vite as a standalone ES module (vite.worker.format is "es"); only its URL ships in
-// the page, so nothing is requested before the inline boot step below decides to load it.
+// the page, so nothing is requested before the boot step below decides to load it.
 import shaderModule from "@/scripts/hero-shader/index.ts?worker&url";
-import heroBootScript from "@/scripts/hero-shader/boot-inline.js?raw";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
@@ -89,8 +88,12 @@ const stack = Object.values(profile.stack).flat();
   </Cell>
 </Sheet>
 
-<!-- Inline boot step (see boot-inline.js). -->
-<script is:inline set:html={heroBootScript} />
+<script>
+  // The boot step (see boot.ts): minified and inlined by the build, so it costs no request
+  // and few bytes in the page.
+  import "@/scripts/hero-shader/boot";
+</script>
+
 <style>
   /* Below 60rem the sheet becomes two columns so the portrait can sit beside
      the base; the pitch comes right after the name, before the shader. The

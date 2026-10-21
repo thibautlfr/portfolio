@@ -1,4 +1,4 @@
-// The live hero shader. Hero.astro's inline boot step imports this module only
+// The live hero shader. The boot step (boot.ts) imports this module only
 // when it may run (no reduced motion, no Save-Data), after load, the largest
 // paint and idle; it then starts itself. It pauses off-screen and in hidden
 // tabs, exposes a pause control, and stops when the router swaps the page away.
