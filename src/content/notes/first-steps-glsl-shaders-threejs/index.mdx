@@ -1,0 +1,108 @@
+---
+title: "My first GLSL shaders: a 3D carousel that bends and splits around the cursor"
+description: "A sine wave in the vertex shader, an RGB split around the cursor in the fragment shader, and the pixel ratio bug that put the split in the wrong place."
+pubDate: 2026-06-11
+updatedDate: 2026-10-20
+tags: [glsl, threejs, webgl]
+draft: false
+---
+
+import carousel from "./carousel.mp4";
+import retina from "./retina.mp4";
+import LensDemo from "@/components/demos/LensDemo.astro";
+
+I did not expect to be glad to see sines and cosines again. Writing my first shaders brought back the trigonometry I learned in high school without knowing what it was for: the wave that bends each image is a sine, and the ring that holds the images is a sine and a cosine.
+
+The project is a 3D carousel. Twelve stills from Studio Ghibli's _When Marnie Was There_ hang in a ring that turns as you scroll, and each image ripples, with its red and blue pulled apart around the cursor. It was my first solo project after the shader lessons of [Three.js Journey](https://threejs-journey.com/), built the way I learn best: read about something, then make something small that uses it. I am not a shader expert, and this is the tour I would have liked before starting, with the bug that sent me back to the code the same afternoon.
+
+<Video
+  src={carousel}
+  label="The ring of film stills turns one way and back as the wheel scrolls; around the cursor, at the centre, the edges of the stills split into red and blue fringes."
+  caption="Six wheel ticks one way, then back. A friction of 0.7 per frame turns each tick into 0.08 rad of rotation."
+/>
+
+## The setup
+
+The scene runs on my own Three.js boilerplate: an `Experience` singleton owns the renderer, the camera, the resources and the render loop, and each part of the world, the carousel or an image, fetches it with `Experience.getInstance()`. The shaders are `.glsl` files imported straight into TypeScript through [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl), so they get syntax highlighting instead of living in template strings.
+
+The ring itself is plain trigonometry: image `i` of 12 sits at the angle `i / 12 × 2π`, at `x = sin(angle) × 4.5` and `z = cos(angle) × 4.5`, and `lookAt(0, 0, 0)` turns it towards the centre, inside the ring, where the camera stands. Scrolling adds to a rotation speed that loses 30 % of itself every frame on a desktop, and when it falls under 0.0005 rad a frame, the ring keeps drifting at that pace on its own.
+
+## A wave in the vertex shader
+
+The vertex shader runs once per vertex and decides where it lands on screen. Each image is a `PlaneGeometry` with 32 by 32 segments, so 1,089 vertices, enough for a smooth bend. The whole deformation is three lines:
+
+```glsl
+float elevation = sin(modelPosition.x * uFrequency.x) * 0.1;
+elevation += sin(modelPosition.y * uFrequency.y) * 0.1;
+modelPosition.z += elevation;
+```
+
+A sine of the vertex's position, between -1 and 1, scaled down to 0.1. `uFrequency` is a uniform, a value sent from JavaScript and shared by every vertex of the mesh, and it sets how tight the wave is: 3.5 along x and 0 along y, so the images ripple horizontally only.
+
+One detail I only understood later: `modelPosition` is the vertex in world space, after the mesh's own position and rotation. The wave stays where it is in the scene, and the images move through it as the ring turns, which is why the bend seems to travel across each one. The shader also declares a `uTime` that every image updates on each frame and the shader never reads.
+
+## Three samples for one pixel
+
+The fragment shader runs once per pixel the image covers and decides its colour. `texture2D(uTexture, vUv)` reads the image at the UV coordinates handed down by the vertex shader and returns red, green, blue and alpha. While trying it, I realised nothing forces the three colours to come from the same place:
+
+```glsl
+float r = texture2D(uTexture, vUv + uvOffset).r;
+float g = texture2D(uTexture, vUv).g;
+float b = texture2D(uTexture, vUv - uvOffset).b;
+```
+
+Red is read slightly ahead, blue slightly behind, green stays put, and the edges in the image split into coloured fringes, the chromatic aberration of a cheap lens. It was not in the plan: **it came out of poking at the fragment shader**, and it costs four texture reads instead of one. A vignette closes the shader: `dot(uv, uv)` is the squared distance from the centre of the image, and the colour darkens with it.
+
+## A lens that follows the cursor
+
+The next step was to make it answer the mouse rather than sit still. The shader compares each pixel with the cursor and keeps the effect within a radius:
+
+```glsl
+vec2 screenUv = gl_FragCoord.xy / uResolution;
+
+float aspect = uResolution.x / uResolution.y;
+vec2 diff = screenUv - uMouse;
+diff.x *= aspect;
+
+float dist = length(diff);
+float mask = smoothstep(uStereoRadius, 0.0, dist);
+vec2 dir = dist > 0.001 ? normalize(diff) : vec2(0.0);
+
+vec2 uvOffset = dir * uStereoStrength * mask;
+uvOffset.x /= aspect;
+```
+
+`gl_FragCoord` is the pixel's position in the canvas; divided by the canvas size, it runs from 0 to 1 on both axes, like the cursor. Its origin is the bottom left corner while the DOM counts from the top, so the cursor's y is flipped in JavaScript: `1.0 - e.clientY / innerHeight`. The difference is multiplied by the aspect ratio before it is measured, otherwise a radius would be wider than tall on a landscape screen, and the offset is divided by it again to come back to 0 to 1 units. `smoothstep` turns the distance into a mask, 1 under the cursor and 0 beyond `uStereoRadius`, 0.2 of the screen's height, and the colours split away from the cursor by up to `uStereoStrength`, 0.04.
+
+<LensDemo
+  label="A dark canvas ruled by an ivory grid. Around the pointer, or at the centre when no pointer is over it, the grid lines split into red and blue fringes inside a circle. Two sliders under it set the circle's radius and how far the colours split."
+  caption="The project's fragment shader, unchanged, with uResolution in the pixels drawn. Here the image fills the canvas, so the split stays round."
+/>
+
+## Halfway to the cursor on a Retina screen
+
+On my Retina screen, the lens did not follow the cursor. It sat between the cursor and the bottom left corner, exactly halfway, and at half the size I had set.
+
+<Video
+  src={retina}
+  label="Two dark screens ruled by an ivory grid, with the same coral cursor running a loop in each and a dashed circle around it. On the left, before the fix, a small patch of red and blue fringes travels halfway between the cursor and the bottom left corner. On the right, after the fix, the fringes fill the dashed circle under the cursor."
+  caption="The project's own fragment shader at a pixel ratio of 2. The dashed circle is uStereoRadius, 0.2 of the screen's height, around the cursor."
+/>
+
+`gl_FragCoord` counts device pixels. With a pixel ratio of 2 the canvas is drawn at twice its CSS size, and I had sent `uResolution` in CSS pixels. **`screenUv` ran from 0 to 2 instead of 0 to 1**, so it matched the cursor at half the cursor's coordinates, and every distance came out twice too long, which halved the radius. With a ratio of 1 the two units are the same and the bug cannot show. The fix went in two and a half hours after the effect:
+
+{/* prettier-ignore */}
+```ts
+image.uniforms.uResolution.value.set(
+  sizes.width * sizes.pixelRatio,
+  sizes.height * sizes.pixelRatio,
+);
+```
+
+The ratio has to be the one the renderer draws at, not `window.devicePixelRatio`. The project caps it with `Math.min(window.devicePixelRatio, 2)` and passes the same value to `renderer.setPixelRatio`. On a screen with a ratio of 3, the raw value would send the lens past the cursor this time, one and a half times as far from the corner.
+
+## What is still off
+
+The offset is measured on the screen but applied to the image's UVs, and the two do not have the same proportions. U runs across the width of the image and v across its height, so a split that should be round comes out stretched by the image's ratio divided by the window's. The stills are 1920 by 1038, a ratio of 1.85, so in a 16:10 window the split is about 16 % wider than it is tall, and its size follows how large the image is on screen. The ratios are close enough that it hardly shows. To fix it, I would convert the offset with `dFdx(vUv)` and `dFdy(vUv)`, which tell how much the UVs change from one pixel to the next on screen. I have not tried it yet.
+
+The [demo](https://3d-carousel.thibaut-lefrancois.com) runs in the browser, and the source is on [GitHub](https://github.com/thibautlfr/3d-carousel).
