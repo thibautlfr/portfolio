@@ -59,8 +59,9 @@ Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all)
 | `--border-hairline`         | 1px solid line                                                                  |
 | `--hero-shader-height`      | 15 to 22 rem                                                                    |
 | `--trail-clearance`         | The gutter plus 4rem: where anchors land below the pinned breadcrumb trail      |
+| `--tap-size`                | 2.75rem (44px): the touch target of a small link or button (`.tap`)             |
 
-The one breakpoint is 60rem. Sheets are separated by `--space-12`.
+The one breakpoint is 60rem. Sheets are separated by `--space-12`. A link or button set small and alone on its line (the breadcrumb, the footer's legal notice, a section's aside link, a project's links, the pause button) carries `.tap`: its hit area reaches 44px tall over the space around it, and nothing moves.
 
 On inner pages the breadcrumb trail is pinned one gutter below the top of the viewport, on one line (the current page gives way with an ellipsis). A band of ground above it hides the page scrolling under it, so the gutter stays empty and the trail never moves.
 

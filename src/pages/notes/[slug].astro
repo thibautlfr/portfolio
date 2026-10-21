@@ -70,7 +70,9 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
           />
           {source && (
             <p class="source">
-              <a href={source.url}>Originally posted on {platforms[source.platform]}</a>
+              <a class="tap" href={source.url}>
+                Originally posted on {platforms[source.platform]}
+              </a>
             </p>
           )}
         </div>

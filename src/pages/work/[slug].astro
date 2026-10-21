@@ -98,7 +98,7 @@ const source = links.find((link) => link.kind === "source");
               <ul role="list" class="links">
                 {links.map((link) => (
                   <li>
-                    <a href={link.url} data-umami-event={`project-${link.kind}`}>
+                    <a class="tap" href={link.url} data-umami-event={`project-${link.kind}`}>
                       {link.label}
                     </a>
                   </li>
@@ -180,10 +180,11 @@ const source = links.find((link) => link.kind === "source");
     margin-block-start: var(--space-4);
   }
 
+  /* Rows far enough apart that the links' touch targets (.tap) do not overlap. */
   .links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-6) var(--space-4);
   }
 
   .links a {

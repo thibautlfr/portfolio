@@ -21,7 +21,7 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
   <SectionTitle id="artworks-title">
     {title}
     {more && (
-      <a slot="aside" href={more.url}>
+      <a slot="aside" class="tap" href={more.url}>
         {more.label}
       </a>
     )}

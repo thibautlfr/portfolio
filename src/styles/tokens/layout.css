@@ -18,6 +18,11 @@
 
     /* Pulls a cell onto the hairline above it, so its own top line covers that one. */
     --border-hairline-overlap: calc(-1 * var(--border-width-hairline));
+
+    /* A small control's touch target: 44px tall whatever its line, reached by spreading its
+       hit area above and below its line rather than growing the line. */
+    --tap-size: 2.75rem;
+
     --focus-ring: 2px solid var(--color-focus);
     --focus-offset: 2px;
 
