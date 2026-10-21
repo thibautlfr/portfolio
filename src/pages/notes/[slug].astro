@@ -4,7 +4,9 @@ import { getCollection, render, type CollectionEntry } from "astro:content";
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import ArticleBody from "@/components/ui/ArticleBody.astro";
 import Cell from "@/components/ui/Cell.astro";
+import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
@@ -23,7 +25,7 @@ interface Props {
 
 const { note } = Astro.props;
 const { title, description, pubDate, updatedDate, tags, source } = note.data;
-const { Content } = await render(note);
+const { Content, headings } = await render(note);
 
 const site = Astro.site ?? Astro.url;
 const url = new URL(`/notes/${note.id}/`, site).href;
@@ -59,21 +61,23 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
       />
       <Cell as="header" class="title-block">
         <h1>{title}</h1>
-        <p class="meta">
-          <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+        <div class="facts">
+          <FactList
+            facts={[
+              { term: "Published", value: formatDate(pubDate), data: true },
+              ...(updatedDate ? [{ term: "Updated", value: formatDate(updatedDate), data: true }] : []),
+            ]}
+          />
           {source && (
-            <>
-              {" · "}
+            <p class="source">
               <a href={source.url}>Originally posted on {platforms[source.platform]}</a>
-            </>
+            </p>
           )}
-        </p>
-      </Cell>
-      <Cell class="body">
-        <div class="prose">
-          <Content components={{ Figure, Video }} />
         </div>
       </Cell>
+      <ArticleBody {headings}>
+        <Content components={{ Figure, Video }} />
+      </ArticleBody>
     </Sheet>
   </article>
 </BaseLayout>
@@ -83,24 +87,43 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
     padding-block-start: var(--layout-gutter);
   }
 
+  /* As on a case study, one step down: a note's title is a sentence, not a name. */
   .title-block {
     display: grid;
-    gap: var(--space-4);
-    padding-block: var(--space-8);
+    gap: var(--space-8);
+    padding-block: var(--space-12) var(--space-8);
   }
 
   h1 {
-    max-inline-size: 20ch;
-    font-size: var(--font-size-step-3);
+    font-size: var(--font-size-step-4);
+    line-height: var(--line-height-title);
   }
 
-  .meta {
-    color: var(--color-text-muted);
-    font-family: var(--font-data);
-    font-size: var(--font-size-step-minus-1);
+  .facts {
+    display: grid;
+    gap: var(--space-4);
   }
 
-  .body {
-    padding-block: var(--space-8) var(--space-16);
+  /* On wide screens the title block takes the body's columns: the title across the section
+     titles and the text, the dates over the list of sections, at the foot of the title. */
+  @media (width >= 60rem) {
+    .title-block {
+      grid-template-columns: subgrid;
+    }
+
+    h1 {
+      grid-column: 1 / span 9;
+    }
+
+    .facts {
+      grid-column: 10 / -1;
+      align-self: end;
+      padding-inline-start: var(--space-4);
+    }
+  }
+
+  .source a {
+    color: var(--color-link);
+    font-weight: var(--font-weight-strong);
   }
 </style>

@@ -1,4 +1,4 @@
-// The list of sections beside a case study (SectionIndex) marks the section being read: the
+// The list of sections beside a case study or a note (SectionIndex) marks the section being read: the
 // last one whose title has passed the upper third of the viewport, or the last one once the
 // page is scrolled to its end, since a short closing section may never reach that line.
 const READING_LINE = 1 / 3;

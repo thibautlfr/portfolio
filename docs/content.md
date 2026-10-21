@@ -122,6 +122,8 @@ import demo from "./demo.mp4";
 />
 ```
 
+A live demo, such as the 3D carousel's lens on its note, is a component of its own in `src/components/demos/`, imported in the MDX body of the one entry it belongs to (`import LensDemo from "@/components/demos/LensDemo.astro"`). It runs the project's own code, draws only when the reader acts on it, and says what it needs when it cannot run. It takes a `label` and a `caption`, as a `Video` does. Its script is listed in [`architecture.md`](architecture.md#client-javascript).
+
 ## Playground
 
 `src/content/playground/<slug>/index.md`, frontmatter only; shown as a strip on the home page, no page of its own.

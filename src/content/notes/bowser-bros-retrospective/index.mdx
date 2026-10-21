@@ -1,0 +1,61 @@
+---
+title: "Bowser Bros: a vertical Mario in C++ and Qt, built in two and a half weeks"
+description: "A first-year school game from 2023: four playable versions in two and a half weeks, and the C++ I would write differently today."
+pubDate: 2026-10-20
+tags: [qt, c++, gamedev]
+draft: false
+---
+
+import climb from "./climb.mp4";
+import levelFour from "./level-4.png";
+
+In June 2023, in the first year of my computer science degree at La Rochelle, six of us had two and a half weeks to ship a retro game in C++ with Qt, the stack the course imposed. We called it Bowser Bros. I opened it again this year, and it still compiles against Qt 6.12 without a single change, which says more about Qt's stability than about our code. Looking at it with three more years behind me, the parts that held up are the ones about shipping, and the parts that did not are the C++.
+
+The team's pitch took the verticality of [Donkey Kong Jr.](https://en.wikipedia.org/wiki/Donkey_Kong_Jr.) with the jumping of Mario Bros: you climb a level towards a chest while Bowser, in his clown car, follows the camera and drops fireballs on you. One fireball a second on the first level, one every 0.8 seconds on the fifth.
+
+<Video
+  src={climb}
+  label="Mario climbs two ladders and jumps between brick platforms while the camera follows him up and Bowser drops a fireball from the top of the screen."
+  caption="Level 1, rendered from the 2023 code with scripted inputs, one frame every 40 ms of game time."
+/>
+
+## Four versions in two and a half weeks
+
+The first commit was a blue cube that moved and jumped. The same day it was playable, without a camera yet. That cube set the rule for the rest of the project: there was always a version our teacher, who played the client, could run. **We delivered four of them**, each one playable, the last on 15 June with five levels, ladders, Goombas and Koopas, a pause menu, saved volume settings, a training mode and a top-five scoreboard.
+
+My part was a bit of everything. I ran the repository and the releases, was the team's contact with the teachers, and wrote my share of the code that held the pieces together: the `Entity` class that Mario, Bowser and the enemies derive from, the chain of levels, the end of a game, the scoreboard and the pause. Towards the end, a good part of my time went into the Windows build: an installer that brings the Qt libraries with it, so the game runs on a machine where Qt was never installed.
+
+Six people on one repository was new to all of us, and it showed early. On 2 June a merge between two personal branches ended with me deleting the folder and copying it back whole from the other branch. After that we kept a branch per feature, merged into `dev`, then into a release branch for each version. It was not elegant, and merges stayed painful until the end, but every version shipped from that branch. Not every change survived either: an optimisation of the collision checks went in on 10 June and was reverted the next day, because it had broken the collisions.
+
+## A level is a text file
+
+Each level is a plain text file with one line per block: `x;y;type`, where the type says brick, breakable block, ladder, chest, Goomba or Koopa. The game reads it line by line at load time. The format went in on 2 June, two days after the first commit, in place of blocks pushed one by one from C++ with their coordinates. From then on, drawing or moving a platform never touched a `.cpp` file, so level changes and code changes did not meet in merges.
+
+It paid off at the end. On 12 June a teammate added a [level editor](https://thibautlfr.github.io/IUT-BowserBros/) in plain HTML and JavaScript: you paint blocks on a 40 by 60 grid and export the file. **Three of the five levels went in during the last three days**, while the ladders and the Koopas were still being merged.
+
+<Figure
+  src={levelFour}
+  alt="Level 4 of Bowser Bros: brick platforms and two ladders over blue rounded hills under snow, two Goombas walking on a long platform, a Koopa near Mario on the ground, Bowser in his clown car at the top right and a fireball below him."
+  caption="Level 4: the whole level is 73 lines of x;y;type."
+/>
+
+## What I would write differently
+
+The collision code is where the inexperience is easiest to read. When an enemy walks into a wall, it has to turn around, but the collision function only received an `Entity`. So it recognised enemies by their speed:
+
+```cpp
+// -0.4 is a walking Goomba or Koopa, -1.5 a kicked Koopa shell
+if (anEntity->getXSpeed() == float(-0.4) || anEntity->getXSpeed() == float(-0.5) ||
+    anEntity->getXSpeed() == float(-1.5))
+{
+    anEntity->reverseXSpeed();
+}
+```
+
+It works, because the speeds are set from the same literals they are compared with. The `-0.5` matches nothing: it is Bowser's top speed, and Bowser never reaches this function. **It also means changing an enemy's speed silently breaks its collisions**, and that the type of a thing is guessed from a float. A virtual method on `Entity`, or simply asking the enemy whether it turns at walls, would have cost ten minutes.
+
+The rest follows the same pattern. `gameform.cpp` grew to 1,376 lines, because the game form was where everything could reach everything else. The scoreboard is read from `../../../../../DataBase/ScoreBoard.json` on macOS, five folders up from wherever the game is launched, so it only finds the file when the game runs from Qt Creator's build folder.
+
+None of this was hidden from us at the time. The commit that added the Koopas, on 12 June, already says the collisions still needed a lot of work. The last version shipped three days later, on top of them.
+
+The source, the editor and the 2023 README are on [GitHub](https://github.com/thibautlfr/IUT-BowserBros).
