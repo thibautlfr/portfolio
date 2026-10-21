@@ -8,8 +8,9 @@ const assertions = {
   "categories:seo": ["error", { minScore: 1 }],
   "largest-contentful-paint": ["error", { maxNumericValue: 1500, aggregationMethod: "median-run" }],
   "cumulative-layout-shift": ["error", { maxNumericValue: 0 }],
-  // Transfer budgets, in bytes: JavaScript stays under 10 KB, fonts under 80 KB.
-  "resource-summary:script:size": ["error", { maxNumericValue: 10240 }],
+  // Transfer budgets, in bytes: JavaScript stays under 13 KB (under 10 KB of the site's own, plus
+  // 3.5 KB for Umami with its headers when UMAMI_WEBSITE_ID is set), fonts under 80 KB.
+  "resource-summary:script:size": ["error", { maxNumericValue: 13312 }],
   "resource-summary:font:size": ["error", { maxNumericValue: 81920 }],
 };
 

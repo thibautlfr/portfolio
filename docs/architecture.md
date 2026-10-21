@@ -102,16 +102,16 @@ Five OFL faces (see [`design/direction.md`](design/direction.md)). The upstream 
 
 As little as possible. Each script is isolated, justified here, and loaded as late as possible.
 
-| Script          | Why                                          | Loaded                                                                                                   | Budget     |
-| --------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------- |
-| `ClientRouter`  | Page transitions that do not flash           | Module on every page (5.7 KB)                                                                            | 6 KB gzip  |
-| `hero-shader`   | The signature domain warp                    | Boot step inlined in the page (no request); the module (2.6 KB) after `load`, the largest paint and idle | 6 KB gzip  |
-| `loop-video`    | Project and playground previews on hover     | Module, on pages with a preview                                                                          | 1 KB gzip  |
-| `scramble`      | Handles and coordinates resolve on hover     | Module, home page                                                                                        | 1 KB gzip  |
-| `back-link`     | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip  |
-| `section-index` | The section being read, beside a long read   | Module, case studies and notes with sections                                                             | 1 KB gzip  |
-| `lens-demo`     | The shader a note explains, to play with     | Module, on that note only; WebGL starts when the demo nears the viewport (2.4 KB, shader included)       | 3 KB gzip  |
-| Umami           | Cookieless analytics                         | `defer`, third party                                                                                     | about 2 KB |
+| Script          | Why                                          | Loaded                                                                                                   | Budget    |
+| --------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------- |
+| `ClientRouter`  | Page transitions that do not flash           | Module on every page (5.7 KB)                                                                            | 6 KB gzip |
+| `hero-shader`   | The signature domain warp                    | Boot step inlined in the page (no request); the module (2.6 KB) after `load`, the largest paint and idle | 6 KB gzip |
+| `loop-video`    | Project and playground previews on hover     | Module, on pages with a preview                                                                          | 1 KB gzip |
+| `scramble`      | Handles and coordinates resolve on hover     | Module, home page                                                                                        | 1 KB gzip |
+| `back-link`     | A breadcrumb back restores the previous page | Module                                                                                                   | 1 KB gzip |
+| `section-index` | The section being read, beside a long read   | Module, case studies and notes with sections                                                             | 1 KB gzip |
+| `lens-demo`     | The shader a note explains, to play with     | Module, on that note only; WebGL starts when the demo nears the viewport (2.4 KB, shader included)       | 3 KB gzip |
+| Umami           | Cookieless analytics                         | `defer`, third party; counts visits on the production domain only (`data-domains`)                       | 2.3 KB    |
 
 **Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little. The animation itself, the sheet, is in `src/styles/base/transitions.css`: the next page slides up over the current one, and going back lifts it off. View transitions are judged on a production build (`pnpm build && pnpm preview`): in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes them flash.
 
