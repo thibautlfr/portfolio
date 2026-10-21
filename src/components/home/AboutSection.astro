@@ -57,7 +57,7 @@ const clients = Object.values(profile.collaborations);
       <ul role="list" class="client-list">
         {clients.map((client) => (
           <li>
-            <a href={client.url} class="client-name">
+            <a href={client.url} class="client-name tap">
               {client.name}
               <ExternalMark href={client.url} />
             </a>

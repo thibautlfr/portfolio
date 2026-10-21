@@ -10,7 +10,7 @@ const { size = "regular" } = Astro.props;
 
 <!-- The wrapper is a size container: the address is fitted to its cell, never to the window. -->
 <div class="email-fit">
-  <a class:list={["email", `email--${size}`]} href={`mailto:${profile.email}`} data-umami-event="email">
+  <a class:list={["email", `email--${size}`, "tap"]} href={`mailto:${profile.email}`} data-umami-event="email">
     {profile.email}
   </a>
 </div>

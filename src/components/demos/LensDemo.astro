@@ -37,7 +37,9 @@ const digits = (step: string) => step.split(".")[1]?.length ?? 0;
           <output for={id}>{value.toFixed(digits(step))}</output>
         </div>
       ))}
-      <button type="reset">Back to the project's values</button>
+      <button type="reset" class="tap">
+        Back to the project's values
+      </button>
     </fieldset>
   </form>
   {caption && <figcaption>{caption}</figcaption>}
@@ -112,6 +114,44 @@ const digits = (step: string) => step.split(".")[1]?.length ?? 0;
     inline-size: 100%;
     margin: 0;
     accent-color: var(--color-accent);
+  }
+
+  /* On a narrow body the slider takes a row of its own, at full width, under its name and
+     value: a thumb needs the travel more than the line needs to be compact. */
+  @media (width < 60rem) {
+    fieldset {
+      grid-template-columns: minmax(0, 1fr) max-content;
+      row-gap: var(--space-1);
+    }
+
+    .control {
+      grid-template-areas:
+        "label output"
+        "input input";
+    }
+
+    .control + .control {
+      margin-block-start: var(--space-2);
+    }
+
+    label {
+      grid-area: label;
+    }
+
+    output {
+      grid-area: output;
+    }
+
+    input {
+      grid-area: input;
+    }
+  }
+
+  /* The thumb itself stays the browser's; the track around it takes a finger. */
+  @media (pointer: coarse) {
+    input {
+      block-size: var(--tap-size);
+    }
   }
 
   output {
