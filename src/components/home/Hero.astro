@@ -253,6 +253,13 @@ const stack = Object.values(profile.stack).flat();
     cursor: pointer;
   }
 
+  /* The button stays hidden until the shader runs, but keeps its place: on a phone it wraps
+     onto a line of its own, and appearing would push the page down after a restored scroll. */
+  figcaption button[hidden] {
+    display: inline-block;
+    visibility: hidden;
+  }
+
   .contact {
     display: grid;
     gap: var(--space-2);
