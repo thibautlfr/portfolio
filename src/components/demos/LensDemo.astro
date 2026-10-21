@@ -1,0 +1,145 @@
+---
+// The 3D carousel's lens, live, for the note on its first shaders: the project's fragment shader
+// on a canvas, its two uniforms on sliders. Import it in the note's MDX body. Without JavaScript
+// or WebGL, the sliders stay at the project's values and a line says what is missing.
+interface Props {
+  /** Describes what the canvas shows, for people who cannot see it. */
+  label: string;
+  caption?: string;
+}
+
+const { label, caption } = Astro.props;
+
+// The project's own values (src/experience/world/image.ts) are the defaults.
+const uniforms = [
+  { name: "uStereoRadius", id: "lens-demo-radius", min: 0.05, max: 0.5, step: "0.01", value: 0.2 },
+  { name: "uStereoStrength", id: "lens-demo-strength", min: 0, max: 0.1, step: "0.005", value: 0.04 },
+];
+const digits = (step: string) => step.split(".")[1]?.length ?? 0;
+---
+
+<figure data-lens-demo>
+  <div class="stage">
+    <canvas data-lens-demo-canvas role="img" aria-label={label}></canvas>
+    <p class="fallback" data-lens-demo-fallback>
+      The live lens needs JavaScript and WebGL.
+    </p>
+  </div>
+  <form class="controls">
+    <fieldset data-lens-demo-controls disabled>
+      <legend class="visually-hidden">The lens's uniforms</legend>
+      {uniforms.map(({ name, id, min, max, step, value }) => (
+        <div class="control">
+          <label for={id}>
+            <code>{name}</code>
+          </label>
+          <input type="range" {id} {min} {max} {step} {value} data-uniform={name} />
+          <output for={id}>{value.toFixed(digits(step))}</output>
+        </div>
+      ))}
+      <button type="reset">Back to the project's values</button>
+    </fieldset>
+  </form>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<script>
+  import "@/scripts/lens-demo";
+</script>
+
+<style>
+  figure {
+    display: grid;
+    gap: var(--space-2);
+    margin-block: var(--space-8);
+  }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    outline: var(--border-hairline);
+    background: var(--color-shader-ground);
+  }
+
+  canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    cursor: crosshair;
+
+    /* A finger dragged sideways moves the lens; up and down, it still scrolls the page. */
+    touch-action: pan-y;
+  }
+
+  .fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: var(--space-4);
+    color: var(--color-surface);
+    font-size: var(--font-size-step-minus-1);
+    text-align: center;
+  }
+
+  .fallback[hidden] {
+    display: none;
+  }
+
+  fieldset {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    margin: 0;
+    padding: var(--space-2) 0 0;
+    border: 0;
+  }
+
+  .control {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+  }
+
+  label {
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  input {
+    inline-size: 100%;
+    margin: 0;
+    accent-color: var(--color-accent);
+  }
+
+  output {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    font-size: var(--font-size-step-minus-1);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  fieldset:disabled button {
+    display: none;
+  }
+
+  figcaption {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

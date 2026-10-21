@@ -99,6 +99,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                      |
 | `ArticleBody`  | The body of a case study or a note, ruled like a specification, with its `SectionIndex` beside it |
 | `SectionIndex` | The body's sections, numbered like their titles, kept in view beside it; marks the one being read |
+| `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it          |
 
 Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 
