@@ -75,7 +75,7 @@ On inner pages the breadcrumb trail is pinned one gutter below the top of the vi
 | `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
 | `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest; a project row draws its title's line when any part of the row is hovered, while its cover frame turns teal at the same pace and its preview loop plays. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
+Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest. A card that leads somewhere (a project row, an experiment with a link, a note, the next case study) is clickable all over: its title stays the link's name, hovering any part of it draws the title's line, and the focus ring frames the whole card, inside its hairlines. A project row or an experiment also turns its image frame teal at the same pace and plays its preview loop. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
 
 Data in mono that a visitor points at resolves like a reading: the social handles and the hero coordinates scramble for 420ms, each character through others of its own kind (digits through digits), then settle from left to right. Punctuation and symbols hold still. Only there, only with a mouse, never under reduced motion: it is a signature, and repeated everywhere it would become a tic.
 
@@ -111,7 +111,7 @@ The development page `/styleguide/` shows every token and base component.
 
 ## Images
 
-Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows.
+Project visuals at 16:10, experiments at 4:3, the portrait square and in black and white, artworks at their own ratio. Every image sits in its cell with a hairline frame; the frame turns teal on hover in project rows and linked experiments.
 
 Every project media sits in the site's frame, but not every one wears its art direction. The cover is how a project is recognised on the home page, so it shows the project as it is; the preview loop and the body media explain how it works, so they are drawn in the site's own language. A cover that is only a title card in the site's style makes every project look like a product of the same range.
 

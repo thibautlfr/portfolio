@@ -14,11 +14,13 @@ const Heading = headingLevel === 2 ? "h2" : "h3";
 const { title, description, pubDate } = note.data;
 ---
 
-<li class="note">
+<li class="note card">
   <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
   <div>
     <Heading class="title">
-      <a href={`/notes/${note.id}/`}>{title}</a>
+      <a class="card-link" href={`/notes/${note.id}/`}>
+        {title}
+      </a>
     </Heading>
     <p>{description}</p>
   </div>
@@ -46,7 +48,7 @@ const { title, description, pubDate } = note.data;
     font-size: var(--font-size-step-1);
   }
 
-  /* No line at rest: it is drawn on hover or focus. */
+  /* No line at rest: it is drawn when any part of the note is hovered, or on focus. */
   .title a {
     --link-rest: 0;
   }

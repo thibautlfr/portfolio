@@ -51,7 +51,7 @@ src/
 │   ├── global.css            # Layer order and imports, nothing else
 │   ├── tokens/               # color, typography, space, layout, motion
 │   ├── base/                 # reset, elements, prose, transitions
-│   └── utilities.css         # visually-hidden, and nothing else unless it earns its place
+│   └── utilities.css         # visually-hidden and the card link, nothing else unless it earns its place
 └── pages/
     ├── index.astro
     ├── 404.astro

@@ -34,6 +34,9 @@
     --layer-trail: 2;
     --layer-skip-link: 10;
 
+    /* A card's link spread over the card, above its media. */
+    --layer-card-link: 1;
+
     /* A page snapshot that must cover the other one during a transition. */
     --layer-transition-top: 1;
   }

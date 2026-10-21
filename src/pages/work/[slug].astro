@@ -125,10 +125,12 @@ const source = links.find((link) => link.kind === "source");
         <Content components={{ Figure, Video }} />
       </ArticleBody>
       {next && next.id !== project.id && (
-        <Cell as="footer" class="next">
+        <Cell as="footer" class="next card">
           <p class="next-label">Next case study</p>
           <p class="next-title">
-            <a href={`/work/${next.id}/`}>{next.data.title}</a>
+            <a class="card-link" href={`/work/${next.id}/`}>
+              {next.data.title}
+            </a>
           </p>
         </Cell>
       )}

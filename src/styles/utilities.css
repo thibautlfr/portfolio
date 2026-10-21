@@ -8,4 +8,34 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
+  /* A card that leads somewhere is clickable all over: its title link (.card-link) keeps its
+     own name for screen readers, and its ::after covers the card (.card). Hovering anywhere
+     draws the title's line, and the focus ring frames the whole card, inside its hairlines so
+     the next cell never covers it. A card holds no other link. */
+  .card {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-card-link);
+  }
+
+  .card-link:focus-visible {
+    outline: none;
+  }
+
+  .card:hover .card-link {
+    --link-draw: 100%;
+    --link-from: left;
+  }
+
+  .card:has(.card-link:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: calc(-2 * var(--focus-offset));
+  }
 }
