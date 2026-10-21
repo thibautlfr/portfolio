@@ -52,7 +52,11 @@ const stack = Object.values(profile.stack).flat();
       <canvas class="shader-canvas" data-hero-shader-canvas aria-hidden="true"></canvas>
     </div>
     <figcaption>
-      <span>I like it when the details are alive. Hover to check.</span>
+      <span>
+        I like it when the details are alive.
+        <span class="hint hint--pointer">Hover to check.</span>
+        <span class="hint hint--touch">Tap to check.</span>
+      </span>
       <button type="button" class="tap" data-hero-shader-toggle aria-pressed="false" hidden>
         Pause animation
       </button>
@@ -215,6 +219,27 @@ const stack = Object.values(profile.stack).flat();
     display: grid;
     align-content: space-between;
     gap: var(--space-6);
+  }
+
+  /* The invitation names the gesture of the device, and shows only once the shader answers
+     it: a still frame (reduced motion, no WebGL2) does not. Its place is kept until then, so
+     the caption never moves. */
+  .hint--touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .hint--pointer {
+      display: none;
+    }
+
+    .hint--touch {
+      display: inline;
+    }
+  }
+
+  .hero-shader:not(:global(.is-live)) .hint {
+    visibility: hidden;
   }
 
   figcaption button {
