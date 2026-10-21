@@ -39,7 +39,7 @@ A rigorous engineer with taste. The frame (layout, type, rhythm, structure) stay
 - Pages: home (self-sufficient, rich), `/work/[slug]` case studies, `/notes` and `/notes/[slug]`, `/legal-notice/`, 404.
 - Light theme only at launch. Tokens are semantic so a dark theme can be added later.
 - Zero client JavaScript by default. One ambient WebGL2 shader in the hero, loaded after LCP, paused off-screen, frozen under reduced motion, with a pause control.
-- Targets: Lighthouse 100 in all four categories on mobile, CLS 0, LCP under 1.5 s on simulated 4G, WCAG 2.2 AA.
+- Targets: Lighthouse 100 in all four categories on mobile, CLS 0, LCP under 1.5 s on simulated 4G, WCAG 2.2 AA. CI blocks a pull request only past 2 s of LCP, so noise and the first-round-trip step never fail it; the 1.5 s target is checked at the final audit (see `lighthouserc.cjs`).
 - Fonts: OFL only, self-hosted.
 - Analytics: Umami Cloud, cookieless.
 
