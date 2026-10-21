@@ -76,7 +76,7 @@ On inner pages the breadcrumb trail is pinned one gutter below the top of the vi
 | `--ease-snap`      | cubic-bezier(0.2, 0, 0, 1)     | Feedback                                  |
 | `--ease-out`       | cubic-bezier(0.16, 1, 0.3, 1)  | Movement: fast start, long settle         |
 
-Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest. A card that leads somewhere (a project row, an experiment with a link, a note, the next case study) is clickable all over: its title stays the link's name, hovering any part of it draws the title's line, and the focus ring frames the whole card, inside its hairlines. A project row or an experiment also turns its image frame teal at the same pace and plays its preview loop. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
+Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is drawn over it from the left, and runs out to the right when the pointer leaves (the email: 2px, then 4px). Project and note titles have no line at rest. A card that leads somewhere (a project row, an experiment with a link, a note, the next case study) is clickable all over: its title stays the link's name, hovering any part of it draws the title's line, and the focus ring frames the whole card, inside its hairlines. A project row or an experiment also turns its image frame teal at the same pace and plays its preview loop. A link that leaves the site (a project's live site or source, an experiment, a client, a network, the original post of a note) ends with a small drawn arrow pointing up and out, and still opens in the same tab: the back button returns to the page where it was left. Running text in case studies and notes keeps a plain underline, which skips descenders and does not move under a reader.
 
 Data in mono that a visitor points at resolves like a reading: the social handles and the hero coordinates scramble for 420ms, each character through others of its own kind (digits through digits), then settle from left to right. Punctuation and symbols hold still. Only there, only with a mouse, never under reduced motion: it is a signature, and repeated everywhere it would become a tic.
 
@@ -84,24 +84,25 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 
 ## Components
 
-| Component      | Role                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| `Sheet`        | A block of cells: draws the top and left hairlines                                                |
-| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media          |
-| `SectionTitle` | The title cell of a section, with an optional aside link                                          |
-| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                       |
-| `TagList`      | Technologies as small tags framed by a hairline, in the text face                                 |
-| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                        |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus           |
-| `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape       |
-| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable             |
-| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                |
-| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top       |
-| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                        |
-| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                      |
-| `ArticleBody`  | The body of a case study or a note, ruled like a specification, with its `SectionIndex` beside it |
-| `SectionIndex` | The body's sections, numbered like their titles, kept in view beside it; marks the one being read |
-| `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it          |
+| Component      | Role                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| `Sheet`        | A block of cells: draws the top and left hairlines                                                      |
+| `Cell`         | One cell: right and bottom hairlines, white surface, `span` out of 12, `flush` for media                |
+| `SectionTitle` | The title cell of a section, with an optional aside link                                                |
+| `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                             |
+| `TagList`      | Technologies as small tags framed by a hairline, in the text face                                       |
+| `Media`        | Images as AVIF with a hairline frame and an optional ratio                                              |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus                 |
+| `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape             |
+| `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable                   |
+| `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                      |
+| `Breadcrumbs`  | The way back home from inner pages: the sheet's first cell, pinned one gutter below the top             |
+| `CodeText`     | A line of frontmatter where backticks mark identifiers, set as inline code                              |
+| `ProjectBrief` | A case study's opening: its decisions and its measured figures, in two cells                            |
+| `ArticleBody`  | The body of a case study or a note, ruled like a specification, with its `SectionIndex` beside it       |
+| `SectionIndex` | The body's sections, numbered like their titles, kept in view beside it; marks the one being read       |
+| `ExternalMark` | Inside a link that leaves the site: a drawn arrow in the link's colour, and the fact for screen readers |
+| `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it                |
 
 Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 

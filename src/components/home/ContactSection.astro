@@ -1,6 +1,7 @@
 ---
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import ScrambleText from "@/components/ui/ScrambleText.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import { profile } from "@/data/profile";
@@ -28,7 +29,10 @@ const { title, socialsLabel } = Astro.props;
         <li>
           <a href={social.url} rel="me" data-scramble-trigger>
             <span class="network">
-              <span class="link-line">{social.label}</span>
+              <span class="link-line">
+                {social.label}
+                <ExternalMark href={social.url} />
+              </span>
             </span>
             <span class="handle">
               <ScrambleText text={formatHandle(social.url)} />

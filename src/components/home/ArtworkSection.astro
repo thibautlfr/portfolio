@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import Media from "@/components/ui/Media.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
@@ -23,6 +24,7 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
     {more && (
       <a slot="aside" class="tap" href={more.url}>
         {more.label}
+        <ExternalMark href={more.url} />
       </a>
     )}
   </SectionTitle>
@@ -35,7 +37,16 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
         widths={[320, 480, 720, 960]}
       />
       <figcaption>
-        <span class="artwork-title">{data.url ? <a href={data.url}>{data.title}</a> : data.title}</span>
+        <span class="artwork-title">
+          {data.url ? (
+            <a href={data.url}>
+              {data.title}
+              <ExternalMark href={data.url} />
+            </a>
+          ) : (
+            data.title
+          )}
+        </span>
         <span class="artwork-kind">
           {kindLabels[data.kind]}
           {data.year && `, ${data.year}`}

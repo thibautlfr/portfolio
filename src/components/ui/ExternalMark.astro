@@ -1,0 +1,35 @@
+---
+import { isExternal } from "@/lib/links";
+
+interface Props {
+  /** The link's address: the mark shows only when it leads off the site. */
+  href: string;
+}
+
+// Placed inside a link, after its text: an arrow drawn in the link's colour, and the same fact
+// in words for screen readers. The link still opens in the same tab. The note stays here
+// rather than in the markup, which would repeat it in the page for every link.
+const show = isExternal(Astro.props.href, Astro.site ?? Astro.url);
+---
+
+{show && (
+  <>
+    <span class="external" aria-hidden="true" />
+    <span class="visually-hidden"> (external site)</span>
+  </>
+)}
+
+<style>
+  /* An arrow pointing up and out, painted in currentcolor through a mask, so it takes the
+     link's colour and its hover. Sized to the text it follows. */
+  .external {
+    display: inline-block;
+    inline-size: 0.6em;
+    block-size: 0.6em;
+    margin-inline-start: var(--space-1);
+    background-color: currentcolor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 9.5 9.5 2.5M4 2.5h5.5V8' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    forced-color-adjust: none;
+  }
+</style>

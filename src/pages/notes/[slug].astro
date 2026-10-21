@@ -4,6 +4,7 @@ import { getCollection, render, type CollectionEntry } from "astro:content";
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import ArticleBody from "@/components/ui/ArticleBody.astro";
 import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
@@ -72,6 +73,7 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
             <p class="source">
               <a class="tap" href={source.url}>
                 Originally posted on {platforms[source.platform]}
+                <ExternalMark href={source.url} />
               </a>
             </p>
           )}

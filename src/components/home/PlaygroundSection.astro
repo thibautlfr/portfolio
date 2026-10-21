@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 
 import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import LoopMedia from "@/components/ui/LoopMedia.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
@@ -32,6 +33,7 @@ const { title, experiments } = Astro.props;
           {data.url ? (
             <a class="card-link" href={data.url}>
               {data.title}
+              <ExternalMark href={data.url} />
             </a>
           ) : (
             data.title

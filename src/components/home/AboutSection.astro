@@ -1,5 +1,6 @@
 ---
 import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
@@ -58,6 +59,7 @@ const clients = Object.values(profile.collaborations);
           <li>
             <a href={client.url} class="client-name">
               {client.name}
+              <ExternalMark href={client.url} />
             </a>
             <p class="client-credit">{client.credit}</p>
           </li>
