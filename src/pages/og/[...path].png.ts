@@ -9,8 +9,9 @@ export const getStaticPaths = (async () => {
   const projects = selectPublished(await getCollection("projects"));
   const notes = selectLatest(await getCollection("notes"));
   const author = profile.name;
+  const homeFacts = [{ term: "Works with", value: [...profile.stack.languages, "Vue", "React"].join(", ") }];
   return [
-    { params: { path: "home" }, props: { title: profile.name, label: profile.role, author } },
+    { params: { path: "home" }, props: { title: profile.name, label: profile.role, facts: homeFacts } },
     { params: { path: "design-system" }, props: { title: "Design system", label: "Reference", author } },
     ...projects.map((project) => ({
       params: { path: `work/${project.id}` },
