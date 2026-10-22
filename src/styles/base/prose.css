@@ -83,8 +83,10 @@
     font-weight: var(--font-weight-text);
   }
 
-  /* Code in a sentence stands out as a small cell of the sheet: tinted, ruled by a hairline. */
+  /* Code in a sentence stands out as a small cell of the sheet: tinted, ruled by a hairline.
+     A long path may break anywhere, so it never widens the page on a phone. */
   .prose :not(pre) > code {
+    overflow-wrap: anywhere;
     padding-inline: var(--space-1);
     outline: var(--border-hairline);
     background: var(--color-ground);
