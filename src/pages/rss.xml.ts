@@ -18,6 +18,7 @@ export const GET: APIRoute = async ({ site }) => {
       link: `/notes/${note.id}/`,
       categories: note.data.tags,
     })),
-    customData: "<language>en</language>",
+    xmlns: { atom: "http://www.w3.org/2005/Atom" },
+    customData: `<language>en</language><atom:link href="${new URL("rss.xml", site)}" rel="self" type="application/rss+xml"/>`,
   });
 };
