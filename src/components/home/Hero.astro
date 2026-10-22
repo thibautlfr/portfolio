@@ -142,6 +142,18 @@ const stack = Object.values(profile.stack).flat();
     }
   }
 
+  /* Wide enough, the stack gets half the row and fits on two lines like the mobility text, so
+     the short base cell does not stand over empty space. Narrower, the three cells share it. */
+  @media (width >= 85rem) {
+    .hero-base {
+      grid-column: span 2;
+    }
+
+    .hero-stack {
+      grid-column: span 6;
+    }
+  }
+
   .hero-name {
     display: grid;
     align-content: space-between;

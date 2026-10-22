@@ -47,7 +47,7 @@ export const profile = {
   familyName: "Lefrançois",
   role: "Freelance full-stack developer",
   positioning:
-    "I build web platforms that run in production, and I sweat the parts people see. Kotlin on the server, TypeScript, Vue and WebGL in the browser.",
+    "I build web platforms that run in production, and I sweat the parts people see. Java/Kotlin on the server, TypeScript, Vue and React in the browser.",
   email: "hello@thibaut-lefrancois.com",
   location: {
     city: "La Rochelle",
