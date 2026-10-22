@@ -368,6 +368,29 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     white-space: nowrap;
   }
 
+  /* A specimen: what a token or a surface looks like on top, its name and value under it. */
+  .layer :global(.kit-specimen) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* A colour role's swatch, painted by the scene with the token itself. */
+  .layer :global(.kit-swatch) {
+    flex: 1;
+    min-block-size: var(--space-8);
+    margin-block-end: var(--space-2);
+    outline: var(--border-hairline);
+  }
+
+  /* An image of a surface at its own ratio, framed by a hairline. */
+  .layer :global(.kit-picture) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    outline: var(--border-hairline);
+  }
+
   /* A capture in the sheet: one white cell on the ground, the capture flush in it, and an
      optional row of data under a hairline. */
   .frame {
