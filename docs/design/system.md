@@ -28,7 +28,7 @@ Two levels: Radix primitives (`--sage-*`, `--teal-*`) are only read by `tokens/c
 | `--color-selection`     | teal-4  | #ccf3ea | Text selection                                      |
 | `--color-shader-ground` | ink     | #091213 | The shader's darkest ink and still-frame background |
 
-Rules: teal-11 never sets body text on sage (4.47:1) and never sits on a tinted ground; nothing white goes on teal-9 (3.07:1); focus rings use teal-11, not teal-7. All measured pairs are in [`direction.md`](direction.md#colour).
+Rules: teal-11 never sets body text on the sage ground (4.31:1) and never sits on a tinted ground; nothing white goes on teal-9 (3.07:1); focus rings use teal-11, not teal-7. All measured pairs are in [`direction.md`](direction.md#colour).
 
 The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d3d38, teal-9 #12a594, coral #f2785c, ivory #f5ede0.
 
@@ -45,7 +45,7 @@ The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d
 
 Scale (fluid between 320 and 1440 px): `--font-size-step-minus-1` 13 to 14 px, `step-0` 16 to 17 px, `step-1` 18 to 21 px, `step-2` 22 to 28 px, `step-3` 28 to 44 px, `step-4` 32 to 56 px (a note's title), `step-5` 40 to 96 px. The email is fitted to the width of its own cell (a size container), so it stays on one line at every width: up to `step-2` in the hero, up to `step-5` in the contact section, where it is the display line and the question above it is a `step-2` title. `step-minus-1` in muted grey is for labels, captions and metadata (dates, kinds, handles); a sentence meant to be read, such as a note or experiment description, is at `step-0`, in grey when it sits under a title. Line heights: `tight` 0.9 (wordmark, h1), `title` 1.05, `lede` 1.45, `text` 1.5. Letter spacing: `wordmark` -0.03em, `title` -0.015em.
 
-Loading: the files are instanced and subset by `scripts/fonts.sh` (66 KB in all). Every face uses `font-display: swap`. Body text is preloaded on every page, the wordmark and the email on the home page, Headline on inner pages; the mono swaps in when it arrives.
+Loading: the files are instanced and subset by `scripts/fonts.sh` (about 63 KB in all). Every face uses `font-display: swap`. Body text is preloaded on every page, the wordmark and the email on the home page, Headline on inner pages; the mono swaps in when it arrives.
 
 ## Space and layout
 
@@ -110,7 +110,7 @@ A case study page opens on its title block and cover, then its decisions and fig
 
 A note uses the same body (`ArticleBody`): the text in the same columns, its `##` headings numbered and set beside it, the index shown once it has two sections. Its title block holds the title at `step-4`, a sentence rather than a name, then the dates as facts and the link to the original post. On wide screens it takes the body's columns: the title runs across the section titles and the text, and the dates sit at its foot over the list of sections.
 
-The development page `/styleguide/` shows every token and base component.
+The page `/design-system/` shows the system: it reads every token from `src/styles/tokens/` at build time, measures every colour pair, and lists the shared components. A test (`src/lib/design-system.test.ts`) fails when a token has no description on the page, when a description has no token, when a pair the system uses stops meeting WCAG 2.2 AA, when a pair it refuses starts to, and when the Open Graph images' colours part from the tokens. Adding a token or a component means adding its line in `src/data/design-system.ts`.
 
 ## Images
 

@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import satori from "satori";
 
+import { colors } from "./og-colors";
+
 const WIDTH = 1200;
 const HEIGHT = 630;
 // Satori's flex layout drifts with padding and growing children: a fixed-size
@@ -14,17 +16,6 @@ const MARGIN = 40;
 const SHEET_WIDTH = WIDTH - 2 * MARGIN;
 const FOOT_HEIGHT = 130;
 const SHADER_WIDTH = 320;
-
-// Literal values: Satori cannot read CSS custom properties. They mirror the tokens.
-const colors = {
-  ground: "#f7f9f8",
-  surface: "#ffffff",
-  text: "#1a211e",
-  muted: "#5f6563",
-  line: "#cbcfcd",
-  shader: "#091213",
-  accent: "#12a594",
-};
 
 const fontPath = (name: string) => join(process.cwd(), "src/assets/fonts/og", `${name}.woff`);
 

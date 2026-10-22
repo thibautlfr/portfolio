@@ -1,0 +1,70 @@
+---
+import type { DescribedToken } from "@/lib/design-system";
+
+// A token per row: its name, the value the stylesheet gives it, what it is for. Rows stack in a
+// narrow cell and sit on one line in a wide one, whatever the window is.
+interface Props {
+  tokens: readonly DescribedToken[];
+}
+
+const { tokens } = Astro.props;
+---
+
+<dl class="tokens">
+  {tokens.map(({ name, value, use }) => (
+    <div class="token">
+      <dt>
+        <code>{name}</code>
+      </dt>
+      <dd class="value">{value}</dd>
+      <dd class="use">{use}</dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .tokens {
+    container-type: inline-size;
+  }
+
+  .token {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-hairline);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .token:first-child {
+    padding-block-start: 0;
+  }
+
+  .token:last-child {
+    padding-block-end: 0;
+    border-block-end: 0;
+  }
+
+  dt,
+  .value,
+  .use {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    color: var(--color-text);
+  }
+
+  .value {
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-data);
+  }
+
+  @container (min-width: 36rem) {
+    .token {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-4);
+    }
+  }
+</style>

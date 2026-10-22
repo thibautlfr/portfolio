@@ -1,0 +1,78 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import type { ContrastResult } from "@/lib/design-system";
+
+// A colour pair, set as it is used, with the ratio measured at build time. The ratio is cut,
+// never rounded up, so a pair a hair under its threshold cannot read as meeting it.
+interface Props {
+  pair: ContrastResult;
+}
+
+const { pair } = Astro.props;
+const ratio = (Math.floor(pair.ratio * 100) / 100).toFixed(2);
+const status = pair.passes
+  ? `Meets AA, ${pair.kind === "text" ? "text" : "non-text"} needs ${pair.required}`
+  : `${pair.refused ? "Refused" : "Fails"}: ${pair.kind === "text" ? "text" : "non-text"} needs ${pair.required}`;
+---
+
+<Cell span={4}>
+  <div class="sample" style={`background: var(${pair.background}); color: var(${pair.foreground})`}>
+    {pair.kind === "text" ? <span class="aa">Aa</span> : <span class="line"></span>}
+  </div>
+  <p class="ratio">{ratio} : 1</p>
+  <p class="status">{status}</p>
+  <p class="use">{pair.use}</p>
+  <p class="tokens">
+    <code>{pair.foreground}</code> on <code>{pair.background}</code>
+  </p>
+</Cell>
+
+<style>
+  .sample {
+    display: grid;
+    align-items: center;
+    block-size: var(--space-16);
+    margin-block-end: var(--space-3);
+    padding-inline: var(--space-4);
+    outline: var(--border-hairline);
+  }
+
+  .aa {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-3);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-tight);
+  }
+
+  /* A line or a frame, as the focus ring and the underlines are drawn. */
+  .line {
+    block-size: var(--space-1);
+    background: currentcolor;
+  }
+
+  .ratio {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .status {
+    margin-block-start: var(--space-1);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .use {
+    margin-block-start: var(--space-2);
+  }
+
+  .tokens {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    color: var(--color-text);
+  }
+</style>

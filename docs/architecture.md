@@ -19,7 +19,8 @@ src/
 │   └── notes/<slug>/         # index.mdx and any assets
 ├── data/
 │   ├── profile.ts            # Identity, contact, location, socials, stack, legal: typed, read by pages and JSON-LD
-│   └── legacy-redirects.ts   # V1 URLs sent to the home page (read by astro.config.ts)
+│   ├── legacy-redirects.ts   # V1 URLs sent to the home page (read by astro.config.ts)
+│   └── design-system.ts      # What /design-system/ says about each token, pair and component (never the values)
 ├── assets/
 │   ├── fonts/                # Instanced and subset woff2 files (see Fonts)
 │   └── images/               # Site-level images: portrait, avatar, static shader frame
@@ -29,6 +30,7 @@ src/
 │   ├── seo/                  # SeoHead, JsonLd
 │   ├── site/                 # SiteFooter, SkipLink
 │   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ZoomMedia, ScrambleText, FactList, TagList, CodeText, ArticleBody, SectionIndex
+│   ├── design-system/        # Parts of the design system page: ColorRole, ContrastPair, TokenList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectBrief (decisions and figures)
 │   ├── note/                 # NoteListItem
@@ -37,6 +39,10 @@ src/
 ├── lib/                      # Plain TypeScript, no Astro imports where avoidable, unit tested
 │   ├── content.ts            # Queries: draft filtering, featured and order sorting, in one place
 │   ├── media.ts              # Resolves colocated videos to built URLs
+│   ├── css-tokens.ts         # Reads custom properties out of the token stylesheets
+│   ├── contrast.ts           # WCAG contrast between two colours
+│   ├── design-system.ts      # The model of /design-system/: tokens, colour roles, measured pairs
+│   ├── og-colors.ts          # The Open Graph images' colours, compared to the tokens by a test
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
@@ -57,7 +63,7 @@ src/
     ├── index.astro
     ├── 404.astro
     ├── legal-notice.astro
-    ├── [styleguide].astro    # Tokens and components, dev only
+    ├── design-system.astro   # The design system, read from the tokens at build time
     ├── [mediakit].astro      # Composition page for project media, dev only (see Project media)
     ├── work/[slug].astro
     ├── notes/index.astro
@@ -107,7 +113,7 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 | `ClientRouter`      | Page transitions that do not flash           | Module on every page (5.7 KB)                                                                                          | 6 KB gzip   |
 | `hero-shader`       | The signature domain warp                    | Boot step minified and inlined by the build (no request); the module (2.6 KB) after `load`, the largest paint and idle | 6 KB gzip   |
 | `loop-video`        | Project and playground previews on hover     | Module, on pages with a preview                                                                                        | 1 KB gzip   |
-| `scramble`          | Handles and coordinates resolve on hover     | Module, home page                                                                                                      | 1 KB gzip   |
+| `scramble`          | Handles and coordinates resolve on hover     | Module, home page and design system page                                                                               | 1 KB gzip   |
 | `back-link`         | A breadcrumb back restores the previous page | Module                                                                                                                 | 1 KB gzip   |
 | `image-viewer`      | Project images seen larger                   | Inlined, case studies and notes with figures (1 KB); the large image on opening                                        | 1.5 KB gzip |
 | `section-index`     | The section being read, beside a long read   | Module, case studies and notes with sections                                                                           | 1 KB gzip   |
@@ -123,7 +129,7 @@ Scroll reveals use CSS scroll-driven animations behind `@supports`.
 
 ## Project media
 
-Covers, preview loops, body figures and playground thumbnails are drawn in the site's art direction (see [`design/system.md`](design/system.md#images)), on one development page, `/media-kit/` (`src/pages/[mediakit].astro` and `src/scripts/media-kit.ts`). It reads the real tokens, fonts and components, so a piece of media cannot drift from the site. Like `/styleguide/`, it exists only under `astro dev`; its script is loaded as it is from the dev server, so a build carries nothing of it.
+Covers, preview loops, body figures and playground thumbnails are drawn in the site's art direction (see [`design/system.md`](design/system.md#images)), on one development page, `/media-kit/` (`src/pages/[mediakit].astro` and `src/scripts/media-kit.ts`). It reads the real tokens, fonts and components, so a piece of media cannot drift from the site. It exists only under `astro dev`; its script is loaded as it is from the dev server, so a build carries nothing of it.
 
 The page composes one piece at the ratio of its `ratio` parameter, filling the window, in one of two ways:
 
@@ -131,6 +137,14 @@ The page composes one piece at the ratio of its `ratio` parameter, filling the w
 - `scene`: a scene module, a plain ES module that receives the canvas, the colour roles, the shader's palette (`src/scripts/hero-shader/palette.ts`), the font stacks and the type scale, and draws the piece at any time `t`. Opened without `render`, it plays live.
 
 Each entry's sources live in `media/<slug>/`: `media.mjs`, the recipe (captures to take, outputs to write next to the entry), and its scenes. A scene imports the project's own published package from a CDN at a pinned version, never from `package.json`. The rendering itself (headless Chrome through `playwright-core`, then ffmpeg) runs from a personal Claude Code skill outside the repository, so it adds no dependency here; it reads the specs of [`content.md`](content.md#images-and-video) at every run. `media/` is formatted and linted with the rest, and ignored by knip.
+
+## Design system page
+
+`/design-system/` (`src/pages/design-system.astro`) is public, indexed, and generated: `src/lib/design-system.ts` imports the token stylesheets and Radix's scales as text (`?raw`), `src/lib/css-tokens.ts` reads their custom properties, and the page paints each specimen with the token it names. The hex values, the type ranges, the spacing and the durations are never written by hand. `src/lib/contrast.ts` measures every colour pair at build time against WCAG 2.2 AA.
+
+Only what a token is for is written by hand, in `src/data/design-system.ts`, and `src/lib/design-system.test.ts` keeps the two in step: it fails when a token has no entry or an entry has no token, when a pair the system uses fails AA, when a pair it refuses starts to pass (the refusal would be stale), when a shared component of `ui/` or `site/` is undocumented, and when the Open Graph images' literal colours (`src/lib/og-colors.ts`) differ from the stylesheets. Vitest returns an empty string for stylesheets by default, so `vitest.config.ts` lets the token files and Radix's through.
+
+The page ships no script of its own: the breadcrumb and the scramble demo bring theirs.
 
 ## Tooling
 

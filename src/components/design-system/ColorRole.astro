@@ -1,0 +1,51 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import type { ColorRole } from "@/lib/design-system";
+
+// One colour role: the swatch is painted with the token itself, the hex is what it resolved to.
+interface Props {
+  role: ColorRole;
+}
+
+const { role } = Astro.props;
+---
+
+<Cell span={3}>
+  <div class="swatch" style={`background: var(${role.name})`}></div>
+  <p class="name">
+    <code>{role.name}</code>
+  </p>
+  <p class="value">
+    {role.hex}
+    {role.primitive && ` · ${role.primitive}`}
+  </p>
+  <p class="use">{role.use}</p>
+</Cell>
+
+<style>
+  .swatch {
+    block-size: var(--space-16);
+    margin-block-end: var(--space-3);
+    outline: var(--border-hairline);
+  }
+
+  .name {
+    overflow-wrap: anywhere;
+  }
+
+  code {
+    color: var(--color-text);
+  }
+
+  .value {
+    margin-block-start: var(--space-1);
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-data);
+  }
+
+  .use {
+    margin-block-start: var(--space-2);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

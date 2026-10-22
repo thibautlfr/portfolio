@@ -11,6 +11,7 @@ export const getStaticPaths = (async () => {
   const author = profile.name;
   return [
     { params: { path: "home" }, props: { title: profile.name, label: profile.role, author } },
+    { params: { path: "design-system" }, props: { title: "Design system", label: "Reference", author } },
     ...projects.map((project) => ({
       params: { path: `work/${project.id}` },
       props: { title: project.data.title, label: "Case study", author },

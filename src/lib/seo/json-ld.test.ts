@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { blogPosting, breadcrumbs, person, profilePage, work } from "./json-ld";
+import { blogPosting, breadcrumbs, person, profilePage, webPage, work } from "./json-ld";
 
 const site = "https://thibaut-lefrancois.com/";
 
@@ -87,5 +87,18 @@ describe("breadcrumbs", () => {
       { name: "Steerkit", url: `${site}work/steerkit/` },
     ]);
     expect(data.itemListElement.map((item) => item.position)).toEqual([1, 2]);
+  });
+});
+
+describe("webPage", () => {
+  it("points at the person as its author", () => {
+    const data = webPage({
+      name: "Design system",
+      description: "The system behind the site.",
+      url: `${site}design-system/`,
+      authorUrl: site,
+    });
+    expect(data["@type"]).toBe("WebPage");
+    expect(data.author).toEqual({ "@id": `${site}#person` });
   });
 });

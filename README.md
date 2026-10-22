@@ -8,7 +8,7 @@ Requires **Node >= 22.22.0** and **pnpm**.
 
 ```bash
 pnpm install       # Install dependencies
-pnpm dev           # Dev server at localhost:4321 (the styleguide is at /styleguide/)
+pnpm dev           # Dev server at localhost:4321 (the design system is at /design-system/)
 pnpm build         # Production build to ./dist/
 pnpm preview       # Serve the production build
 pnpm verify        # Format, lint, CSS lint, dead code, type check, tests
@@ -29,10 +29,10 @@ Experiments, artworks and notes work the same way, each with its own `_template`
 src/
 ├── content.config.ts   # Content schemas (Zod)
 ├── content/            # One folder per entry, assets beside it
-├── data/               # Profile and V1 redirects
-├── components/         # Small single-purpose components: ui/, home/, project/, note/, seo/, site/, mdx/
+├── data/               # Profile, V1 redirects and the design system page's copy
+├── components/         # Small single-purpose components: ui/, home/, project/, note/, design-system/, seo/, site/, mdx/
 ├── layouts/            # BaseLayout: head, skip link, main, footer
-├── lib/                # Plain TypeScript, unit tested: content queries, formatting, JSON-LD, OG images
+├── lib/                # Plain TypeScript, unit tested: content queries, formatting, JSON-LD, OG images, the design tokens read from the stylesheets
 ├── scripts/            # Client code: the hero shader (WebGL2), previews, image viewer, live demo
 ├── styles/             # Tokens, reset, base and prose styles, in cascade layers
 └── pages/              # Routes, RSS, robots.txt, llms.txt, Open Graph images

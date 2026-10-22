@@ -24,7 +24,7 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: "./dist",
-      url: ["/", "/work/youbook/", "/notes/"],
+      url: ["/", "/work/youbook/", "/notes/", "/design-system/"],
       numberOfRuns: 3,
     },
     assert: { assertions },

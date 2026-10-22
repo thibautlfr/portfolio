@@ -116,6 +116,25 @@ export function blogPosting(input: PostingInput) {
   };
 }
 
+interface PageInput {
+  name: string;
+  description: string;
+  url: string;
+  authorUrl: string;
+}
+
+/** A page of the site that is neither a case study nor a note. */
+export function webPage(input: PageInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: input.name,
+    description: input.description,
+    url: input.url,
+    author: { "@id": `${input.authorUrl}#person` },
+  };
+}
+
 export function breadcrumbs(items: readonly { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",
