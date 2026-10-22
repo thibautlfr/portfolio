@@ -60,3 +60,4 @@ build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=
 FORMAT=woff build "archivo:vf@$VERSION/latin-wdth-normal.woff2" archivo-wordmark "--text=$WORDMARK" wght=800 wdth=125
 FORMAT=woff build "stack-sans-headline:vf@$VERSION/latin-wght-normal.woff2" stack-sans-headline "--unicodes=$LATIN" wght=700
 FORMAT=woff build "stack-sans-text:vf@$VERSION/latin-wght-normal.woff2" stack-sans-text "--unicodes=$LATIN" wght=400
+FORMAT=woff build "fragment-mono@$VERSION/latin-400-normal.woff2" fragment-mono "--unicodes=$DATA"
