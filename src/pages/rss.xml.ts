@@ -1,33 +1,23 @@
 import rss from "@astrojs/rss";
-import type { APIContext } from "astro";
+import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
-import { groupPostsBySlug, blogPostUrl } from "../lib/blog";
 
-export async function GET(context: APIContext) {
-  const posts = (await getCollection("blog")).filter(
-    (post) => !post.data.draft,
-  );
+import { profile } from "@/data/profile";
+import { selectLatest } from "@/lib/content";
 
-  const grouped = groupPostsBySlug(posts);
-
-  const items = [...grouped.entries()]
-    .map(([postSlug, versions]) => {
-      const post = versions.en ?? versions.fr;
-      const lang = versions.en ? "en" : "fr";
-      return {
-        title: post.data.title,
-        description: post.data.description,
-        pubDate: post.data.date,
-        link: blogPostUrl(postSlug, lang),
-      };
-    })
-    .sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
-
+export const GET: APIRoute = async ({ site }) => {
+  const notes = selectLatest(await getCollection("notes"));
   return rss({
-    title: "Thibaut LEFRANCOIS — Blog",
-    description:
-      "Articles on web development, creative coding, and side projects.",
-    site: context.site!,
-    items,
+    title: `${profile.name}, notes`,
+    description: "Short notes on web development, shaders and freelance work.",
+    site: site ?? "",
+    items: notes.map((note) => ({
+      title: note.data.title,
+      description: note.data.description,
+      pubDate: note.data.pubDate,
+      link: `/notes/${note.id}/`,
+      categories: note.data.tags,
+    })),
+    customData: "<language>en</language>",
   });
-}
+};

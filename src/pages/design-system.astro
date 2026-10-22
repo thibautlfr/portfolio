@@ -1,0 +1,797 @@
+---
+import ColorRole from "@/components/design-system/ColorRole.astro";
+import ContrastPair from "@/components/design-system/ContrastPair.astro";
+import TokenList from "@/components/design-system/TokenList.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import CodeText from "@/components/ui/CodeText.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import FactList from "@/components/ui/FactList.astro";
+import Media from "@/components/ui/Media.astro";
+import ScrambleText from "@/components/ui/ScrambleText.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import TagList from "@/components/ui/TagList.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import portrait from "@/assets/images/portrait.jpg";
+import ocarinaCover from "@/content/projects/ocarina/cover.png";
+import trinityThumbnail from "@/content/playground/trinity/thumbnail.png";
+import { profile } from "@/data/profile";
+import { componentRoles, imageFrames, principles } from "@/data/design-system";
+import { buildDesignSystem } from "@/lib/design-system";
+import { breadcrumbs, webPage } from "@/lib/seo/json-ld";
+
+const system = buildDesignSystem();
+
+const title = "Design system";
+const description =
+  "The tokens, type, motion and components behind this site, read from its own stylesheets at build time, with every colour pair measured.";
+const site = Astro.site ?? Astro.url;
+const url = new URL("/design-system/", site).href;
+
+const sections = [
+  { id: "principles", title: "Principles" },
+  { id: "colour", title: "Colour" },
+  { id: "type", title: "Type" },
+  { id: "space", title: "Space and layout" },
+  { id: "motion", title: "Motion" },
+  { id: "components", title: "Components" },
+  { id: "images", title: "Images" },
+  { id: "beyond", title: "Beyond the page" },
+];
+const number = (id: string) => String(sections.findIndex((section) => section.id === id) + 1).padStart(2, "0");
+const pixels = (min: number, max: number) => (min === max ? `${min} px` : `${min} to ${max} px`);
+const principleSpans = [6, 6, 4, 4, 4];
+
+// One real image per frame, in the order of imageFrames: the sheet is shown with what it holds.
+const frameImages = [
+  {
+    src: ocarinaCover,
+    alt: "The title screen of Ocarina, a game of mine, captured and set in a white frame with its address underneath.",
+  },
+  {
+    src: trinityThumbnail,
+    alt: "Laylow's Trinity CD case floating in 3D on a dark green ground, the iridescent disc seen through its clear front.",
+  },
+  { src: portrait, alt: "Black and white portrait of Thibaut Lefrançois." },
+];
+---
+
+<BaseLayout
+  title={`${title} · ${profile.name}`}
+  {description}
+  ogImage="/og/design-system.png"
+  jsonLd={[
+    webPage({ name: title, description, url, authorUrl: site.href }),
+    breadcrumbs([
+      { name: profile.name, url: site.href },
+      { name: title, url },
+    ]),
+  ]}
+>
+  <article class="page">
+    <Sheet as="div">
+      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
+
+      <Cell as="header" class="title-block">
+        <h1>{title}</h1>
+        <div class="intro">
+          <p class="lede">
+            The tokens, type, motion and components this site is built from. Every value below is read from the site's
+            own stylesheets when the page is built, and every colour pair is measured, so the page cannot describe a
+            system other than the one in use.
+          </p>
+          <FactList
+            facts={[
+              { term: "Source", value: "src/styles/tokens/", data: true },
+              { term: "Theme", value: "Light only" },
+              { term: "Standard", value: "WCAG 2.2 AA" },
+            ]}
+          />
+        </div>
+        <nav class="contents" aria-label="Sections">
+          <ol role="list">
+            {sections.map((section) => (
+              <li>
+                <a href={`#${section.id}`}>
+                  <span class="contents-index" aria-hidden="true">
+                    {number(section.id)}
+                  </span>
+                  <span class="link-line">{section.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </Cell>
+
+      <SectionTitle id="principles">
+        Principles
+        <span slot="aside" class="number">
+          {number("principles")}
+        </span>
+      </SectionTitle>
+      {principles.map((principle, index) => (
+        <Cell span={principleSpans[index] ?? 4}>
+          <h3>{principle.title}</h3>
+          <p class="text">{principle.text}</p>
+        </Cell>
+      ))}
+
+      <SectionTitle id="colour">
+        Colour
+        <span slot="aside" class="number">
+          {number("colour")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          Two levels. Radix scales are read by a single file, <code>color.css</code>, and everything else asks for a
+          role. Each swatch below is painted with its token, and the hex is what the stylesheet resolves it to.
+        </p>
+      </Cell>
+      {system.colors.map((role) => (
+        <ColorRole {role} />
+      ))}
+      <Cell>
+        <h3>The shader's own colours</h3>
+        <p class="text">
+          The hero shader is a work, so it carries its own palette, outside the tokens. Its ink is the one token that
+          reaches into it: <code>--color-shader-ground</code>.
+        </p>
+        <ul role="list" class="palette">
+          {system.shader.map((colour) => (
+            <li>
+              <div class="swatch" style={`background: ${colour.hex}`}></div>
+              <p class="value">{colour.hex}</p>
+              <p class="use">
+                {colour.name}: {colour.use.toLowerCase()}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </Cell>
+      <Cell>
+        <h3>Contrast</h3>
+        <p class="text">
+          Measured at build time against WCAG 2.2 AA: 4.5 for text at body size, 3 for lines and frames. The last two
+          pairs fail and are never used. A test keeps both lists honest: it fails when a used pair stops meeting the
+          standard, and when a refused pair starts to.
+        </p>
+      </Cell>
+      {system.contrast.map((pair) => (
+        <ContrastPair {pair} />
+      ))}
+
+      <SectionTitle id="type">
+        Type
+        <span slot="aside" class="number">
+          {number("type")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          Five faces with one job each, and the system monospace for code. A role names the job, not the face, so a face
+          can change without touching a component.
+        </p>
+      </Cell>
+      {system.typeRoles.map((role) => (
+        <Cell span={role.name === "--font-wordmark" ? 8 : role.name === "--font-code" ? 12 : 4}>
+          <p class="label">
+            <code>{role.name}</code> · {role.face}, {role.setting}
+          </p>
+          {role.name === "--font-wordmark" && <p class="specimen wordmark">{profile.name}</p>}
+          {role.name === "--font-title" && <p class="specimen title">Selected work, built to last</p>}
+          {role.name === "--font-text" && <p class="specimen text-face">{profile.positioning}</p>}
+          {role.name === "--font-email" && (
+            <div class="email-fit">
+              <p class="specimen email">{profile.email}</p>
+            </div>
+          )}
+          {role.name === "--font-data" && <p class="specimen data">{profile.location.coordinates}</p>}
+          {role.name === "--font-code" && (
+            <p class="specimen code-face">
+              <CodeText text="`pnpm verify` runs before every commit" />
+            </p>
+          )}
+          <p class="use">{role.use}</p>
+        </Cell>
+      ))}
+      <Cell>
+        <h3>Scale</h3>
+        <p class="text">Fluid between 320 and 1440 px. Each sample is set with the token it names.</p>
+      </Cell>
+      {system.steps.map((step, index) => (
+        <Cell span={index < 3 ? 6 : 12}>
+          <p class="label">
+            <code>{step.name}</code> · {pixels(step.min, step.max)}
+          </p>
+          <p class="specimen title" style={`font-size: var(${step.name})`}>
+            Selected work, built to last
+          </p>
+          <p class="use">{step.use}</p>
+        </Cell>
+      ))}
+      <Cell span={6}>
+        <h3>Weights</h3>
+        <TokenList tokens={system.weights} />
+      </Cell>
+      <Cell span={6}>
+        <h3>Other sizes</h3>
+        <TokenList tokens={system.otherSizes} />
+      </Cell>
+      <Cell span={6}>
+        <h3>Line heights</h3>
+        <TokenList tokens={system.lineHeights} />
+      </Cell>
+      <Cell span={6}>
+        <h3>Letter spacing</h3>
+        <TokenList tokens={system.letterSpacings} />
+      </Cell>
+
+      <SectionTitle id="space">
+        Space and layout
+        <span slot="aside" class="number">
+          {number("space")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          A strict 4px-based scale: the number in a token's name is its multiple of 0.25rem. Each bar is as wide as the
+          token it names.
+        </p>
+      </Cell>
+      {system.spaces.map((space) => (
+        <Cell span={4}>
+          <p class="label">
+            <code>{space.name}</code> · {space.px} px
+          </p>
+          <div class="space" style={`inline-size: var(${space.name})`}></div>
+        </Cell>
+      ))}
+      <Cell>
+        <h3>The sheet</h3>
+        <p class="text">
+          Twelve columns from 60rem, one below. The sheet draws its top and left hairlines and each cell its right and
+          bottom ones, so lines never double. Cells carry the white surface, so an unfinished row shows the ground.
+        </p>
+        <ol role="list" class="columns" aria-label="The twelve columns of the sheet">
+          {Array.from({ length: 12 }, (_, index) => (
+            <li>{index + 1}</li>
+          ))}
+        </ol>
+      </Cell>
+      <Cell span={6}>
+        <p class="label">
+          <code>--layout-measure</code>
+        </p>
+        <div class="measure" style="inline-size: var(--layout-measure)"></div>
+        <p class="use">The longest line of running text.</p>
+      </Cell>
+      <Cell span={6}>
+        <p class="label">
+          <code>--layout-measure-wide</code>
+        </p>
+        <div class="measure" style="inline-size: var(--layout-measure-wide)"></div>
+        <p class="use">Case study bodies, beside their section titles.</p>
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>--border-hairline</code>
+        </p>
+        <div class="hairline-demo"></div>
+        <p class="use">The line on every cell edge.</p>
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>--focus-ring</code>
+        </p>
+        <div class="focus-demo"></div>
+        <p class="use">The focus ring: teal, 2px, with a 2px offset.</p>
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>--tap-size</code>
+        </p>
+        <div class="tap-demo"></div>
+        <p class="use">The touch target of a small link or button.</p>
+      </Cell>
+      <Cell>
+        <details>
+          <summary>Every layout token</summary>
+          <TokenList tokens={system.layout} />
+        </details>
+      </Cell>
+
+      <SectionTitle id="motion">
+        Motion
+        <span slot="aside" class="number">
+          {number("motion")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          Dry and short: the hero shader is the only continuous motion. Durations drop to zero under reduced motion, so
+          nothing below moves for a visitor who asked for that. Where there is a pointer, hover a cell to run it.
+        </p>
+      </Cell>
+      {system.durations.map((duration) => (
+        <Cell span={6} class="run">
+          <p class="label">
+            <code>{duration.name}</code> · {duration.value}
+          </p>
+          <div class="track">
+            <div class="fill" style={`--run: var(${duration.name}); --run-ease: var(--ease-out)`}></div>
+          </div>
+          <p class="use">{duration.use}</p>
+        </Cell>
+      ))}
+      {system.easings.map((easing) => (
+        <Cell span={6} class="run">
+          <p class="label">
+            <code>{easing.name}</code> · {easing.value}
+          </p>
+          <div class="track">
+            <div class="dot" style={`--run: var(--duration-page); --run-ease: var(${easing.name})`}></div>
+          </div>
+          <p class="use">{easing.use}</p>
+        </Cell>
+      ))}
+      <Cell span={6}>
+        <p class="label">Links</p>
+        <p class="specimen">
+          <a href="#motion">A text link</a>, ruled by a 1px line and drawn over by a 2px one.
+        </p>
+        <p class="use">Hover or focus it. The line runs out to the right when the pointer leaves.</p>
+      </Cell>
+      <Cell span={6} data-scramble-trigger>
+        <p class="label">Data</p>
+        <p class="specimen data">
+          <ScrambleText text={profile.location.coordinates} digitsOnly />
+        </p>
+        <p class="use">
+          Mono data resolves when pointed at, with a mouse only. Used on handles and coordinates, nowhere else.
+        </p>
+      </Cell>
+
+      <SectionTitle id="components">
+        Components
+        <span slot="aside" class="number">
+          {number("components")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          Shared components, each small and single-purpose. This page is made of them: a <code>Sheet</code> holding{" "}
+          <code>Cell</code>s under a <code>Breadcrumbs</code> trail, which stays pinned as the page scrolls.
+        </p>
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>FactList</code>
+        </p>
+        <FactList
+          facts={[
+            { term: "Context", value: "Client SaaS" },
+            { term: "Role", value: "Full-stack developer" },
+            { term: "Stack", value: ["TypeScript", "Node.js"] },
+            { term: "Year", value: "2026", data: true },
+          ]}
+        />
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>TagList</code>
+        </p>
+        <TagList items={["TypeScript", "Three.js", "Vue", "React"]} />
+        <p class="label spaced">
+          <code>CodeText</code>
+        </p>
+        <p>
+          <CodeText text="Set `out` last, so nothing is allocated" />
+        </p>
+      </Cell>
+      <Cell span={4}>
+        <p class="label">
+          <code>ExternalMark</code>
+        </p>
+        <p>
+          <a href="https://www.radix-ui.com/colors">
+            Radix Colors
+            <ExternalMark href="https://www.radix-ui.com/colors" />
+          </a>
+        </p>
+        <p class="use">A link that leaves the site ends with a drawn arrow, and still opens in the same tab.</p>
+      </Cell>
+      <Cell>
+        <h3>Every shared component</h3>
+        <FactList facts={Object.entries(componentRoles).map(([name, role]) => ({ term: name, value: role }))} />
+      </Cell>
+
+      <SectionTitle id="images">
+        Images
+        <span slot="aside" class="number">
+          {number("images")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          Every image sits in its cell with a hairline frame, which turns teal on hover where the image leads somewhere.
+          Artworks are shown at their own ratio. The cover is the project as it is, captured and set in the sheet; only
+          the loops and figures that explain how something works are drawn in the site's own language. The reason is in{" "}
+          <a href="/notes/one-design-system-for-everything-around-me/">
+            a note on why the system leaves some things alone
+          </a>
+          .
+        </p>
+      </Cell>
+      {imageFrames.map((frame, index) => {
+        const image = frameImages[index];
+        return (
+          image && (
+            <Cell span={4}>
+              <Media src={image.src} alt={image.alt} ratio={frame.ratio} sizes="(width >= 60rem) 33vw, 100vw" />
+              <p class="label spaced">
+                <code>{frame.label}</code>
+              </p>
+              <p class="use">{frame.use}</p>
+            </Cell>
+          )
+        );
+      })}
+
+      <SectionTitle id="beyond">
+        Beyond the page
+        <span slot="aside" class="number">
+          {number("beyond")}
+        </span>
+      </SectionTitle>
+      <Cell>
+        <p class="text">
+          The system is built to travel: anything made around the site starts from the same tokens. Two of the places it
+          already runs are below.
+        </p>
+      </Cell>
+      <Cell span={3}>
+        <img
+          class="monogram"
+          src="/favicon.svg"
+          width="96"
+          height="96"
+          alt="The monogram: the letters TL in light on a dark square."
+          loading="lazy"
+        />
+        <p class="label spaced">Monogram</p>
+        <p class="use">Avatars and small marks. The square is the text colour.</p>
+      </Cell>
+      <Cell span={9}>
+        <img
+          class="card"
+          src="/og/design-system.png"
+          width="1200"
+          height="630"
+          alt="The Open Graph card of this page: a white cell holding the title Design system, over a foot with the name in the wordmark face and a dark cell with a teal bar."
+          loading="lazy"
+        />
+        <p class="label spaced">Open Graph card</p>
+        <p class="use">Drawn at build time, in the same cells, faces and colours.</p>
+      </Cell>
+      <Cell>
+        <FactList
+          facts={[
+            {
+              term: "The site",
+              value:
+                "Reads the tokens as custom properties. Stylelint rejects a raw colour, size or duration anywhere else.",
+            },
+            {
+              term: "Project media",
+              value:
+                "Covers, loops and figures are drawn on a development page that loads the same tokens, fonts and shader palette.",
+            },
+            {
+              term: "Open Graph cards",
+              value:
+                "The renderer cannot read custom properties, so seven colours are copied by hand, and a test compares them with the stylesheets.",
+            },
+            {
+              term: "Documents and slides",
+              value:
+                "White cells, one-pixel hairlines in the line colour, titles in Headline and data in mono. The five faces are open source (SIL Open Font License), so they install anywhere.",
+            },
+          ]}
+        />
+      </Cell>
+    </Sheet>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  h3 {
+    margin-block-end: var(--space-3);
+    font-size: var(--font-size-step-1);
+  }
+
+  .text {
+    max-inline-size: var(--layout-measure-wide);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  .title-block h1 {
+    font-size: var(--font-size-step-5);
+    line-height: var(--line-height-tight);
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .lede {
+    font-size: var(--font-size-step-1);
+    line-height: var(--line-height-lede);
+  }
+
+  /* The sections, listed as at the head of a long read: a full touch target each. */
+  .contents a {
+    display: grid;
+    grid-template-columns: var(--space-8) minmax(0, 1fr);
+    align-items: center;
+    min-block-size: var(--tap-size);
+  }
+
+  .contents-index {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .contents .link-line {
+    justify-self: start;
+  }
+
+  @media (width >= 60rem) {
+    .title-block {
+      grid-template-columns: subgrid;
+    }
+
+    .title-block h1,
+    .intro {
+      grid-column: 1 / span 8;
+    }
+
+    .contents {
+      grid-column: 9 / -1;
+      grid-row: 1 / span 2;
+      align-self: end;
+      padding-inline-start: var(--space-4);
+    }
+  }
+
+  .number {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  code {
+    color: var(--color-text);
+  }
+
+  .label {
+    margin-block-end: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+    overflow-wrap: anywhere;
+  }
+
+  .spaced {
+    margin-block-start: var(--space-4);
+  }
+
+  .use {
+    margin-block-start: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .value {
+    font-family: var(--font-data);
+    font-size: var(--font-size-data);
+  }
+
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--space-4);
+    margin-block-start: var(--space-4);
+  }
+
+  .swatch {
+    block-size: var(--space-16);
+    margin-block-end: var(--space-2);
+    outline: var(--border-hairline);
+  }
+
+  .specimen {
+    line-height: var(--line-height-title);
+  }
+
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-size: var(--font-size-step-5);
+    font-weight: var(--font-weight-wordmark);
+    font-stretch: var(--font-stretch-wordmark);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-wordmark);
+  }
+
+  .title {
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+    letter-spacing: var(--letter-spacing-title);
+  }
+
+  .text-face {
+    font-family: var(--font-text);
+    line-height: var(--line-height-text);
+  }
+
+  /* The address is fitted to its own cell, as the email link is. */
+  .email-fit {
+    container-type: inline-size;
+  }
+
+  .email {
+    font-family: var(--font-email);
+    font-size: var(--font-size-email);
+    font-weight: var(--font-weight-title);
+    white-space: nowrap;
+  }
+
+  .data {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .code-face {
+    font-size: var(--font-size-step-0);
+  }
+
+  .space {
+    block-size: var(--space-4);
+    background: var(--color-accent);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    margin-block-start: var(--space-4);
+    border-block-start: var(--border-hairline);
+    border-inline-start: var(--border-hairline);
+  }
+
+  .columns li {
+    padding-block: var(--space-3);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    text-align: center;
+  }
+
+  .measure {
+    block-size: var(--space-2);
+    max-inline-size: 100%;
+    background: var(--color-accent);
+  }
+
+  .hairline-demo,
+  .focus-demo,
+  .tap-demo {
+    block-size: var(--tap-size);
+  }
+
+  .hairline-demo {
+    border: var(--border-hairline);
+  }
+
+  .focus-demo {
+    inline-size: calc(100% - 2 * var(--focus-offset));
+    margin: var(--focus-offset);
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  .tap-demo {
+    inline-size: var(--tap-size);
+    outline: var(--border-hairline);
+    background: var(--color-ground);
+  }
+
+  summary {
+    display: list-item;
+    min-block-size: var(--tap-size);
+    list-style: disclosure-closed inside;
+    cursor: pointer;
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-1);
+    font-weight: var(--font-weight-title);
+  }
+
+  details[open] summary {
+    margin-block-end: var(--space-3);
+    list-style-type: disclosure-open;
+  }
+
+  /* A run: hovering the cell plays the token. Without a pointer the bar is shown full. */
+  .track {
+    position: relative;
+    block-size: var(--space-4);
+    outline: var(--border-hairline);
+    background: var(--color-ground);
+  }
+
+  .fill,
+  .dot {
+    position: absolute;
+    inset-block: 0;
+    background: var(--color-accent);
+    transition-duration: var(--run);
+    transition-timing-function: var(--run-ease);
+  }
+
+  .fill {
+    inset-inline-start: 0;
+    inline-size: 0;
+    transition-property: inline-size;
+  }
+
+  .dot {
+    --dot-end: calc(100% - var(--space-4));
+
+    inset-inline-start: 0;
+    inline-size: var(--space-4);
+    transition-property: inset-inline-start;
+  }
+
+  .run:hover .fill {
+    inline-size: 100%;
+  }
+
+  .run:hover .dot {
+    inset-inline-start: var(--dot-end);
+  }
+
+  @media (hover: none) {
+    .fill {
+      inline-size: 100%;
+    }
+
+    .dot {
+      inset-inline-start: var(--dot-end);
+    }
+  }
+
+  .monogram {
+    inline-size: var(--space-24);
+    block-size: auto;
+  }
+
+  .card {
+    inline-size: 100%;
+    block-size: auto;
+    outline: var(--border-hairline);
+  }
+</style>

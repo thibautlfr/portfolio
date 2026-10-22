@@ -1,102 +1,198 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+
+const { legal, email } = profile;
 ---
 
-<BaseLayout pageTitle="Legal Notice — Thibaut LEFRANCOIS" title="Legal notice">
-  <div
-    class="text-sage-11 flex max-w-prose flex-col gap-5 text-base leading-relaxed md:gap-6"
-  >
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Publisher</h2>
-      <div class="mt-3 flex flex-col gap-1">
-        <p>Thibaut LEFRANCOIS</p>
-        <p>Individual</p>
+<BaseLayout
+  title={`Legal notice · ${profile.name}`}
+  description={`Publisher, hosting and personal data information for ${profile.name}'s website.`}
+>
+  <div class="page">
+    <Sheet aria-labelledby="legal-title">
+      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Legal notice" }]} />
+      <Cell as="header" class="title-block">
+        <h1 id="legal-title">Legal notice</h1>
+        <p>Who publishes this website, who hosts it, and what happens to your data.</p>
+      </Cell>
+
+      <!-- One row per topic: the topic in a narrow cell, the text beside it. -->
+      <Cell span={4} class="topic">
+        <h2>Publisher</h2>
+      </Cell>
+      <Cell span={8} class="statement">
+        <dl class="facts">
+          <div>
+            <dt>Name</dt>
+            <dd>{legal.publisher}, individual</dd>
+          </div>
+          <div>
+            <dt>Contact</dt>
+            <dd>
+              <a href={`mailto:${email}`}>{email}</a>
+            </dd>
+          </div>
+        </dl>
         <p>
-          Contact: <a
-            data-email
-            class="text-sage-12 cursor-pointer underline"></a
-          >
+          In accordance with article 6-III-2 of French law no. 2004-575 of 21 June 2004 (LCEN), an individual publisher
+          is not required to disclose their personal address. This information has been communicated to the hosting
+          provider.
         </p>
-      </div>
-      <p class="mt-3 text-sm">
-        In accordance with article 6-III-2 of French law no. 2004-575 of 21 June
-        2004 (LCEN), an individual publisher is not required to disclose their
-        personal address. This information has been communicated to the hosting
-        provider.
-      </p>
-    </section>
+      </Cell>
 
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Hosting</h2>
-      <div class="mt-3 flex flex-col gap-1">
-        <p>Netlify, Inc.</p>
-        <p>512 2nd Street, Suite 200</p>
-        <p>San Francisco, CA 94107, United States</p>
+      <Cell span={4} class="topic">
+        <h2>Hosting</h2>
+      </Cell>
+      <Cell span={8} class="statement">
+        <dl class="facts">
+          <div>
+            <dt>Name</dt>
+            <dd>{legal.host.name}</dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd>{legal.host.address}</dd>
+          </div>
+          <div>
+            <dt>Website</dt>
+            <dd>
+              <a href={legal.host.url}>{legal.host.url.replace("https://", "")}</a>
+            </dd>
+          </div>
+        </dl>
+      </Cell>
+
+      <Cell span={4} class="topic">
+        <h2>Personal data</h2>
+      </Cell>
+      <Cell span={8} class="statement">
         <p>
-          <a
-            href="https://www.netlify.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-sage-12 underline"
-            >www.netlify.com<span class="sr-only"> (opens in new tab)</span></a
-          >
+          This website sets no cookie, and stores nothing on your device unless you turn the count off. Audience is
+          measured with Umami Cloud, run by Umami Software, Inc., with the data hosted in the European Union, in
+          Frankfurt. Each visit records the page, the referring site, the browser, the operating system, the device type
+          and the approximate location. Your IP address is used to tell visits apart and to find the country, and is not
+          kept with the statistics. The figures are only read as totals, to know which pages are visited. They are not
+          shared, and are kept for six months.
         </p>
-      </div>
-    </section>
+        <p>
+          To opt out, block <code>cloud.umami.is</code>, as most content blockers do.
+        </p>
+        <!-- Shown by the script, which needs storage to keep the choice; it remembers it in this browser only. -->
+        <div class="opt-out" data-analytics-opt-out aria-live="polite" hidden>
+          <p data-opt-out-state="counted">
+            Visits from this browser are counted. <button type="button">Stop counting them</button>
+          </p>
+          <p data-opt-out-state="stopped" hidden>
+            Visits from this browser are no longer counted. <button type="button">Count them again</button>
+          </p>
+        </div>
+        <p>Emails you send are only used to answer you.</p>
+      </Cell>
 
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
-        Intellectual property
-      </h2>
-      <p class="mt-3">
-        All content on this website (text, images, source code, graphic
-        elements) is the property of Thibaut LEFRANCOIS unless otherwise stated.
-        Any reproduction, representation, or distribution, in whole or in part,
-        without prior authorization is prohibited.
-      </p>
-    </section>
+      <Cell span={4} class="topic">
+        <h2>Intellectual property</h2>
+      </Cell>
+      <Cell span={8} class="statement">
+        <p>
+          {`All content on this website (text, images, source code, graphic elements) is the property of ${legal.publisher} unless stated otherwise. Any reproduction without prior authorisation is prohibited.`}
+        </p>
+      </Cell>
 
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
-        Personal data
-      </h2>
-      <p class="mt-3">
-        This website does not collect any personal data. No cookies, trackers,
-        or analytics tools are used.
-      </p>
-    </section>
-
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">Liability</h2>
-      <p class="mt-3">
-        The publisher strives to provide information that is as accurate as
-        possible. However, they cannot be held responsible for omissions,
-        inaccuracies, or outcomes resulting from the misuse of this information.
-      </p>
-      <p class="mt-3">
-        This website may contain links to third-party sites. The publisher
-        accepts no responsibility for the content of these external websites.
-      </p>
-    </section>
-
-    <section>
-      <h2 class="text-sage-12 text-xl font-semibold md:text-2xl">
-        Applicable law
-      </h2>
-      <p class="mt-3">
-        This legal notice is governed by French law. In the event of a dispute,
-        French courts shall have exclusive jurisdiction.
-      </p>
-    </section>
+      <Cell span={4} class="topic">
+        <h2>Applicable law</h2>
+      </Cell>
+      <Cell span={8} class="statement">
+        <p>
+          This legal notice is governed by French law. In the event of a dispute, French courts have exclusive
+          jurisdiction.
+        </p>
+      </Cell>
+    </Sheet>
   </div>
 </BaseLayout>
 
 <script>
-  document.addEventListener("astro:page-load", () => {
-    const link = document.querySelector<HTMLAnchorElement>("[data-email]");
-    if (!link) return;
-    const email = atob("Y29udGFjdEB0aGliYXV0LWxlZnJhbmNvaXMuY29t");
-    link.textContent = email;
-    link.href = `mailto:${email}`;
-  });
+  import "@/scripts/analytics-opt-out";
 </script>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  .title-block {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--font-size-step-5);
+    line-height: var(--line-height-tight);
+  }
+
+  .title-block p {
+    color: var(--color-text-muted);
+  }
+
+  /* Below 60rem the topic sits on top of its text: no hairline between them. */
+  .topic {
+    padding-block-end: 0;
+    border-block-end: 0;
+  }
+
+  h2 {
+    font-size: var(--font-size-step-1);
+  }
+
+  .statement {
+    display: grid;
+    gap: var(--space-4);
+    padding-block-end: var(--space-6);
+  }
+
+  .statement > * {
+    max-inline-size: var(--layout-measure);
+  }
+
+  /* A button set as a quiet link, like the lens demo's reset. */
+  .opt-out button {
+    padding: 0;
+    border: 0;
+    background: none;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .facts div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+  }
+
+  a {
+    color: var(--color-link);
+  }
+
+  @media (width >= 60rem) {
+    .topic {
+      padding-block-end: var(--space-6);
+      border-block-end: var(--border-hairline);
+    }
+  }
+</style>

@@ -1,0 +1,133 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+import Figure from "@/components/mdx/Figure.astro";
+import Video from "@/components/mdx/Video.astro";
+import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import ArticleBody from "@/components/ui/ArticleBody.astro";
+import Cell from "@/components/ui/Cell.astro";
+import FactList from "@/components/ui/FactList.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+import { selectLatest } from "@/lib/content";
+import { formatDate, isoDate } from "@/lib/format";
+import { blogPosting, breadcrumbs } from "@/lib/seo/json-ld";
+
+export async function getStaticPaths() {
+  const notes = selectLatest(await getCollection("notes"));
+  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+}
+
+interface Props {
+  note: CollectionEntry<"notes">;
+}
+
+const { note } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, source } = note.data;
+const { Content, headings } = await render(note);
+
+const site = Astro.site ?? Astro.url;
+const url = new URL(`/notes/${note.id}/`, site).href;
+const platforms = { x: "X", linkedin: "LinkedIn" };
+---
+
+<BaseLayout
+  title={`${title} · ${profile.name}`}
+  {description}
+  ogImage={`/og/notes/${note.id}.png`}
+  type="article"
+  jsonLd={[
+    blogPosting({
+      headline: title,
+      description,
+      url,
+      authorUrl: site.href,
+      datePublished: isoDate(pubDate),
+      ...(updatedDate && { dateModified: isoDate(updatedDate) }),
+      keywords: tags,
+    }),
+    breadcrumbs([
+      { name: profile.name, url: site.href },
+      { name: "Notes", url: new URL("/notes/", site).href },
+      { name: title, url },
+    ]),
+  ]}
+>
+  <article class="page">
+    <Sheet as="div">
+      <Breadcrumbs
+        items={[{ label: profile.name, href: "/" }, { label: "Notes", href: "/notes/" }, { label: title }]}
+      />
+      <Cell as="header" class="title-block">
+        <h1>{title}</h1>
+        <div class="facts">
+          <FactList
+            facts={[
+              { term: "Published", value: formatDate(pubDate), data: true },
+              ...(updatedDate ? [{ term: "Updated", value: formatDate(updatedDate), data: true }] : []),
+            ]}
+          />
+          {source && (
+            <p class="source">
+              <a class="tap" href={source.url}>
+                Originally posted on {platforms[source.platform]}
+                <ExternalMark href={source.url} />
+              </a>
+            </p>
+          )}
+        </div>
+      </Cell>
+      <ArticleBody {headings}>
+        <Content components={{ Figure, Video }} />
+      </ArticleBody>
+    </Sheet>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block-start: var(--layout-gutter);
+  }
+
+  /* As on a case study, one step down: a note's title is a sentence, not a name. */
+  .title-block {
+    display: grid;
+    gap: var(--space-8);
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  h1 {
+    font-size: var(--font-size-step-4);
+    line-height: var(--line-height-title);
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* On wide screens the title block takes the body's columns: the title across the section
+     titles and the text, the dates over the list of sections, at the foot of the title. */
+  @media (width >= 60rem) {
+    .title-block {
+      grid-template-columns: subgrid;
+    }
+
+    h1 {
+      grid-column: 1 / span 9;
+    }
+
+    .facts {
+      grid-column: 10 / -1;
+      align-self: end;
+      padding-inline-start: var(--space-4);
+    }
+  }
+
+  .source a {
+    color: var(--color-link);
+    font-weight: var(--font-weight-strong);
+  }
+</style>

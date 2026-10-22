@@ -1,0 +1,37 @@
+---
+import Cell from "./Cell.astro";
+
+interface Props {
+  /** Referenced by the section's aria-labelledby. */
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Cell as="header">
+  <h2 {id} class="section-title">
+    <slot />
+  </h2>
+  <!-- Wrapped so the link stays an inline box: its line sits under the text, not the flex item. -->
+  {Astro.slots.has("aside") && (
+    <p>
+      <slot name="aside" />
+    </p>
+  )}
+</Cell>
+
+<style>
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+  }
+
+  .section-title {
+    padding-block-start: var(--space-2);
+    font-size: var(--font-size-step-3);
+  }
+</style>

@@ -1,0 +1,50 @@
+---
+title: "One design system for the site and everything I make around it"
+description: "The site's tokens also draw its Open Graph images, its favicon and the media of every project. What the system leaves alone matters as much as what it covers."
+pubDate: 2026-10-22
+tags: [design-system, css, tokens]
+draft: false
+featured: false
+---
+
+import covers from "./covers.png";
+import roles from "./roles.png";
+import surfaces from "./surfaces.png";
+
+A design system for one person sounds like a joke, and it would be one if it stopped at the site. From the first brief of this version, the point was to pull an identity out of the portfolio that I could reuse on my communications and my projects, so anything I make around the site looks like it without my checking each time. The Open Graph image of a note, the favicon, the cover of a case study and its preview loop already come out of the same tokens. Next in line are the diagrams for my Codrops article and the announcement of Steerkit on LinkedIn, with no date on either.
+
+## Tokens named by what they do
+
+The system itself is small: white cells bounded by one-pixel hairlines on a sage ground, five typefaces with one job each, a spacing scale in multiples of 4 px. What lets it travel is that **the tokens are named by role from the start**. `--color-text` points at Radix's `sage-12`, and nothing outside `color.css` reads `sage-12`. A component asks for the text colour, and so does anything else I draw, so changing the grey of the text is one line in one place.
+
+<Figure
+  src={roles}
+  alt="A sheet of white cells on the sage ground. Six colour swatches, each above its token's name in mono and its hex: the pale sage ground, the white surface, the near-black text, the grey muted text, the light grey line and the teal accent. Below them, three type samples: Selected work in bold Headline, Running text in Stack Sans Text, and 46.16° N in Fragment Mono, each with its token and its face."
+  caption="Six of the eleven colour roles and three of the six type roles, each painted or set with its own token."
+/>
+
+The faces follow the same rule. `--font-title` is a job, set in Stack Sans Headline today, so a new face for titles would change one line and no component. All the roles, with what each one is for and every colour pair measured against WCAG 2.2 AA, are on the [design system page](/design-system/), which reads them from the stylesheets when the site is built.
+
+## Where it already runs outside the CSS
+
+The media of a project are not screenshots pasted in from a design tool. They are composed on a development page of the site, `/media-kit/`, which loads the real tokens, the real fonts and the shader's palette, then rendered to PNG and MP4 from there. **A piece of media cannot use a grey the site does not have**, because the page it is drawn on does not have it either. The figures of this note were made there too. The favicon is a dark square in the text colour with a light TL, the monogram of the wordmark.
+
+<Figure
+  src={surfaces}
+  alt="Two cells side by side on the sage ground. Left, the Open Graph card of this note: a white cell with the note's title in bold, over a foot with the name Thibaut Lefrançois and a dark cell with a teal bar. Right, a figure from the Steerkit case study: on an ink cell, an agent in ivory turns back inside a dashed teal circle toward a coral target, under the call arrive(agent, target, { slowingDistance: 2.2 }, force) in mono."
+  caption="This note's Open Graph card and a figure of the Steerkit case study: one drawn by Satori at build time, one on the media kit."
+/>
+
+The Open Graph images are the leak. They are rendered at build time by Satori, which cannot read CSS custom properties, so `og-colors.ts` holds literal copies of seven colours. They are the one place a value is written twice, so **a test compares each with the token it mirrors**: the day I change a hex in `color.css` without touching `og-colors.ts`, `pnpm verify` fails. The same test file measures every colour pair of the site against WCAG 2.2 AA.
+
+## What the system leaves alone
+
+The cover is how a project is recognised on the home page. The first one I drew, Steerkit's, is a title card in the site's style: the mark, the name, a line saying what it is, a row of facts. It suits a library whose only face is its API. For Ocarina and Ocean Heartbeat, the cover is the live project, captured and set in a white cell of the sheet with its address and the viewport in mono underneath, and Youbook, client work, sets its name beside captures of its booking widget and cart. **A row of title cards in one style would make every project look like a product of the same range**, which is the opposite of what a cover is for.
+
+<Figure
+  src={covers}
+  alt="Two covers side by side on the sage ground. Left, Steerkit's title card: a dark square with a light arrow beside the name steerkit in bold, the line Steering behaviors for games, as small typed functions, and a row of three facts, with faint grey arrows scattered behind. Right, Ocarina's cover: the game's own title screen, a blue ocarina over a tree stump in a dim wooden room, under a golden pixel triangle and the name Ocarina in yellow, with the address ocarina.thibaut-lefrancois.com in mono below."
+  caption="Steerkit's cover is set in the site's type; Ocarina's keeps the game's own colours and lettering."
+/>
+
+So the frame stays quiet and the work stays loud. Only the media that explain how something works, the preview loops and the figures in the body, speak the site's language: an ink cell where the project's own code runs, in the shader's colours. Ocarina's pitch detection and Steerkit's `arrive()` are drawn that way. The diagrams for Codrops and the LinkedIn post will go through the media kit like the rest, so they start from the same tokens.

@@ -1,0 +1,82 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { formatDate, isoDate } from "@/lib/format";
+
+interface Props {
+  note: CollectionEntry<"notes">;
+  /** h2 on the notes page, h3 inside the home's Notes section. */
+  headingLevel?: 2 | 3;
+}
+
+const { note, headingLevel = 3 } = Astro.props;
+const Heading = headingLevel === 2 ? "h2" : "h3";
+const { title, description, pubDate } = note.data;
+---
+
+<li class="note card">
+  <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+  <div>
+    <Heading class="title">
+      <a class="card-link" href={`/notes/${note.id}/`}>
+        {title}
+      </a>
+    </Heading>
+    <p>{description}</p>
+  </div>
+</li>
+
+<style>
+  .note {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-4);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+    background: var(--color-surface);
+  }
+
+  time {
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .title {
+    margin-block-end: var(--space-2);
+    font-size: var(--font-size-step-1);
+  }
+
+  /* No line at rest: it is drawn when any part of the note is hovered, or on focus. */
+  .title a {
+    --link-rest: 0;
+  }
+
+  /* The description is read, not scanned: body size, grey under the title. */
+  p {
+    max-inline-size: var(--layout-measure);
+    color: var(--color-text-muted);
+  }
+
+  /* The date sits on the title's baseline, in a column just wide enough for the longest
+     month ("12 September 2026"). */
+  @media (width >= 60rem) {
+    .note {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      align-items: first baseline;
+      gap: var(--space-6);
+      padding-block: var(--space-8);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .note {
+        animation: reveal-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import Media from "@/components/ui/Media.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+
+interface Props {
+  title: string;
+  artworks: CollectionEntry<"artworks">[];
+  /** Where the rest lives (Instagram), when known. */
+  more?: { label: string; url: string } | undefined;
+}
+
+const { title, artworks, more } = Astro.props;
+const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing", illustration: "Illustration" };
+---
+
+<Sheet aria-labelledby="artworks-title">
+  <SectionTitle id="artworks-title">
+    {title}
+    {more && (
+      <a slot="aside" class="tap" href={more.url}>
+        {more.label}
+        <ExternalMark href={more.url} />
+      </a>
+    )}
+  </SectionTitle>
+  {artworks.map(({ data }) => (
+    <Cell span={6} as="figure" class="artwork">
+      <Media
+        src={data.image.src}
+        alt={data.image.alt}
+        sizes="(width >= 60rem) 23rem, 80vw"
+        widths={[320, 480, 720, 960]}
+      />
+      <figcaption>
+        <span class="artwork-title">
+          {data.url ? (
+            <a href={data.url}>
+              {data.title}
+              <ExternalMark href={data.url} />
+            </a>
+          ) : (
+            data.title
+          )}
+        </span>
+        <span class="artwork-kind">
+          {kindLabels[data.kind]}
+          {data.year && `, ${data.year}`}
+        </span>
+        {data.description && <span class="artwork-description">{data.description}</span>}
+      </figcaption>
+    </Cell>
+  ))}
+</Sheet>
+
+<style>
+  .artwork {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+  }
+
+  /* Hung like a wall: one height for every artwork, each at its natural ratio, centred in its cell. */
+  .artwork :global(.media) {
+    display: block;
+    inline-size: auto;
+    block-size: var(--artwork-height);
+    margin-inline: auto;
+  }
+
+  figcaption {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .artwork-title {
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+  }
+
+  .artwork-kind,
+  .artwork-description {
+    color: var(--color-text-muted);
+  }
+
+  .artwork-kind {
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

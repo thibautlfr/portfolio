@@ -1,0 +1,45 @@
+---
+import { profile } from "@/data/profile";
+
+const year = new Date().getFullYear();
+const links = [
+  { label: "Design system", path: "/design-system/" },
+  { label: "Legal notice", path: "/legal-notice/" },
+];
+const current = Astro.url.pathname.replace(/\/?$/, "/");
+---
+
+<footer class="site-footer">
+  <p>
+    &copy; {year} {profile.name}
+  </p>
+  <p class="links">
+    {links.map(({ label, path }) =>
+      current === path ? (
+        <span aria-current="page">{label}</span>
+      ) : (
+        <a class="tap" href={path}>
+          {label}
+        </a>
+      ),
+    )}
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--layout-gutter) var(--space-12);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+</style>

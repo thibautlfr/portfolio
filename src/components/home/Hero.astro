@@ -1,0 +1,309 @@
+---
+import { Image } from "astro:assets";
+
+import shaderFrame from "@/assets/images/shader-frame.jpg";
+// Built by Vite as a standalone ES module (vite.worker.format is "es"); only its URL ships in
+// the page, so nothing is requested before the boot step below decides to load it.
+import shaderModule from "@/scripts/hero-shader/index.ts?worker&url";
+import Cell from "@/components/ui/Cell.astro";
+import EmailLink from "@/components/ui/EmailLink.astro";
+import Media from "@/components/ui/Media.astro";
+import ScrambleText from "@/components/ui/ScrambleText.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { profile } from "@/data/profile";
+import TagList from "@/components/ui/TagList.astro";
+
+const stack = Object.values(profile.stack).flat();
+---
+
+<Sheet aria-labelledby="hero-title" class="hero">
+  <Cell span={9} class="hero-name">
+    <h1 id="hero-title" class="wordmark">
+      <span>{profile.givenName}</span>
+      <span>{profile.familyName}</span>
+    </h1>
+    <p class="role">{profile.role}</p>
+  </Cell>
+
+  <Cell span={3} flush as="figure" class="hero-portrait">
+    <Media
+      src={profile.portrait.src}
+      alt={profile.portrait.alt}
+      ratio="1 / 1"
+      sizes="(width >= 60rem) 25vw, 50vw"
+      priority
+    />
+  </Cell>
+
+  <Cell span={8} flush as="figure" class="hero-shader" data-hero-shader={shaderModule}>
+    <div class="shader-frame">
+      <Image
+        class="shader-still"
+        src={shaderFrame}
+        alt=""
+        format="avif"
+        quality={45}
+        loading="lazy"
+        fetchpriority="low"
+        widths={[640, 960, 1440]}
+        sizes="(width >= 60rem) 66vw, 100vw"
+      />
+      <canvas class="shader-canvas" data-hero-shader-canvas aria-hidden="true"></canvas>
+    </div>
+    <figcaption>
+      <span>
+        I like it when the details are alive. <span class="hint hint--pointer">Hover to check.</span>
+        <span class="hint hint--touch">Tap to check.</span>
+      </span>
+      <button type="button" class="tap" data-hero-shader-toggle aria-pressed="false" hidden>
+        Pause animation
+      </button>
+    </figcaption>
+  </Cell>
+
+  <Cell span={4} class="hero-pitch">
+    <p class="positioning">{profile.positioning}</p>
+    <div class="contact">
+      {profile.availability && <p class="availability">{profile.availability}.</p>}
+      <EmailLink />
+    </div>
+  </Cell>
+
+  <Cell span={4} class="hero-base" data-scramble-trigger>
+    <p class="label">Base</p>
+    <p>
+      {profile.location.city}, {profile.location.country}
+    </p>
+    <p class="data coordinates">
+      <ScrambleText text={profile.location.coordinates} digitsOnly />
+    </p>
+  </Cell>
+  <Cell span={4} class="hero-mobility">
+    <p class="label">Mobility</p>
+    <p>{profile.mobility}.</p>
+  </Cell>
+  <Cell span={4} class="hero-stack">
+    <p class="label">Stack</p>
+    <TagList items={stack} />
+  </Cell>
+</Sheet>
+
+<script>
+  // The boot step (see boot.ts): minified and inlined by the build, so it costs no request
+  // and few bytes in the page.
+  import "@/scripts/hero-shader/boot";
+</script>
+
+<style>
+  /* Below 60rem the sheet becomes two columns so the portrait can sit beside
+     the base; the pitch comes right after the name, before the shader. The
+     portrait column stays narrower than the pitch, which keeps the pitch text
+     (painted with the first frame) as the largest element of the first view. */
+  .hero {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+
+  .hero-name,
+  .hero-pitch,
+  .hero-shader,
+  .hero-mobility,
+  .hero-stack {
+    grid-column: 1 / -1;
+  }
+
+  .hero-portrait,
+  .hero-base {
+    order: 2;
+  }
+
+  .hero-mobility {
+    order: 3;
+  }
+
+  .hero-stack {
+    order: 4;
+  }
+
+  @media (width >= 60rem) {
+    .hero {
+      grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    }
+
+    .hero > * {
+      order: 0;
+    }
+
+    .hero-name,
+    .hero-pitch,
+    .hero-shader,
+    .hero-mobility,
+    .hero-stack {
+      grid-column: span var(--cell-span);
+    }
+  }
+
+  /* Wide enough, the stack gets half the row and fits on two lines like the mobility text, so
+     the short base cell does not stand over empty space. Narrower, the three cells share it. */
+  @media (width >= 85rem) {
+    .hero-base {
+      grid-column: span 2;
+    }
+
+    .hero-stack {
+      grid-column: span 6;
+    }
+  }
+
+  .hero-name {
+    display: grid;
+    align-content: space-between;
+    gap: var(--space-8);
+    padding-block: var(--space-6);
+  }
+
+  .wordmark {
+    font-family: var(--font-wordmark);
+    font-size: var(--font-size-step-5);
+    font-weight: var(--font-weight-wordmark);
+    font-stretch: var(--font-stretch-wordmark);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-wordmark);
+  }
+
+  .wordmark span {
+    display: block;
+  }
+
+  .role {
+    font-size: var(--font-size-step-1);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .hero-portrait :global(img) {
+    filter: grayscale(1);
+    outline: none;
+  }
+
+  .hero-shader {
+    order: 5;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  /* The still frame holds the space and stays under the canvas, so the live
+     shader fades in without any layout shift. */
+  .shader-frame {
+    position: relative;
+    min-block-size: var(--hero-shader-height);
+    overflow: hidden;
+    background: var(--color-shader-ground);
+  }
+
+  .shader-still,
+  .shader-canvas {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+  .shader-canvas {
+    opacity: 0;
+    transition: opacity var(--duration-fade) var(--ease-snap);
+  }
+
+  .hero-shader:global(.is-live) .shader-canvas {
+    opacity: 1;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    border-block-start: var(--border-hairline);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .hero-pitch {
+    order: 1;
+    display: grid;
+    align-content: space-between;
+    gap: var(--space-6);
+  }
+
+  /* The invitation names the gesture of the device, and shows only once the shader answers
+     it: a still frame (reduced motion, no WebGL2) does not. Its place is kept until then, so
+     the caption never moves. */
+  .hint--touch {
+    display: none;
+  }
+
+  @media (hover: none) {
+    .hint--pointer {
+      display: none;
+    }
+
+    .hint--touch {
+      display: inline;
+    }
+  }
+
+  .hero-shader:not(:global(.is-live)) .hint {
+    visibility: hidden;
+  }
+
+  figcaption button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  /* The button stays hidden until the shader runs, but keeps its place: on a phone it wraps
+     onto a line of its own, and appearing would push the page down after a restored scroll. */
+  figcaption button[hidden] {
+    display: inline-block;
+    visibility: hidden;
+  }
+
+  .contact {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .availability {
+    color: var(--color-accent-text);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .positioning {
+    max-inline-size: var(--layout-measure);
+    font-size: var(--font-size-step-1);
+    line-height: var(--line-height-lede);
+  }
+
+  .label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .data {
+    font-family: var(--font-data);
+    font-size: var(--font-size-data);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<style>
+  .coordinates {
+    white-space: nowrap;
+  }
+</style>

@@ -1,0 +1,159 @@
+---
+import Cell from "./Cell.astro";
+import SectionIndex from "./SectionIndex.astro";
+
+// The body of a case study or a note, ruled and numbered like a specification: each section's
+// title in a narrow column, its text beside it, a hairline between sections, and the sections
+// listed again beside the body on wide screens, or at its head on narrow ones. A body without
+// sections keeps the same columns.
+interface Props {
+  /** The body's h2 headings, as Astro's render() returns them. */
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const sections = Astro.props.headings.filter((heading) => heading.depth === 2);
+const number = (index: number) => String(index + 1).padStart(2, "0");
+---
+
+<Cell span={9} class="body">
+  {/* On narrow screens the index beside the body is hidden: the sections are listed here
+      instead, once, so a reader can go straight to one. */}
+  {sections.length > 1 && (
+    <nav class="contents" aria-label="Sections">
+      <ol role="list">
+        {sections.map((heading, index) => (
+          <li>
+            <a href={`#${heading.slug}`}>
+              <span class="contents-index" aria-hidden="true">
+                {number(index)}
+              </span>
+              <span class="link-line">{heading.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )}
+  <div class="prose">
+    <slot />
+  </div>
+</Cell>
+<Cell span={3} class="sections">
+  {sections.length > 1 && <SectionIndex headings={sections} />}
+</Cell>
+
+<style>
+  .body {
+    padding-block: var(--space-12) var(--space-16);
+  }
+
+  .prose {
+    container-type: inline-size;
+    counter-reset: section;
+    max-inline-size: none;
+    font-size: var(--font-size-step-0);
+    line-height: var(--line-height-text);
+  }
+
+  .prose > :global(h2) {
+    position: relative;
+    counter-increment: section;
+    margin-block-start: var(--space-16);
+    font-size: var(--font-size-step-1);
+    line-height: var(--line-height-title);
+    scroll-margin-block-start: var(--space-8);
+  }
+
+  .prose > :global(h2:first-child),
+  .prose > :global(h2:first-child + *) {
+    margin-block-start: 0;
+  }
+
+  /* The section's number, as in the list of sections beside the text. */
+  .prose > :global(h2::before) {
+    display: block;
+    margin-block-end: var(--space-1);
+    color: var(--color-text-muted);
+    font-family: var(--font-text);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-text);
+    font-variant-numeric: tabular-nums;
+    content: counter(section, decimal-leading-zero);
+  }
+
+  /* The rule above a section runs across both columns of the body. */
+  .prose > :global(h2::after) {
+    --rule-offset: calc(-1 * var(--space-8));
+
+    position: absolute;
+    inset-block-start: var(--rule-offset);
+    inset-inline-start: 0;
+    inline-size: 100cqi;
+    border-block-start: var(--border-hairline);
+    content: "";
+  }
+
+  .prose > :global(h2:first-child::after) {
+    content: none;
+  }
+
+  .sections {
+    display: none;
+  }
+
+  /* Ruled off from the first section like the sections from each other. Each row is a full
+     touch target, so a thumb cannot take the wrong section. */
+  .contents {
+    margin-block-end: var(--space-8);
+    padding-block-end: var(--space-8);
+    border-block-end: var(--border-hairline);
+  }
+
+  .contents a {
+    display: grid;
+    grid-template-columns: var(--space-8) minmax(0, 1fr);
+    align-items: center;
+    min-block-size: var(--tap-size);
+  }
+
+  .contents-index {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .contents .link-line {
+    justify-self: start;
+  }
+
+  @media (width >= 60rem) {
+    .prose {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      column-gap: var(--space-8);
+    }
+
+    .prose > :global(*) {
+      grid-column: 3 / -1;
+      max-inline-size: var(--layout-measure-wide);
+    }
+
+    .prose > :global(h2) {
+      grid-column: 1 / span 2;
+    }
+
+    /* A section's first block sits on the same row as its title. */
+    .prose > :global(h2:not(:first-child) + *) {
+      margin-block-start: var(--space-16);
+    }
+
+    .sections {
+      display: block;
+      padding-block: var(--space-12);
+    }
+
+    .contents {
+      display: none;
+    }
+  }
+</style>

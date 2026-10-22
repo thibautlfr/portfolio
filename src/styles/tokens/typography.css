@@ -1,0 +1,56 @@
+/* Type roles. The font variables come from Astro's Fonts API
+   (astro.config.ts); each role names one job, not one face. */
+@layer tokens {
+  :root {
+    --font-wordmark: var(--font-archivo-wordmark);
+    --font-title: var(--font-stack-sans-headline);
+    --font-text: var(--font-stack-sans-text);
+    --font-email: var(--font-stack-sans-notch);
+    --font-data: var(--font-fragment-mono);
+
+    /* Code is read like in an editor: the system's own monospace (SF Mono, Menlo, Consolas),
+       which needs no download and is the face developers already read code in. */
+    --font-code: ui-monospace, "SF Mono", sfmono-regular, menlo, consolas, "Liberation Mono", monospace;
+
+    /* Running text in case studies and notes is set light, so the words set in bold carry. */
+    --font-weight-light: 300;
+    --font-weight-text: 400;
+    --font-weight-strong: 500;
+    --font-weight-bold: 600;
+    --font-weight-title: 700;
+    --font-weight-wordmark: 800;
+    --font-stretch-wordmark: 125%;
+
+    /* Fluid scale, 320px to 1440px viewports. */
+    --font-size-step-minus-1: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+    --font-size-step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+    --font-size-step-1: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
+    --font-size-step-2: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+    --font-size-step-3: clamp(1.75rem, 1.45rem + 1.5vw, 2.75rem);
+    --font-size-step-4: clamp(2rem, 1.55rem + 2.25vw, 3.5rem);
+    --font-size-step-5: clamp(2.5rem, 1.4rem + 5.4vw, 6rem);
+
+    /* The name on a project's title card, drawn in the media kit (src/pages/[mediakit].astro). */
+    --font-size-media-name: calc(var(--font-size-step-5) * 1.6);
+
+    /* The email is set on one line, fitted to the width of its own cell (EmailLink is a
+       size container): about 13.5em wide, so 7cqi fills the cell. */
+    --font-size-email: min(var(--font-size-step-2), 7cqi);
+
+    /* In the contact section the address is the answer and the display line: it fills its cell. */
+    --font-size-email-large: min(var(--font-size-step-5), 7cqi);
+
+    /* Mono is kept for data that qualifies the line above it (coordinates under the city,
+       inline code): a little under the text, never at its weight. Technologies are words, set
+       as tags in the text face (TagList). */
+    --font-size-data: 0.9em;
+
+    --line-height-tight: 0.9;
+    --line-height-title: 1.05;
+    --line-height-text: 1.5;
+    --line-height-lede: 1.45;
+
+    --letter-spacing-wordmark: -0.03em;
+    --letter-spacing-title: -0.015em;
+  }
+}

@@ -1,0 +1,41 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  /** CSS aspect ratio, for example "16 / 10". The image is cropped to it. */
+  ratio?: string;
+  sizes: string;
+  widths?: number[];
+  /** Above the fold: load eagerly with high priority. */
+  priority?: boolean;
+}
+
+// AVIF for every raster: all target browsers decode it and it is the smallest.
+// SVG stays vector (rasterising it is not supported for every file).
+const { src, alt, ratio, sizes, widths = [320, 480, 720, 960, 1280], priority = false } = Astro.props;
+---
+
+<Image
+  class="media"
+  src={src}
+  alt={alt}
+  format={src.format === "svg" ? "svg" : "avif"}
+  sizes={sizes}
+  widths={widths}
+  loading={priority ? "eager" : "lazy"}
+  fetchpriority={priority ? "high" : "auto"}
+  style={ratio ? `--media-ratio: ${ratio}` : undefined}
+/>
+
+<style>
+  .media {
+    width: 100%;
+    aspect-ratio: var(--media-ratio, auto);
+    object-fit: cover;
+    outline: var(--border-hairline);
+    transition: outline-color var(--duration-quick) var(--ease-snap);
+  }
+</style>

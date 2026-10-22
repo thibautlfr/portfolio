@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+// A sheet is a block of cells bounded by hairlines: the sheet draws the top
+// and left edges, each cell its right and bottom edges, so lines never double.
+// Cells carry the white surface, so an unfinished row shows the ground.
+type Props = HTMLAttributes<"section"> & {
+  as?: "section" | "div" | "footer";
+};
+
+const { as: Element = "section", class: className, ...attributes } = Astro.props;
+---
+
+<Element class:list={["sheet", className]} {...attributes}>
+  <slot />
+</Element>
+
+<style>
+  .sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-inline: var(--layout-gutter);
+    border-block-start: var(--border-hairline);
+    border-inline-start: var(--border-hairline);
+  }
+
+  @media (width >= 60rem) {
+    .sheet {
+      grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    }
+  }
+</style>

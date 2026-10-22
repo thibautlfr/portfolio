@@ -1,0 +1,88 @@
+---
+title: Ocarina · Songs of Hyrule
+summary: "The ocarina of Ocarina of Time in the browser: the game's notes on a keyboard or a phone, and 21 songs recognized as you play them."
+role: Design and development
+context: personal
+year: 2026
+stack: [TypeScript, Three.js, GSAP, Vite, mitt, steerkit]
+cover:
+  src: ./cover.png
+  alt: The title screen of Ocarina in a white frame. In a dim wooden room, a blue ocarina floats above a tree stump, behind a pixel-art golden triangle, the name Ocarina in yellow pixel letters, "Songs of Hyrule" and "Press Start". The five note buttons and their keys are listed in a corner.
+gallery:
+  - src: ./song-book.png
+    alt: The song book open over the blurred room. On a stone slab, two rows of note icons, six white, then green, red, blue, two greyed out for songs not yet learned and yellow, and the selected one, Zelda's Lullaby, written on a staff below as six round buttons.
+  - src: ./game.png
+    alt: The scene after Press Start. A blue ocarina floats above a tree stump in the middle of a round wooden room with a bed and a table, while four glowing fairies fly around it, and three pixel buttons sit in a corner.
+preview: ./preview.mp4
+links:
+  - { label: Play it, url: "https://ocarina.thibaut-lefrancois.com", kind: live }
+  - { label: Source on GitHub, url: "https://github.com/thibautlfr/ocarina", kind: source }
+decisions:
+  - Songs match the end of the notes played, and a test checks no song ends another, so none hides inside a longer one.
+  - Sound and recognition listen to the same `noteDown` apart, so a note never waits for the detector.
+  - Models and sounds stay in a private repository, fetched at build and checked against SHA-256 hashes.
+  - The fairies fly on named steering behaviors from steerkit instead of anonymous vector maths.
+figures:
+  items:
+    - { value: "21", label: "songs from Ocarina of Time and Majora's Mask, recognized as they are played" }
+    - { value: 3 days, label: "for the playable prototype, from the first commit to the songs and the fairies" }
+    - { value: "0", label: "UI framework: vanilla Three.js, and the menus are native `<dialog>` elements" }
+  source: From the repository's song list and the history of the prototype, 16 to 18 September 2026.
+schemaType: VideoGame
+featured: true
+order: 30
+---
+
+import detection from "./detection.png";
+
+## Context
+
+On 8 September 2026, the trailer for the _Ocarina of Time_ remake showed new ways to play the ocarina: humming into the console's microphone, a real instrument, a virtual one in a companion app. Two days later, the first [Three.js Conf](https://threejs.paris/) opened in Paris, where Bruno Simon gave his [seven golden rules](https://ics.media/en/entry/260925/#seven-golden-rules-for-creating-web-experiences) for web experiences: animate everything, treat sound as a feature, ship early. I took them as a brief. Ocarina puts the instrument in the browser, on the stump in Link's house, for fans waiting for the remake, and **I wanted it out before the game**.
+
+## Constraints
+
+- **A time box.** The idea only made sense while the remake was news, so the prototype had three days.
+- **Assets that are not mine.** The models and sounds belong to Nintendo or to fan creators. They can be served to a browser, never published in a public repository or its history.
+- **Sound is the product.** Browsers block audio until a user gesture, and iOS only accepts some of them, so the first thing on screen has to earn that gesture.
+- **Keyboard and touch.** The same five notes must work with Space and the arrows on a laptop, and with thumbs on a phone, several held at once.
+- **Players do not keep time.** Most people play a song from memory, at their own pace.
+
+## Approach
+
+I wrote it in vanilla Three.js with TypeScript. The experience is almost all 3D and the menus are native `<dialog>` elements, so React Three Fiber would have added a renderer for an interface that barely exists. A root `Experience` creates every class in the order of their dependencies, and each class asks it for what it needs. Classes talk through **one small typed mitt emitter per module** rather than a shared store: the state stays where it lives (settings in `Settings`, learned songs in `SongProgress`), and events only say that something happened.
+
+Keys are read by `KeyboardEvent.code`, their physical position, so an AZERTY keyboard plays the same notes. The on-screen buttons press keys of the same `Keyboard` module, which is why sliding a finger or holding two buttons needed no second code path. The ocarina listens to the sampler rather than to the keyboard: it animates what actually sounds, so the replays of a song move it exactly as the player does.
+
+Each song is a short score in the controller's notation, a button and a length in beats. The detector keeps the last notes played and checks, on every note, whether they end with a known song. **The rhythm is ignored for recognition** and only drives the replay, since players do not keep time.
+
+```ts
+// Zelda's Lullaby: a button, then its length in beats
+const score = "<2 ^1 >3 <2 ^1 >3";
+
+// Do the notes played end with the song's buttons?
+const endsWith = (history, buttons) => {
+  const start = history.length - buttons.length;
+  if (start < 0) return false;
+  return buttons.every((b, i) => history[start + i] === b);
+};
+```
+
+Matching the end of the history only works if no song ends with another, otherwise the shorter one would always win. **A test checks that none of the 21 does**, so the order of the list does not matter. The detector and the sampler both listen to the same `noteDown`, and the detector announces a song in a microtask: the last note sounds and moves the ocarina before the jingle starts.
+
+<Figure
+  src={detection}
+  alt="On a dark ground, a row of eight cells holds the last notes played as controller symbols: an up triangle and a disc in teal, then six symbols in ivory on deep teal cells. A coral bracket under those six joins them to a staff below, where the same six notes are written, labelled Zelda's Lullaby. Above, the call endsWith(history, song.buttons)."
+  caption="The detector keeps eight notes, the length of the longest songs. Whatever came before, the last six match Zelda's Lullaby."
+/>
+
+## Engineering notes
+
+The public repository holds the code and no binary file. The models and sounds live in a private repository with a manifest of SHA-256 hashes and sizes. At build time, GitHub Actions loads a read-only deploy key, fetches them, and `scripts/assets.mjs` checks every file against the manifest before copying it: **a missing file or a hash mismatch fails the build**, so the site never deploys without its real assets. The models are compressed with WebP textures and Meshopt, but never through `gltf-transform optimize`, which flattens and joins nodes. The code finds the ocarina's place by an empty node, `ocarina_anchor`, and that pass would have removed it.
+
+The fairies were the other detail worth the time. The Navi model I found had a body sphere of 31,000 vertices; I kept its wings and put a Three.js sphere of 221 vertices between them. The glow is an additive sprite whose texture is **computed pixel by pixel** rather than drawn as a canvas gradient: WebKit dithers canvas gradients, and the noise in the faint edge showed as coloured and black dots once added to the scene.
+
+Their flight started as hand-written vector maths: each fairy aimed for a random point, slowed on arrival and kept away from the ocarina and the camera. It worked, but it was Craig Reynolds' [steering behaviors](https://www.red3d.com/cwr/steer/) without their names. I extracted it into [steerkit](/work/steerkit/), and the fairies now sum `arrive`, `brake` and `keepAway`, then call `step`. In `#debug`, its `SteeringHelper` draws each fairy's velocity, desired velocity and steering force.
+
+## Outcome
+
+Ocarina has been live since late September, with all 21 songs of both games and a song book that fills as they are learned. About ten friends tested the prototype before release, and nearly all of them asked for some kind of completion: the full book now ends on a celebration of the fairies. Anonymous analytics on that first version showed notes played without a single song learned, which is where the "Learn a song" hint comes from, eight seconds after the first note. Feedback now goes through the repository's issues. **steerkit came out of its fairies** and is published on npm.

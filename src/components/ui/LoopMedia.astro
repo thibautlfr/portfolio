@@ -1,0 +1,44 @@
+---
+import type { ComponentProps } from "astro/types";
+
+import Media from "./Media.astro";
+
+type Props = ComponentProps<typeof Media> & {
+  /** Built URL of a short loop (resolveVideo). It plays over the image while the nearest
+      ancestor marked data-loop-video-trigger is hovered or focused; the image is its poster. */
+  loop?: string | undefined;
+};
+
+const { loop, ...media } = Astro.props;
+---
+
+<div class="loop-media">
+  <Media {...media} />
+  {loop && <video src={loop} muted loop playsinline preload="none" aria-hidden="true" data-loop-video />}
+</div>
+
+{loop && <script>
+  import "@/scripts/loop-video";
+</script>}
+
+<style>
+  .loop-media {
+    position: relative;
+  }
+
+  /* The loop sits on its image and only shows once it plays, so a loading video never
+     covers the image with an empty frame. */
+  video {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity var(--duration-quick) var(--ease-snap);
+  }
+
+  video:global(.is-playing) {
+    opacity: 1;
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import LoopMedia from "@/components/ui/LoopMedia.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { resolveVideo } from "@/lib/media";
+
+interface Props {
+  title: string;
+  experiments: CollectionEntry<"playground">[];
+}
+
+const { title, experiments } = Astro.props;
+---
+
+<Sheet aria-labelledby="playground-title">
+  <SectionTitle id="playground-title">{title}</SectionTitle>
+  {experiments.map(({ id, data }) => (
+    <Cell span={6} as="article" class:list={["experiment", { card: data.url }]} data-loop-video-trigger>
+      <LoopMedia
+        src={data.thumbnail.src}
+        alt={data.thumbnail.alt}
+        ratio="4 / 3"
+        sizes="(width >= 60rem) 16rem, 40vw"
+        widths={[320, 640]}
+        loop={data.preview && resolveVideo("playground", id, data.preview)}
+      />
+      <div class="text">
+        <h3>
+          {data.url ? (
+            <a class="card-link" href={data.url}>
+              {data.title}
+              <ExternalMark href={data.url} />
+            </a>
+          ) : (
+            data.title
+          )}
+        </h3>
+        <p>{data.description}</p>
+      </div>
+    </Cell>
+  ))}
+</Sheet>
+
+<style>
+  .experiment {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: var(--space-4);
+    align-items: center;
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  h3 {
+    font-size: var(--font-size-step-1);
+  }
+
+  /* As in a project row: an experiment that leads somewhere frames its thumbnail in teal on
+     hover, at the pace of its title's line. */
+  .experiment :global(.media) {
+    transition-duration: var(--duration-draw);
+  }
+
+  .card:hover :global(.media) {
+    outline-color: var(--color-accent);
+  }
+
+  /* A sentence to read, so body size; grey keeps it under the title. */
+  p {
+    color: var(--color-text-muted);
+  }
+</style>

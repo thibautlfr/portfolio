@@ -1,44 +1,85 @@
 ---
-import BaseLayout from "@layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+import AboutSection from "@/components/home/AboutSection.astro";
+import ArtworkSection from "@/components/home/ArtworkSection.astro";
+import ContactSection from "@/components/home/ContactSection.astro";
+import Hero from "@/components/home/Hero.astro";
+import NotesSection from "@/components/home/NotesSection.astro";
+import PlaygroundSection from "@/components/home/PlaygroundSection.astro";
+import WorkSection from "@/components/home/WorkSection.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { profile } from "@/data/profile";
+import { selectFeatured, selectLatest } from "@/lib/content";
+import { profilePage } from "@/lib/seo/json-ld";
+import { author } from "@/lib/seo/site";
+
+const projects = selectFeatured(await getCollection("projects"));
+const experiments = selectFeatured(await getCollection("playground"));
+const artworks = selectFeatured(await getCollection("artworks"));
+const notes = selectLatest(await getCollection("notes"), 3);
+const instagram = profile.socials.find((social) => social.label === "Instagram");
+const person = await author(Astro.site ?? Astro.url);
 ---
 
-<BaseLayout title="Thibaut LEFRANCOIS">
-  <h2 class="pb-6 text-xl font-semibold italic md:text-2xl">
-    full-stack and creative developer
-  </h2>
-  <div
-    class="text-sage-11 flex max-w-prose flex-col gap-5 text-base leading-relaxed md:gap-6"
-  >
-    <p>
-      This portfolio was published way too early, intentionally. I wanted a
-      place to write, and Astro was the tool I had picked for both the blog and
-      the portfolio, so I shipped what I had.
-    </p>
-    <p>
-      The <a href="/projects" class="text-sage-12 underline">projects</a> page gathers
-      the larger things I've built, while
-      <a href="/labs" class="text-sage-12 underline">labs</a> is where I keep shorter
-      creative experiments: shaders, 3D scenes, visual prototypes. The <a
-        href="/blog"
-        class="text-sage-12 underline">blog</a
-      > documents what I learn along the way. If you want to know more about me, there's
-      an
-      <a href="/about" class="text-sage-12 underline">about page</a> for that.
-    </p>
-    <p>
-      Eventually, these projects will be showcased here in a more creative way.
-      For now, I'm still practicing to get there.
-    </p>
-    <p>
-      <a
-        href="https://drive.google.com/file/d/1MUc2HIg5t0PNbOLgWoNSbB64vOiBXfUA/view?usp=sharing"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-sage-12 underline"
-        >View my resume &rarr;<span class="sr-only">
-          (opens in new tab)</span
-        ></a
-      >
-    </p>
+<BaseLayout
+  title={`${profile.name}, ${profile.role}`}
+  description={`${profile.role} based in ${profile.location.city}. ${profile.positioning}`}
+  jsonLd={[profilePage(person)]}
+  hero
+>
+  <div class="page">
+    <Hero />
+    <WorkSection title="Selected work" {projects} />
+    <AboutSection
+      title="About"
+      offers={[
+        {
+          title: "Inside your team",
+          text: "Missions with product teams, directly or through ESNs. I join the team, its rituals and its codebase, and take features from the ticket to production.",
+        },
+        {
+          title: "For your product",
+          text: "Startups and agencies: a platform to build, a product to take to production, or a team to reinforce for a while.",
+        },
+      ]}
+      factsTitle="Stack"
+      clientsTitle="Clients and partners"
+    />
+    {experiments.length > 0 && <PlaygroundSection title="Playground" {experiments} />}
+    {artworks.length > 0 && (
+      <ArtworkSection
+        title="Off the clock"
+        {artworks}
+        more={instagram && { label: "More on Instagram", url: instagram.url }}
+      />
+    )}
+    {notes.length > 0 && <NotesSection title="Notes" {notes} />}
+    <ContactSection title="Have a project or a mission in mind?" socialsLabel="Elsewhere online" />
   </div>
 </BaseLayout>
+
+<style>
+  .page {
+    display: grid;
+    gap: var(--space-12);
+    padding-block-start: var(--layout-gutter);
+  }
+
+  /* Sections below the hero are laid out when they come near the viewport, not on the first
+     render: the first paint only pays for the hero. Their last measured size is kept. Only on
+     a page loaded by the browser: one brought back by the router is new, has no size kept,
+     and its scroll is restored at once, so sections still at their placeholder height would
+     put the visitor far below where they left. */
+  :global(:root:not([data-routed])) .page > :global(:not(:first-child)) {
+    content-visibility: auto;
+    contain-intrinsic-block-size: auto 40rem;
+  }
+</style>
+
+<script>
+  // The router copies the attributes of the incoming <html> onto the current one.
+  document.addEventListener("astro:before-swap", (event) => {
+    event.newDocument.documentElement.dataset.routed = "";
+  });
+</script>

@@ -1,0 +1,144 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import FactList from "@/components/ui/FactList.astro";
+import SectionTitle from "@/components/ui/SectionTitle.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { profile } from "@/data/profile";
+
+interface Offer {
+  title: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  offers: Offer[];
+  /** Title of the facts cell, at the offers' level so the three columns read as peers. */
+  factsTitle: string;
+  /** Label of the row naming clients and partners, under the offers. */
+  clientsTitle: string;
+}
+
+const { title, offers, factsTitle, clientsTitle } = Astro.props;
+const { stack, languages, cvPath } = profile;
+const clients = Object.values(profile.collaborations);
+---
+
+<Sheet aria-labelledby="about-title">
+  <SectionTitle id="about-title">{title}</SectionTitle>
+  {offers.map((offer) => (
+    <Cell span={4} as="article" class="offer">
+      <h3>{offer.title}</h3>
+      <p>{offer.text}</p>
+    </Cell>
+  ))}
+  <Cell span={4} class="facts">
+    <h3>{factsTitle}</h3>
+    <FactList
+      facts={[
+        { term: "Languages", value: stack.languages },
+        { term: "Front-end", value: stack.frontEnd },
+        { term: "Back-end", value: stack.backEnd },
+        { term: "Speaks", value: languages.join(", ") },
+      ]}
+    />
+    {cvPath && (
+      <p class="cv">
+        <a class="tap" href={cvPath} data-umami-event="cv">
+          Download my CV (PDF)
+        </a>
+      </p>
+    )}
+  </Cell>
+  {clients.length > 0 && (
+    <Cell class="clients">
+      <h3 class="clients-title">{clientsTitle}</h3>
+      <ul role="list" class="client-list">
+        {clients.map((client) => (
+          <li>
+            <a href={client.url} class="client-name tap">
+              {client.name}
+              <ExternalMark href={client.url} />
+            </a>
+            <p class="client-credit">{client.credit}</p>
+          </li>
+        ))}
+      </ul>
+    </Cell>
+  )}
+</Sheet>
+
+<style>
+  /* The offer's name is a title, its text reads as body copy under it. */
+  .offer {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  h3 {
+    font-size: var(--font-size-step-2);
+  }
+
+  .offer p {
+    max-inline-size: var(--layout-measure);
+    color: var(--color-text-muted);
+  }
+
+  /* A label, then one column per client, on the thirds of the offers above. */
+  .clients,
+  .client-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .clients {
+    padding-block: var(--space-6);
+  }
+
+  @media (width >= 60rem) {
+    .clients {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .client-list {
+      grid-column: span 2;
+      grid-template-columns: subgrid;
+    }
+  }
+
+  .clients-title,
+  .client-credit {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
+  }
+
+  .clients-title {
+    font-family: var(--font-text);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .client-name {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-2);
+    font-weight: var(--font-weight-title);
+    letter-spacing: var(--letter-spacing-title);
+  }
+
+  /* The facts are this cell's content, not metadata: body size, like the offers' text. */
+  .facts {
+    --facts-size: var(--font-size-step-0);
+
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  .cv a {
+    color: var(--color-link);
+    font-weight: var(--font-weight-strong);
+  }
+</style>

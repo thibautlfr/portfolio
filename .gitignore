@@ -22,6 +22,16 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+/CLAUDE.md
+/.claude
 
 # test artifacts
 test-results/
+.lighthouseci/
+
+# media captures: lossless intermediates, regenerated from the recipe (media/<slug>/media.mjs)
+media/*/captures/
+
+# local tooling, not part of the site
+/.mcp.json
+/skills-lock.json

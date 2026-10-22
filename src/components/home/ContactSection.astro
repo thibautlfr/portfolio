@@ -1,0 +1,105 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import EmailLink from "@/components/ui/EmailLink.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import ScrambleText from "@/components/ui/ScrambleText.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import { profile } from "@/data/profile";
+import { formatHandle } from "@/lib/format";
+
+interface Props {
+  title: string;
+  /** Accessible name of the social links list. */
+  socialsLabel: string;
+}
+
+const { title, socialsLabel } = Astro.props;
+---
+
+<Sheet aria-labelledby="contact-title">
+  <!-- The address is the answer and the display line; the question introduces it at title size. -->
+  <Cell span={8} class="contact">
+    <h2 id="contact-title">{title}</h2>
+    <EmailLink size="large" />
+  </Cell>
+  <!-- One row per network, ruled like the sheet, sharing the height of the contact cell. -->
+  <Cell span={4} flush class="socials">
+    <ul role="list" aria-label={socialsLabel}>
+      {profile.socials.map((social) => (
+        <li>
+          <a href={social.url} rel="me" data-scramble-trigger>
+            <span class="network">
+              <span class="link-line">
+                {social.label}
+                <ExternalMark href={social.url} />
+              </span>
+            </span>
+            <span class="handle">
+              <ScrambleText text={formatHandle(social.url)} />
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </Cell>
+</Sheet>
+
+<style>
+  .contact {
+    display: grid;
+    align-content: space-between;
+    gap: var(--space-6);
+    padding-block: var(--space-8);
+  }
+
+  /* On a phone the address is near body size: the question steps down to stay under it. */
+  h2 {
+    font-size: var(--font-size-step-1);
+  }
+
+  @media (width >= 60rem) {
+    .contact {
+      gap: var(--space-8);
+      padding-block: var(--space-12);
+    }
+
+    h2 {
+      font-size: var(--font-size-step-2);
+    }
+  }
+
+  .contact :global(.email) {
+    line-height: var(--line-height-title);
+  }
+
+  .socials ul {
+    display: grid;
+    grid-auto-rows: 1fr;
+    block-size: 100%;
+  }
+
+  .socials li + li {
+    border-block-start: var(--border-hairline);
+  }
+
+  .socials a {
+    display: flex;
+    flex-wrap: wrap;
+    place-content: center space-between;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-4);
+    block-size: 100%;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .network {
+    font-size: var(--font-size-step-1);
+    font-weight: var(--font-weight-strong);
+  }
+
+  .handle {
+    color: var(--color-text-muted);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

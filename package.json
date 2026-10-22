@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.22.0"
   },
   "scripts": {
     "dev": "astro dev",
@@ -11,25 +11,41 @@
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write .",
-    "predeploy": "pnpm build",
-    "deploy": "gh-pages -d dist --nojekyll"
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:css": "stylelint \"src/**/*.{css,astro}\"",
+    "lint:unused": "knip",
+    "check": "astro check",
+    "test": "vitest run --passWithNoTests",
+    "verify": "pnpm format:check && pnpm lint && pnpm lint:css && pnpm lint:unused && pnpm check && pnpm test",
+    "lighthouse": "lhci autorun"
   },
   "dependencies": {
-    "@astrojs/mdx": "^6.0.2",
-    "@astrojs/rss": "^4.0.18",
+    "@astrojs/mdx": "^8.1.0",
+    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
-    "@astrojs/ts-plugin": "^1.10.9",
     "@radix-ui/colors": "^3.0.0",
-    "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.4.4",
-    "gsap": "^3.15.0",
-    "sharp": "^0.34.5",
-    "tailwindcss": "^4.3.0"
+    "@resvg/resvg-js": "^2.6.2",
+    "astro": "^7.4.0",
+    "satori": "^0.62.0"
   },
   "devDependencies": {
-    "gh-pages": "^6.3.0",
-    "prettier": "3.8.3",
-    "prettier-plugin-astro": "0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.0"
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@lhci/cli": "^0.15.1",
+    "eslint": "^10.13.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.13.0",
+    "knip": "^6.41.0",
+    "postcss-html": "^2.0.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "stylelint": "^17.16.0",
+    "stylelint-config-html": "^2.0.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-declaration-strict-value": "^1.12.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5"
   }
 }

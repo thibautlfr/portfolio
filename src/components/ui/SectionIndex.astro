@@ -1,0 +1,82 @@
+---
+// The sections of a case study or a note, numbered like their titles in the body, kept in
+// view beside the text on wide screens.
+interface Props {
+  headings: { slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const number = (index: number) => String(index + 1).padStart(2, "0");
+---
+
+<nav aria-label="Sections" data-section-index>
+  <ol role="list">
+    {headings.map((heading, index) => (
+      <li>
+        <span class="index" aria-hidden="true">
+          {number(index)}
+        </span>
+        <a href={`#${heading.slug}`}>{heading.text}</a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  nav {
+    position: sticky;
+    inset-block-start: var(--trail-index-offset);
+  }
+
+  /* Quiet beside the text: small, light, spaced, with no line until a title is pointed at. */
+  ol {
+    display: grid;
+    gap: var(--space-4);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-light);
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: var(--space-8) minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .index {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--duration-quick) var(--ease-snap);
+  }
+
+  a {
+    --link-rest: 0;
+    --link-drawn: 1px;
+
+    justify-self: start;
+    color: var(--color-text-muted);
+    transition:
+      color var(--duration-quick) var(--ease-snap),
+      background-size var(--duration-draw) var(--ease-out);
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--color-text);
+  }
+
+  /* The section being read: its title darkens and its line is drawn, its number with it. */
+  a[aria-current] {
+    --link-draw: 100%;
+    --link-from: left;
+
+    color: var(--color-text);
+  }
+
+  li:has(a[aria-current]) .index {
+    color: var(--color-text);
+  }
+</style>
+
+<script>
+  import "@/scripts/section-index";
+</script>

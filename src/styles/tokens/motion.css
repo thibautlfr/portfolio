@@ -1,0 +1,21 @@
+/* Motion is dry and short; the hero shader is the only continuous motion. Feedback is quick;
+   a line being drawn needs a little longer to be seen moving. */
+@layer tokens {
+  :root {
+    --duration-quick: 140ms;
+    --duration-draw: 360ms;
+    --duration-fade: 400ms;
+    --duration-page: 650ms;
+    --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-quick: 0ms;
+      --duration-draw: 0ms;
+      --duration-fade: 0ms;
+      --duration-page: 0ms;
+    }
+  }
+}

@@ -1,0 +1,37 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div"> & {
+  as?: "div" | "figure" | "article" | "header" | "footer" | "li" | "nav";
+  /** Columns spanned on wide screens, out of 12. Cells are full width below 60rem. */
+  span?: number;
+  /** Drops the padding, for media that fills the cell. */
+  flush?: boolean;
+};
+
+const { as: Element = "div", span = 12, flush = false, class: className, ...attributes } = Astro.props;
+---
+
+<Element class:list={["cell", { "cell--flush": flush }, className]} style={`--cell-span: ${span}`} {...attributes}>
+  <slot />
+</Element>
+
+<style>
+  .cell {
+    min-width: 0;
+    padding: var(--space-4);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+    background: var(--color-surface);
+  }
+
+  .cell--flush {
+    padding: 0;
+  }
+
+  @media (width >= 60rem) {
+    .cell {
+      grid-column: span var(--cell-span);
+    }
+  }
+</style>

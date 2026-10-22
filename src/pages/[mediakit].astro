@@ -1,0 +1,451 @@
+---
+// Development-only composition page for project media: covers, preview loops, figures and
+// playground thumbnails are drawn here, in the site's own tokens, fonts and components, so
+// their art direction cannot drift from the site. The make-media tooling drives it; opened by
+// hand, it shows the piece live; without parameters, it lists the outputs of every recipe in
+// media/. The route only exists under `astro dev`.
+//
+//   /media-kit/?ratio=16:10&src=/path/to/capture.png&data=Left&data=Right   a capture in the sheet
+//   /media-kit/?ratio=16:10&scene=/media/steerkit/scene.js&shot=stream     a scene module
+import { Font } from "astro:assets";
+
+import Cell from "@/components/ui/Cell.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import "@/styles/global.css";
+
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { mediakit: "media-kit" } }] : [];
+}
+
+interface Output {
+  file: string;
+  ratio?: string;
+  scene?: string;
+  src?: string;
+  time?: number;
+  params?: Record<string, string | number>;
+  data?: string | string[];
+}
+
+// The recipes (media/<slug>/media.mjs), each output turned into the link that shows it live.
+const recipes = import.meta.glob<{ default: { scene?: string; outputs: Output[] } }>("/media/*/media.mjs", {
+  eager: true,
+});
+const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
+  slug: path.split("/")[2] ?? path,
+  outputs: recipe.outputs.map((output) => {
+    const query = new URLSearchParams();
+    if (output.ratio) query.set("ratio", output.ratio);
+    if (output.src) query.set("src", `/media/${path.split("/")[2]}/${output.src}`);
+    else query.set("scene", output.scene ?? recipe.scene ?? "");
+    for (const item of [output.data ?? []].flat()) query.append("data", item);
+    for (const [key, value] of Object.entries(output.params ?? {})) query.set(key, String(value));
+    if (output.time !== undefined && !output.file.endsWith(".mp4")) query.set("t", String(output.time));
+    return { file: output.file, href: `?${query}` };
+  }),
+}));
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Media kit</title>
+    <Font cssVariable="--font-stack-sans-headline" preload />
+    <Font cssVariable="--font-stack-sans-text" preload />
+    <Font cssVariable="--font-fragment-mono" preload />
+  </head>
+  <body>
+    <nav class="index" data-media-index aria-labelledby="index-title" hidden>
+      <Sheet as="div">
+        <Cell>
+          <h1 id="index-title">Media kit</h1>
+          <p>
+            Every output of the recipes in <code>media/</code>, live. Rendered with make-media.
+          </p>
+        </Cell>
+        {index.map(({ slug, outputs }) => (
+          <Cell>
+            <h2>{slug}</h2>
+            <ul>
+              {outputs.map(({ file, href }) => (
+                <li>
+                  <a href={href}>{file}</a>
+                </li>
+              ))}
+            </ul>
+          </Cell>
+        ))}
+      </Sheet>
+    </nav>
+    <div class="stage" data-media-stage>
+      <canvas class="scene" data-media-scene hidden></canvas>
+      <div class="layer" data-media-layer></div>
+      <Sheet as="div" class="frame" data-media-frame hidden>
+        <Cell flush class="window" data-media-window />
+        <Cell class="data" data-media-data hidden />
+      </Sheet>
+    </div>
+    <!-- Served by the dev server as it is: a bundled script would leave an orphan chunk in builds. -->
+    <script is:inline type="module" src="/src/scripts/media-kit.ts"></script>
+  </body>
+</html>
+
+<style>
+  body {
+    display: grid;
+    place-items: center;
+    min-block-size: 100vh;
+    background: var(--color-ground);
+  }
+
+  .index {
+    inline-size: min(100%, var(--layout-measure));
+  }
+
+  .index[hidden] {
+    display: none;
+  }
+
+  .index h2 {
+    margin-block-end: var(--space-2);
+    font-size: var(--font-size-step-1);
+  }
+
+  .index ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  .index p,
+  .index li {
+    font-size: var(--font-size-step-0);
+  }
+
+  .stage {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-ground);
+  }
+
+  .scene {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  /* The layer a scene builds its sheets in, over the canvas. The kit-* classes repeat the
+     Sheet and Cell components and the site's type roles, from the same tokens. */
+  .layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .layer :global(.kit-page) {
+    position: absolute;
+    inset: 0;
+    background: var(--color-ground);
+  }
+
+  .layer :global(.kit-sheet) {
+    position: absolute;
+    inset: var(--space-8);
+    display: grid;
+    border-block-start: var(--border-hairline);
+    border-inline-start: var(--border-hairline);
+  }
+
+  .layer :global(.kit-row) {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  .layer :global(.kit-cell) {
+    position: relative;
+    min-inline-size: 0;
+    padding: var(--space-6);
+    overflow: hidden;
+    background: var(--color-surface);
+    border-inline-end: var(--border-hairline);
+    border-block-end: var(--border-hairline);
+  }
+
+  .layer :global(.kit-flush) {
+    padding: 0;
+  }
+
+  .layer :global(.kit-ground) {
+    background: var(--color-ground);
+  }
+
+  .layer :global(.kit-ink) {
+    background: var(--color-shader-ground);
+  }
+
+  /* A canvas, or a still image (an entry's cover opening a reel), filling its cell or page. */
+  .layer :global(.kit-canvas),
+  .layer :global(.kit-still) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .layer :global(.kit-title) {
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-3);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-title);
+    letter-spacing: var(--letter-spacing-title);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-display) {
+    font-family: var(--font-title);
+    font-size: var(--font-size-media-name);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-title);
+    color: var(--color-text);
+  }
+
+  /* A name longer than a library's, set one step down so it holds beside a picture. */
+  .layer :global(.kit-display-short) {
+    font-size: var(--font-size-step-5);
+  }
+
+  .layer :global(.kit-lede) {
+    font-size: var(--font-size-step-2);
+    line-height: var(--line-height-lede);
+    color: var(--color-text-muted);
+  }
+
+  .layer :global(.kit-text) {
+    font-size: var(--font-size-step-0);
+    font-weight: var(--font-weight-strong);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-label) {
+    font-size: var(--font-size-step-minus-1);
+    color: var(--color-text-muted);
+  }
+
+  /* A project's mark, set in the text like the site's own favicon: a dark square, a light sign. */
+  .layer :global(.kit-mark) {
+    display: inline-block;
+    flex: none;
+    inline-size: 0.78em;
+    block-size: 0.78em;
+  }
+
+  .layer :global(.kit-mark svg) {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    fill: var(--color-text);
+  }
+
+  .layer :global(.kit-mark path) {
+    fill: var(--color-surface);
+  }
+
+  /* A client's own logo used as the mark: wider than the square sign of the site's marks. */
+  .layer :global(.kit-logo) {
+    inline-size: 0.84em;
+  }
+
+  /* A title card: a label at the top, the name and what it is at the bottom. */
+  .layer :global(.kit-card) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    justify-content: space-between;
+    padding: var(--space-12);
+  }
+
+  .layer :global(.kit-card > :not(canvas)),
+  .layer :global(.kit-case),
+  .layer :global(.kit-foot) {
+    position: relative;
+  }
+
+  .layer :global(.kit-heading) {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-start: auto;
+  }
+
+  .layer :global(.kit-name) {
+    display: flex;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .layer :global(.kit-name .kit-mark) {
+    font-size: var(--font-size-media-name);
+  }
+
+  .layer :global(.kit-fact) {
+    display: grid;
+    gap: var(--space-1);
+    padding-inline: var(--space-12);
+  }
+
+  /* The heading cell of a use case: number, title and code on the left, a note on the right. */
+  .layer :global(.kit-case) {
+    display: flex;
+    gap: var(--space-8);
+    align-items: end;
+    justify-content: space-between;
+  }
+
+  .layer :global(.kit-case .kit-title) {
+    margin-block: var(--space-1) var(--space-3);
+  }
+
+  .layer :global(.kit-aside) {
+    max-inline-size: 18rem;
+    text-align: end;
+  }
+
+  .layer :global(.kit-foot) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: var(--space-3);
+  }
+
+  .layer :global(.kit-name-small) {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    font-family: var(--font-title);
+    font-weight: var(--font-weight-title);
+  }
+
+  .layer :global(.kit-data) {
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+
+  /* A capture filling its cell, cropped from its top left. */
+  .layer :global(.kit-capture) {
+    object-fit: cover;
+    object-position: left top;
+  }
+
+  /* A capture laid on a cell, framed by a hairline; the scene places it. */
+  .layer :global(.kit-shot) {
+    position: absolute;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: var(--border-hairline);
+  }
+
+  /* A diagram: components as cells framed by a hairline, placed by the scene, and the labels of
+     the arrows between them, on the ground. */
+  .layer :global(.kit-box) {
+    position: absolute;
+    display: grid;
+    gap: var(--space-1);
+    align-content: center;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border: var(--border-hairline);
+  }
+
+  .layer :global(.kit-box.kit-accent) {
+    border-color: var(--color-accent);
+  }
+
+  .layer :global(.kit-tag) {
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  /* A specimen: what a token or a surface looks like on top, its name and value under it. */
+  .layer :global(.kit-specimen) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* A colour role's swatch, painted by the scene with the token itself. */
+  .layer :global(.kit-swatch) {
+    flex: 1;
+    min-block-size: var(--space-8);
+    margin-block-end: var(--space-2);
+    outline: var(--border-hairline);
+  }
+
+  /* An image of a surface at its own ratio, framed by a hairline. */
+  .layer :global(.kit-picture) {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    outline: var(--border-hairline);
+  }
+
+  /* A capture in the sheet: one white cell on the ground, the capture flush in it, and an
+     optional row of data under a hairline. */
+  .frame {
+    position: absolute;
+    inset: var(--frame-margin, var(--space-12));
+    grid-template-rows: minmax(0, 1fr) auto;
+    margin: 0;
+  }
+
+  .frame[hidden] {
+    display: none;
+  }
+
+  .window {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .window :global(img),
+  .window :global(video) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: var(--window-position, top);
+  }
+
+  .data {
+    display: flex;
+    gap: var(--space-6);
+    justify-content: space-between;
+    padding-block: var(--space-3);
+    font-family: var(--font-data);
+    font-size: var(--font-size-step-minus-1);
+    color: var(--color-text-muted);
+  }
+
+  .data[hidden] {
+    display: none;
+  }
+
+  /* Data that is the content of its cell (an install command, a call), not a note on it. */
+  .layer :global(.kit-data.kit-strong) {
+    font-size: var(--font-size-step-0);
+    color: var(--color-text);
+  }
+
+  .layer :global(.kit-data.kit-code) {
+    color: var(--color-text);
+  }
+
+  /* A call that names a figure's subject, read at the width of a note's text. */
+  .layer :global(.kit-data.kit-call) {
+    font-size: var(--font-size-step-2);
+    color: var(--color-text);
+  }
+</style>

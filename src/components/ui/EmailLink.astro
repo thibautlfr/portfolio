@@ -1,0 +1,40 @@
+---
+import { profile } from "@/data/profile";
+
+interface Props {
+  size?: "regular" | "large";
+}
+
+const { size = "regular" } = Astro.props;
+---
+
+<!-- The wrapper is a size container: the address is fitted to its cell, never to the window. -->
+<div class="email-fit">
+  <a class:list={["email", `email--${size}`, "tap"]} href={`mailto:${profile.email}`} data-umami-event="email">
+    {profile.email}
+  </a>
+</div>
+
+<style>
+  .email-fit {
+    container-type: inline-size;
+  }
+
+  .email {
+    font-family: var(--font-email);
+    font-weight: var(--font-weight-title);
+    white-space: nowrap;
+
+    /* Display size, heavier lines. */
+    --link-rest: 2px;
+    --link-drawn: 4px;
+  }
+
+  .email--regular {
+    font-size: var(--font-size-email);
+  }
+
+  .email--large {
+    font-size: var(--font-size-email-large);
+  }
+</style>

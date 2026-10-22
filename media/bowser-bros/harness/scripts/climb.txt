@@ -1,0 +1,23 @@
+# Level 1, the first five seconds of a climb: two ladders, two jumps, the camera following.
+# One tick is 10 ms of game time. Mario walks at 2 px a tick and jumps at 8 px a tick.
+
+0 right down       # walk to the first ladder
+30 right up
+35 up down         # climb onto the first platform
+95 up up
+100 right down
+122 space down     # jump across to the second platform, under the next ladder
+124 space up
+193 right up
+200 up down        # climb: the camera starts to follow
+280 up up
+290 left down      # jump left onto the next block
+292 space down
+294 space up
+340 left up
+380 right down
+390 right up
+400 space down     # straight up, then left once above the block, so its side does not stop him
+402 space up
+418 left down
+440 left up
