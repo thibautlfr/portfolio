@@ -1,0 +1,20 @@
+# Thibaut Lefrançois
+
+> Freelance full-stack developer based in La Rochelle, France. Remote across France, on-site in Bordeaux, La Rochelle, Niort and around. I build web platforms that run in production, and I sweat the parts people see. Java/Kotlin on the server, TypeScript, Vue and React in the browser.
+
+Contact: hello@thibaut-lefrancois.com. Languages: French, English.
+Stack: Kotlin, Java, TypeScript, Vue, React, Astro, Angular, Three.js, WebGL, Ktor, Spring Boot, PostgreSQL, Temporal, Docker, Kubernetes.
+Works with: [Raccourci Agency](https://www.raccourci.fr) (Groupe Yoni), [Areti](https://areti.fr/approche) (a creative and technical studio).
+
+## Case studies
+
+- [Youbook](https://thibaut-lefrancois.com/work/youbook/): The activity marketplace of French tourism destinations, from the import of every provider's catalogue to one cart and one payment across them.
+- [Steerkit](https://thibaut-lefrancois.com/work/steerkit/): Craig Reynolds' steering behaviors as small typed functions for JavaScript and Three.js, with no allocation per frame and a live demo for each one.
+- [Ocarina · Songs of Hyrule](https://thibaut-lefrancois.com/work/ocarina/): The ocarina of Ocarina of Time in the browser: the game's notes on a keyboard or a phone, and 21 songs recognized as you play them.
+- [Ocean Heartbeat](https://thibaut-lefrancois.com/work/ocean-heartbeat/): An underwater 3D scene where a heart, a brain and kidneys stand for the ocean's own systems, built overnight for the Nuit de l'Info 2024.
+
+## Notes
+
+- [One design system for the site and everything I make around it](https://thibaut-lefrancois.com/notes/one-design-system-for-everything-around-me/): The site's tokens also draw its Open Graph images, its favicon and the media of every project. What the system leaves alone matters as much as what it covers.
+- [Bowser Bros: a vertical Mario in C++ and Qt, built in two and a half weeks](https://thibaut-lefrancois.com/notes/bowser-bros-retrospective/): A first-year school game from 2023: four playable versions in two and a half weeks, and the C++ I would write differently today.
+- [My first GLSL shaders: a 3D carousel that bends and splits around the cursor](https://thibaut-lefrancois.com/notes/first-steps-glsl-shaders-threejs/): A sine wave in the vertex shader, an RGB split around the cursor in the fragment shader, and the pixel ratio bug that put the split in the wrong place.
