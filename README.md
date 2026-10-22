@@ -33,16 +33,16 @@ src/
 ├── components/         # Small single-purpose components: ui/, home/, project/, note/, seo/, site/, mdx/
 ├── layouts/            # BaseLayout: head, skip link, main, footer
 ├── lib/                # Plain TypeScript, unit tested: content queries, formatting, JSON-LD, OG images
-├── scripts/            # Client code: the hero shader (WebGL2) and playground previews
+├── scripts/            # Client code: the hero shader (WebGL2), previews, image viewer, live demo
 ├── styles/             # Tokens, reset, base and prose styles, in cascade layers
 └── pages/              # Routes, RSS, robots.txt, llms.txt, Open Graph images
 ```
 
-- **Zero JavaScript by default.** The only scripts are the hero shader (2.3 KB gzipped, loaded after the largest paint, never under reduced motion) and the playground previews (only on pages that have one).
+- **Little JavaScript.** Astro's `ClientRouter` for page transitions, the hero shader (2.6 KB gzipped, loaded after the largest paint, never under reduced motion) and a few small scripts that load only on the pages that need them (previews, image viewer, section index, one live demo). Each is justified in `docs/architecture.md`.
 - **CSS from tokens only.** Radix sage and teal behind semantic tokens; Stylelint rejects raw values outside `src/styles/tokens/`.
 - **Self-hosted, subset fonts**, rebuilt by `scripts/fonts.sh`.
 - **SEO**: per-page metadata, JSON-LD, sitemap, RSS, `llms.txt`, Open Graph images rendered at build time.
-- **Security**: a Content Security Policy with hashed inline scripts and styles.
+- **No Content Security Policy**: Astro does not support one with the `ClientRouter`, and the site has no form, account or user content.
 
 The details and the conventions are in [`docs/architecture.md`](docs/architecture.md), the visual system in [`docs/design/`](docs/design/), the latest audit in [`docs/audit.md`](docs/audit.md).
 

@@ -66,8 +66,6 @@ src/
     └── og/[...path].png.ts   # Open Graph images, rendered at build time
 ```
 
-`src/proposals/` holds design proposals under review: the dynamic ASCII hero (`/proposals/ascii/`). It exists under `astro dev`, and in a production build made with `pnpm proposals` (`PUBLIC_PROPOSALS=true`, served on port 4322). The pages are registered by an integration in `astro.config.ts`. A normal build contains none of it. The folder is emptied once a proposal is chosen and built properly. **Before launch (the merge of `v2` into `main`), the ASCII proposal and all of its plumbing must be removed**: the folder, the integration in `astro.config.ts`, the `proposals` script in `package.json`, the entry in `knip.config.ts` and this paragraph.
-
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `media/` (see [Project media](#project-media)), `docs/`, `.github/workflows/`.
 
 ## Conventions
@@ -165,4 +163,4 @@ Not used on purpose: Tailwind (the tokens are the system), GSAP (CSS covers the 
 
 ## Git
 
-Work happens on `v2`, one branch per phase (`v2-foundations`, `v2-content`, ...) merged through a pull request; the pull request is the validation point. Small commits in English, conventional prefixes (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`).
+`main` is what is published: a push to `main` deploys. `develop` follows `main` and is where work starts: every change is a feature branch cut from `develop` and merged through a pull request, whose `verify` check must pass. After a deploy, `develop` is brought back up to date from `main`, so the next branch starts from what is in production. Small commits in English, conventional prefixes (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`).
