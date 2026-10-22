@@ -57,14 +57,14 @@ export const profile = {
   },
   /** Shown above the email in the hero; leave it undefined when not taking missions. */
   availability: "Available for missions now" as string | undefined,
-  mobility: "Remote across France, on-site in Bordeaux, Niort and around",
+  mobility: "Remote across France, on-site in Bordeaux, La Rochelle, Niort and around",
   languages: ["French", "English"],
   /** Published under public/cv/; the link stays hidden while this is undefined. */
   cvPath: "/cv/thibaut-lefrancois-cv.pdf" as string | undefined,
   stack: {
     languages: ["Kotlin", "Java", "TypeScript"],
-    frontEnd: ["Vue 3", "Astro", "Three.js", "WebGL"],
-    backEnd: ["Ktor", "PostgreSQL", "Temporal", "Docker", "Kubernetes"],
+    frontEnd: ["Vue", "React", "Astro", "Angular", "Three.js", "WebGL"],
+    backEnd: ["Ktor", "Spring Boot", "PostgreSQL", "Temporal", "Docker", "Kubernetes"],
   },
   socials,
   collaborations,
