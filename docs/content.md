@@ -75,8 +75,8 @@ On the page, the sections are numbered 01 to 05, each title in a narrow column b
 
 Between the header and the body, two blocks let a reader judge the project in thirty seconds. Both are optional; either one takes the full width alone, and without them the page goes straight to the body.
 
-- `decisions`: two to four of the choices told in Approach, one line each, with the reason in the same line: "Every behavior writes into an `out` vector passed last, so nothing is allocated per call." Every project has some, client work under NDA included, as long as no name or figure slips in. Backticks set an identifier as code.
-- `figures`: two to four measured values from Engineering notes or Outcome, each `value` short and set in mono (`0.7 ms`, `4.1 kB`, `18`), each `label` saying what was measured and against what. `source` gives where they come from and the conditions ("Node 26 on an M1 Pro, from the repository's benchmark"). The rules of **Numbers** below apply. Leave the block out rather than fill it: client work under NDA never has it, a hackathon rarely does, and a personal project often needs its figures measured first.
+- `decisions`: two to four of the choices told in Approach, one line each, with the reason in the same line: "Every behavior writes into an `out` vector passed last, so nothing is allocated per call." Every project has some, client work included, as long as no internal name or figure slips in. Backticks set an identifier as code.
+- `figures`: two to four measured values from Engineering notes or Outcome, each `value` short and set in mono (`0.7 ms`, `4.1 kB`, `18`), each `label` saying what was measured and against what. `source` gives where they come from and the conditions ("Node 26 on an M1 Pro, from the repository's benchmark"). The rules of **Numbers** below apply. Leave the block out rather than fill it: client work has it only with figures the client published or approved, a hackathon rarely does, and a personal project often needs its figures measured first.
 
 **Voice.** First person singular, sober: "I extracted the module", not "the module was extracted", and "we" only for a team, saying who did what. Past tense for what was done, present tense for what the work does. Short paragraphs, facts before adjectives. The writing rules of [`CLAUDE.md`](../CLAUDE.md) and the anti AI-look checklist of [`design/system.md`](design/system.md) apply: no em dash, no "it's not X, it's Y", no forced triads, no rhetorical question, no one-line moral to close a section.
 
@@ -86,7 +86,7 @@ Between the header and the body, two blocks let a reader judge the project in th
 
 **Numbers.** Every figure comes from a source that can be pointed to (a benchmark, a test, analytics, the client) and carries its conditions: "1,000 boids on an M1 Pro: 12 ms per frame scanning the whole crowd, 0.7 ms with the grid." Leave out vanity numbers, such as stars or downloads in the first days of a release, and never round a figure to make it sound better.
 
-**Code.** For open-source and personal work only, and only where it shows what prose cannot, such as the shape of an API. Two blocks at most, about 15 lines each, with a language tag. A case study is not documentation: link to the documentation instead.
+**Code.** For open-source and personal work, or written for the page in client work (see **By context**), and only where it shows what prose cannot, such as the shape of an API. Two blocks at most, about 15 lines each, with a language tag. A case study is not documentation: link to the documentation instead.
 
 **Media.** One to three `Figure` or `Video` in the body, in Approach or Engineering notes, next to the paragraph they illustrate. The caption adds a fact instead of naming the picture: "arrive(), with a 120 px slowing radius", not "Screenshot of the demo".
 
@@ -96,7 +96,7 @@ Between the header and the body, two blocks let a reader judge the project in th
 
 **By context.**
 
-- `client`: the client is named only with their agreement, in the `client` field. Under NDA, the page shows no code, no source links, no figures and no competitor names. It stays `draft: true` until the client has approved the text.
+- `client`: the client is named only with their agreement, in the `client` field. The page never shows the client's code, source links, internal names (services, people, the client's own customers) or competitor names. It can show code written for the page on a public standard, to explain a principle; figures the client or its customers published, with the link; and the architecture at the level of its components. A page that holds only that can be published before the client has read it; figures the client has not published, and anything else, wait for their approval.
 - `open-source`: link the source and the demos; code is welcome within the limits above.
 - `hackathon`: the time box is the first constraint. Say what Thibaut built and what the team did; the prize goes in `award`.
 - `personal`: say what the project explores and why it exists.

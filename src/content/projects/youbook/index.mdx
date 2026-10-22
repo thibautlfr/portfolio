@@ -1,37 +1,76 @@
 ---
 title: Youbook
-summary: A multi-tenant booking platform for tourism, normalising several providers to the OCTO standard and shipping embeddable widgets.
+summary: The activity marketplace of French tourism destinations, from the import of every provider's catalogue to one cart and one payment across them.
 role: Full-stack developer
 context: client
 client:
   name: Raccourci Agency
   url: https://www.raccourci.fr
   group: Groupe Yoni
-stack: [Kotlin, Ktor, Vue 3, TypeScript, Temporal, PostgreSQL]
+year: 2026
+stack: [Kotlin, Ktor, Temporal, PostgreSQL, Vue 3, TypeScript]
 cover:
-  src: ./cover.svg
-  alt: Placeholder for the Youbook visual.
+  src: ./cover.png
+  alt: "The Youbook title card, set as a sheet of white cells. On the left, the two blue o of the Youbook logo stand beside the name Youbook in bold, above the line One cart and one payment for every activity of a destination, under the label Client work, Raccourci Agency, 2026. On the right, on the sage ground, a capture of the booking widget with a slot picked, and in front of it a capture of the cart on a phone, the visit held for 29 minutes 47 above an orange payment button. A row of facts below: native booking, the second version; Kotlin, Temporal, PostgreSQL; Vue 3 widgets on any site."
+gallery:
+  - src: ./widget.png
+    alt: "The booking widget on a desktop page. Under the heading Choisissez vos dates, vos options, one standard ticket and Saturday 24 October are chosen; the brewery visit shows three slots at 2.50 euros, 10:00, 16:00 selected in orange, and 17:00 with fewer than ten places left, above the price detail. Beside it, a box reads from 2.50 euros with a button to book a date."
+  - src: ./cart.png
+    alt: "The cart on a desktop page, titled Panier. One line holds the brewery visit on Saturday 24 October at 16:00 for one person, with a blue badge saying the booking is guaranteed for 29 minutes 50 and a bin to remove it. A red box asks for the participants' details, then the price detail, a total of 2.50 euros and a wide orange payment button."
+links:
+  - { label: Youbook on Raccourci's site, url: "https://www.raccourci.fr/nos-produits/youbook/", kind: live }
+decisions:
+  - Every connector fills in one shared import skeleton, so a forgotten field no longer compiles and removals are handled once.
+  - Each destination's import settings live in one tool and travel with each run, instead of environment variables redeployed.
+  - The browser sends identifiers only. Prices are read again from the provider on the server, so nobody pays a price they wrote.
+  - The cart's id is the workflow's id, so a second click finds the payment already running instead of starting another.
 schemaType: WebApplication
-featured: true
-order: 10
+featured: false
+order: 100
 ---
+
+import template from "./template.png";
 
 ## Context
 
-Youbook is a booking platform used by tourism destinations across France. Placeholder: the wording is being validated with the client.
+Youbook is the activity marketplace that Raccourci builds for tourism destinations. Tourist offices such as [Marseille's](https://www.marseille-tourisme.com/experience/club-marseille-experience/top-5-erreurs-sur-marseille-experience/) show the activities of local providers on their own sites, while each provider keeps its own booking software.
+
+I joined in April 2024 as an intern who had never written Kotlin, stayed through an apprenticeship and then as a freelancer, and worked on every layer of the product: the import of the providers' catalogues, the tool that configures it for each destination, the front end, and **the second version, which books and pays inside Youbook** instead of in each provider's widget.
 
 ## Constraints
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Placeholder: the real constraints are written later.
+- **Every provider's software is different**, and the first connectors had each been written from scratch by a different developer, so the same field was computed in several ways.
+- Each destination has its own credentials and settings at each provider. The import read them from environment variables: one deployment per change.
+- The widgets run on other people's sites, inside a shadow DOM. Anything the browser sends can be rewritten before it arrives.
+- Providers hold a booking for a limited time and confirm each one separately, after the payment is authorised, so a paid cart can end up half booked.
+- The team was small and changed over the years, and **I became the one who knew the product end to end**, back and front.
 
 ## Approach
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+The import came first. Each connector built the common model by hand, in a few hundred lines that drifted apart. I replaced them with a [template method](https://refactoring.guru/design-patterns/template-method): a base class assembles the model and asks each connector for one field at a time, so a field forgotten in a new connector no longer compiles. Four months later I moved the pipeline itself into the base class: load what exists, import, store, then unpublish what the provider no longer lists, which no connector did before.
+
+<Figure
+  src={template}
+  alt="Two diagrams side by side. On the left, under Before: a pipeline per connector, three boxes, connectors A, B and C, each doing fetch, build every field, store, count and log. On the right, under After: one skeleton, a base pipeline framed in teal runs startup, import, store and unpublish what is gone, and three small boxes A, B and C extend it, each with only import and getters."
+  caption="Unpublishing what a provider no longer lists is written once, in the base pipeline, for every connector."
+/>
+
+Settings came next. One import served one destination per deployment, so I gave every run an import context, then rebuilt the configuration tool from an empty project: each connector declares typed fields, each destination fills them in, and a scheduled job publishes them on a queue the import listens to. I chose a scheduler and a queue because Temporal was not deployed yet. The same fields later became per-destination switches, such as the one that turns native booking on.
+
+In 2025 I moved to the front end with the map mode, which the French sailing federation asked for on [Destination Voile](https://www.destinationvoile.com/toutes-les-activites/). It loads only the visible area when the map stops moving and cancels the previous request, because the search engine computes its filters over every result it returns.
+
+Native booking is the largest part. The widget talks only to **a cart API, the only public entry**, and sends identifiers. The server reads availability and price again from a booking service that speaks [OCTO](https://docs.octo.travel/), the open standard for activities, holds the booking at that price and charges what it stored.
+
+The transaction runs as a [Temporal](https://temporal.io/) workflow whose id is the cart's id, so the orchestrator itself keeps one transaction per cart. The workflow confirms the bookings in a child workflow, one activity per booking with its own retries. When some fail, it shows them to the visitor and waits for a choice: **capture only the confirmed bookings, or cancel all of them**. Capturing everything would charge for a missing activity, and cancelling without asking would throw away the rest of the cart.
 
 ## Engineering notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation.
+Two problems taught me the most, two years apart, and both came from state kept one level too high.
+
+In the import, my first pipeline kept the product being processed in a field of the base class, and the connectors were Kotlin `object`s, which are singletons. As soon as two imports ran at once, one overwrote the other's current product. The fix was to turn the pipelines into classes created for each run, with their state passed to the constructor, and the lesson stayed with me: **a template method that holds state cannot live in a singleton**. The same month, I replaced a plain map shared between coroutines with a concurrent one.
+
+In the payment workflow, the cart's id became the workflow's id, so that a second click finds the payment already running. That broke something else. The key sent to the payment provider for [idempotency](https://docs.stripe.com/api/idempotent_requests) was built from the workflow's id and the activity's id, so after a failed attempt, a new run for the same cart would have sent the same key, and **the provider would have returned the previous attempt's payment session** from its cache. I added the run's id to the key the same day: each attempt gets its own session, and retries within one attempt still share theirs. It never reached production.
 
 ## Outcome
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+The import skeleton has carried every provider added since, written by other developers on the same base class. The configuration tool has been in production since February 2026, the map mode since 2025, and native booking since September 2026, enabled product by product, first on the [Semaines du tourisme économique et des savoir-faire](https://semaines-tourisme-economique.bzh/) in Brittany. Youbook is used by [more than ten destinations](https://www.raccourci.fr/nos-produits/youbook/), and the Région Sud runs its [own marketplace](https://provence-alpes-cotedazur.com/espace-pro/professionnel-de-la-region/youbook-by-region-sud-la-nouvelle-marketplace-dediee-aux-activites-touristiques/) on it. Over those years I onboarded three developers onto the product.
