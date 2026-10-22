@@ -176,6 +176,10 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     padding: 0;
   }
 
+  .layer :global(.kit-ground) {
+    background: var(--color-ground);
+  }
+
   .layer :global(.kit-ink) {
     background: var(--color-shader-ground);
   }
@@ -205,6 +209,11 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-title);
     color: var(--color-text);
+  }
+
+  /* A name longer than a library's, set one step down so it holds beside a picture. */
+  .layer :global(.kit-display-short) {
+    font-size: var(--font-size-step-5);
   }
 
   .layer :global(.kit-lede) {
@@ -241,6 +250,11 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
 
   .layer :global(.kit-mark path) {
     fill: var(--color-surface);
+  }
+
+  /* A client's own logo used as the mark: wider than the square sign of the site's marks. */
+  .layer :global(.kit-logo) {
+    inline-size: 0.84em;
   }
 
   /* A title card: a label at the top, the name and what it is at the bottom. */
@@ -317,6 +331,41 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     font-size: var(--font-size-step-minus-1);
     font-variant-numeric: tabular-nums;
     color: var(--color-text-muted);
+  }
+
+  /* A capture filling its cell, cropped from its top left. */
+  .layer :global(.kit-capture) {
+    object-fit: cover;
+    object-position: left top;
+  }
+
+  /* A capture laid on a cell, framed by a hairline; the scene places it. */
+  .layer :global(.kit-shot) {
+    position: absolute;
+    overflow: hidden;
+    background: var(--color-surface);
+    border: var(--border-hairline);
+  }
+
+  /* A diagram: components as cells framed by a hairline, placed by the scene, and the labels of
+     the arrows between them, on the ground. */
+  .layer :global(.kit-box) {
+    position: absolute;
+    display: grid;
+    gap: var(--space-1);
+    align-content: center;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border: var(--border-hairline);
+  }
+
+  .layer :global(.kit-box.kit-accent) {
+    border-color: var(--color-accent);
+  }
+
+  .layer :global(.kit-tag) {
+    position: absolute;
+    white-space: nowrap;
   }
 
   /* A capture in the sheet: one white cell on the ground, the capture flush in it, and an
