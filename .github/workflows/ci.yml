@@ -16,37 +16,66 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
+      - uses: ./.github/actions/setup
       - run: pnpm verify
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+
+      # Astro's optimized images (AVIF in every size) took most of a cold build. The key follows the
+      # source images; a near miss restores the previous set and only the new ones are generated.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.astro/assets
+          key: astro-assets-${{ hashFiles('src/**/*.png', 'src/**/*.jpg', 'src/**/*.jpeg', 'src/**/*.webp', 'src/**/*.svg', 'astro.config.ts') }}
+          restore-keys: astro-assets-
 
       - run: pnpm build
         env:
           # Repository variable; analytics stay off when it is unset.
           PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
 
-      # Mobile Lighthouse on the built site: scores, LCP, CLS and byte budgets (lighthouserc.cjs).
-      - run: pnpm lighthouse
-
       - uses: actions/upload-artifact@v4
         with:
           name: site
           path: dist/
           retention-days: 1
+
+  # Mobile Lighthouse on the built site: scores, LCP, CLS and byte budgets (lighthouserc.cjs).
+  # One job per page, so the runs happen side by side.
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        url: ["/", "/work/youbook/", "/notes/", "/design-system/"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist/
+      - run: pnpm exec lhci autorun --collect.url=${{ matrix.url }}
+
+  # The one check the branch ruleset requires: it stands for all of the above.
+  verify:
+    needs: [checks, build, lighthouse]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          test "${{ needs.checks.result }}" = success \
+            && test "${{ needs.build.result }}" = success \
+            && test "${{ needs.lighthouse.result }}" = success
 
   deploy:
     needs: verify
