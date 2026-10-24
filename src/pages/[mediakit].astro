@@ -52,6 +52,7 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>Media kit</title>
+    <Font cssVariable="--font-archivo-wordmark" preload />
     <Font cssVariable="--font-stack-sans-headline" preload />
     <Font cssVariable="--font-stack-sans-text" preload />
     <Font cssVariable="--font-fragment-mono" preload />
@@ -209,6 +210,57 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-title);
     color: var(--color-text);
+  }
+
+  /* Thibaut's name on his own surfaces (banners, profile images, documents), as in the hero:
+     the wordmark face is for the name and nothing else. */
+  .layer :global(.kit-wordmark) {
+    font-family: var(--font-wordmark);
+    font-size: var(--font-size-step-5);
+    font-weight: var(--font-weight-wordmark);
+    font-stretch: var(--font-stretch-wordmark);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-wordmark);
+    color: var(--color-text);
+  }
+
+  /* Technologies as the site's TagList sets them: words in the text face, framed by a hairline. */
+  .layer :global(.kit-tags) {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .layer :global(.kit-tags > *) {
+    padding-inline: var(--space-2);
+    font-size: var(--font-size-step-minus-1);
+    font-weight: var(--font-weight-strong);
+    line-height: var(--line-height-lede);
+    color: var(--color-text);
+    white-space: nowrap;
+    background: var(--color-surface);
+    border: var(--border-hairline);
+  }
+
+  /* Availability, as the hero shows it above the email: a small teal square before the line. */
+  .layer :global(.kit-status) {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  .layer :global(.kit-status::before) {
+    inline-size: var(--space-2);
+    block-size: var(--space-2);
+    content: "";
+    background: var(--color-accent);
+  }
+
+  /* An address that would be a link on the site: ruled by its teal line at rest. */
+  .layer :global(.kit-address) {
+    padding-block-end: var(--space-1);
+    border-block-end: var(--border-width-hairline) solid var(--color-accent);
   }
 
   /* A name longer than a library's, set one step down so it holds beside a picture. */
