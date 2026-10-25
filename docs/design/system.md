@@ -4,7 +4,7 @@ The reference for the visual identity: what the site uses, under which names, an
 
 ## Principles
 
-1. **The sheet is the layout.** White cells bounded by hairlines on a sage ground. Structure is drawn by the content's own edges, never by a decorative grid.
+1. **The sheet is the layout.** White cells bounded by hairlines on a gray ground. Structure is drawn by the content's own edges, never by a decorative grid.
 2. **The frame is quiet, the works are loud.** Type, colour and space stay sober; colour comes from the shader, the project visuals and the posters.
 3. **Engineering first.** Data is set as data (mono, tabular figures), facts come before adjectives, nothing is claimed that is not shown.
 4. **One continuous motion.** The hero shader moves; everything else answers the visitor briefly and stops.
@@ -12,15 +12,15 @@ The reference for the visual identity: what the site uses, under which names, an
 
 ## Colour
 
-Two levels: Radix primitives (`--sage-*`, `--teal-*`) are only read by `tokens/color.css`; everything else uses the roles below.
+Two levels: Radix primitives (`--gray-*`, `--teal-*`) are only read by `tokens/color.css`; everything else uses the roles below.
 
 | Token                   | Value   | Hex     | Use                                                 |
 | ----------------------- | ------- | ------- | --------------------------------------------------- |
-| `--color-ground`        | sage-2  | #f7f9f8 | Page background, between sheets                     |
+| `--color-ground`        | gray-2  | #f9f9f9 | Page background, between sheets                     |
 | `--color-surface`       | white   | #ffffff | Cells                                               |
-| `--color-text`          | sage-12 | #1a211e | Text, titles, the wordmark                          |
-| `--color-text-muted`    | sage-11 | #5f6563 | Labels, captions, dates                             |
-| `--color-line`          | sage-7  | #cbcfcd | Hairlines (decorative)                              |
+| `--color-text`          | gray-12 | #202020 | Text, titles, the wordmark                          |
+| `--color-text-muted`    | gray-11 | #646464 | Labels, captions, dates                             |
+| `--color-line`          | gray-7  | #cecece | Hairlines (decorative)                              |
 | `--color-accent`        | teal-9  | #12a594 | Underlines, award frames, hovered image frames      |
 | `--color-accent-text`   | teal-12 | #0d3d38 | Teal text at body size                              |
 | `--color-link`          | teal-11 | #008573 | Links on white cells only                           |
@@ -28,7 +28,7 @@ Two levels: Radix primitives (`--sage-*`, `--teal-*`) are only read by `tokens/c
 | `--color-selection`     | teal-4  | #ccf3ea | Text selection                                      |
 | `--color-shader-ground` | ink     | #091213 | The shader's darkest ink and still-frame background |
 
-Rules: teal-11 never sets body text on the sage ground (4.31:1) and never sits on a tinted ground; nothing white goes on teal-9 (3.07:1); focus rings use teal-11, not teal-7. All measured pairs are in [`direction.md`](direction.md#colour).
+Rules: teal-11 never sets body text on the gray ground (4.33:1) and never sits on a tinted ground; nothing white goes on teal-9 (3.07:1); focus rings use teal-11, not teal-7. All measured pairs are in [`direction.md`](direction.md#colour).
 
 The shader carries its own palette, outside the tokens: ink #091213, teal-12 #0d3d38, teal-9 #12a594, coral #f2785c, ivory #f5ede0.
 
@@ -104,7 +104,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `ExternalMark` | Inside a link that leaves the site: a drawn arrow in the link's colour, and the fact for screen readers |
 | `LensDemo`     | The 3D carousel's shader, live on an ink cell, with its two uniforms on sliders under it                |
 
-Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the sage ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
+Code is the one exception to the site's palette: blocks use VS Code's default dark theme (Dark+) in the system's monospace, so any developer reads them as in their editor. Inline code is a small cell of the sheet: the gray ground, a hairline, square corners. Running text in case studies and notes is set at 300, so that its few bold phrases (600) carry.
 
 A case study page opens on its title block and cover, then its decisions and figures (`ProjectBrief`). The measured figures are framed as small cells of the sheet, in mono. Images, videos and code blocks in the body take the width of the text. The body is ruled like a specification: each section numbered 01 to 05, its title in a narrow column beside the text, a hairline between sections, and the sections listed again on the right (`SectionIndex`) on wide screens, or at the head of the body on narrow ones, one full touch target per section.
 
@@ -118,7 +118,7 @@ Project visuals at 16:10, experiments at 4:3, the portrait square and in black a
 
 Every project media sits in the site's frame, but not every one wears its art direction. The cover is how a project is recognised on the home page, so it shows the project as it is; the preview loop and the body media explain how it works, so they are drawn in the site's own language. A cover that is only a title card in the site's style makes every project look like a product of the same range.
 
-- **The cover and the gallery**: the real thing, captured and set in the sheet: a white cell with a hairline on the sage ground. The cover carries a row in mono with real data (the address, the viewport), never decoration; the gallery's images, shown at a quarter of the page, carry none. A game shows its title screen, a site its first viewport, a product its main screen. A library with no face of its own other than its API keeps a title card (the project's mark redrawn like the site's favicon, a dark square and a light sign; the name in Headline; what it is; a row of facts): Steerkit is the reference.
+- **The cover and the gallery**: the real thing, captured and set in the sheet: a white cell with a hairline on the gray ground. The cover carries a row in mono with real data (the address, the viewport), never decoration; the gallery's images, shown at a quarter of the page, carry none. A game shows its title screen, a site its first viewport, a product its main screen. A library with no face of its own other than its API keeps a title card (the project's mark redrawn like the site's favicon, a dark square and a light sign; the name in Headline; what it is; a row of facts): Steerkit is the reference.
 - **The preview loop and the body media**, for Thibaut's own code: a few use cases, one page each, a heading cell (number, title, the call in mono) over an ink cell where the project's real code runs, in the shader's palette (teal for the many, ivory for the one in focus, coral for what acts on it). Pages change by sliding up, as the site's do. The loop opens and closes on the cover, its poster, so it starts on hover without a jump. Ocarina and Steerkit are the references.
 - **Client work**: the same captures for the cover, the gallery and the loop, within what the client allows.
 
@@ -134,7 +134,7 @@ Before shipping any new surface, check that it has none of: gradient blobs, mesh
 
 ## Outside the web
 
-- **Colours**: the hex values above. Print: start from them and proof; sage-2 and white are close enough to need a visible hairline (#cbcfcd) between them.
+- **Colours**: the hex values above. Print: start from them and proof; gray-2 and white are close enough to need a visible hairline (#cecece) between them.
 - **Type**: the same five faces, all SIL Open Font License, so they can be installed for documents, slides and print. Full families: Archivo, Stack Sans (Text, Headline, Notch), Fragment Mono on Google Fonts or Fontsource. Set the name in Archivo 800 at width 125%, and only the name.
 - **Monogram**: TL in the wordmark face, light on ink (`public/favicon.svg`), for avatars and small marks.
-- **Layout**: the sheet translates directly to slides and documents: white cells, 1px sage hairlines, titles in Headline, data in mono. The Open Graph template in `src/lib/og.ts` is a ready example at 1200 × 630.
+- **Layout**: the sheet translates directly to slides and documents: white cells, 1px gray hairlines, titles in Headline, data in mono. The Open Graph template in `src/lib/og.ts` is a ready example at 1200 × 630.
