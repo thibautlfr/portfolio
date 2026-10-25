@@ -39,7 +39,7 @@ export function resolveHex(value: string, scope: ReadonlyMap<string, string>, de
   return `#${digits.toLowerCase()}`;
 }
 
-/** The name a colour token points at in the primitives: `var(--sage-12)` gives "sage-12". */
+/** The name a colour token points at in the primitives: `var(--gray-12)` gives "gray-12". */
 export function primitiveName(value: string): string | undefined {
   return /^var\(--([\w-]+)\)$/.exec(value)?.[1];
 }
