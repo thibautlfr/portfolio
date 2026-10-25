@@ -2,6 +2,7 @@
 title: "One design system for the site and everything I make around it"
 description: "The site's tokens also draw its Open Graph images, its favicon and the media of every project. What the system leaves alone matters as much as what it covers."
 pubDate: 2026-10-22
+updatedDate: 2026-10-25
 tags: [design-system, css, tokens]
 draft: false
 featured: false
@@ -15,11 +16,11 @@ A design system for one person sounds like a joke, and it would be one if it sto
 
 ## Tokens named by what they do
 
-The system itself is small: white cells bounded by one-pixel hairlines on a sage ground, five typefaces with one job each, a spacing scale in multiples of 4 px. What lets it travel is that **the tokens are named by role from the start**. `--color-text` points at Radix's `sage-12`, and nothing outside `color.css` reads `sage-12`. A component asks for the text colour, and so does anything else I draw, so changing the grey of the text is one line in one place.
+The system itself is small: white cells bounded by one-pixel hairlines on a gray ground, five typefaces with one job each, a spacing scale in multiples of 4 px. What lets it travel is that **the tokens are named by role from the start**. `--color-text` points at Radix's `gray-12`, and nothing outside `color.css` reads `gray-12`. A component asks for the text colour, and so does anything else I draw, so changing the grey of the text is one line in one place.
 
 <Figure
   src={roles}
-  alt="A sheet of white cells on the sage ground. Six colour swatches, each above its token's name in mono and its hex: the pale sage ground, the white surface, the near-black text, the grey muted text, the light grey line and the teal accent. Below them, three type samples: Selected work in bold Headline, Running text in Stack Sans Text, and 46.16° N in Fragment Mono, each with its token and its face."
+  alt="A sheet of white cells on the gray ground. Six colour swatches, each above its token's name in mono and its hex: the pale gray ground, the white surface, the near-black text, the grey muted text, the light grey line and the teal accent. Below them, three type samples: Selected work in bold Headline, Running text in Stack Sans Text, and 46.16° N in Fragment Mono, each with its token and its face."
   caption="Six of the eleven colour roles and three of the six type roles, each painted or set with its own token."
 />
 
@@ -31,7 +32,7 @@ The media of a project are not screenshots pasted in from a design tool. They ar
 
 <Figure
   src={surfaces}
-  alt="Two cells side by side on the sage ground. Left, the Open Graph card of this note: a white cell with the note's title in bold, over a foot with the name Thibaut Lefrançois and a dark cell with a teal bar. Right, a figure from the Steerkit case study: on an ink cell, an agent in ivory turns back inside a dashed teal circle toward a coral target, under the call arrive(agent, target, { slowingDistance: 2.2 }, force) in mono."
+  alt="Two cells side by side on the gray ground. Left, the Open Graph card of this note: a white cell with the label Note and the note's title in bold, over a foot with the name Thibaut Lefrançois and a crop of the hero shader's still frame. Right, a figure from the Steerkit case study: on an ink cell, an agent in ivory turns back inside a dashed teal circle toward a coral target, under the call arrive(agent, target, { slowingDistance: 2.2 }, force) in mono."
   caption="This note's Open Graph card and a figure of the Steerkit case study: one drawn by Satori at build time, one on the media kit."
 />
 
@@ -43,7 +44,7 @@ The cover is how a project is recognised on the home page. The first one I drew,
 
 <Figure
   src={covers}
-  alt="Two covers side by side on the sage ground. Left, Steerkit's title card: a dark square with a light arrow beside the name steerkit in bold, the line Steering behaviors for games, as small typed functions, and a row of three facts, with faint grey arrows scattered behind. Right, Ocarina's cover: the game's own title screen, a blue ocarina over a tree stump in a dim wooden room, under a golden pixel triangle and the name Ocarina in yellow, with the address ocarina.thibaut-lefrancois.com in mono below."
+  alt="Two covers side by side on the gray ground. Left, Steerkit's title card: a dark square with a light arrow beside the name steerkit in bold, the line Steering behaviors for games, as small typed functions, and a row of three facts, with faint grey arrows scattered behind. Right, Ocarina's cover: the game's own title screen, a blue ocarina over a tree stump in a dim wooden room, under a golden pixel triangle and the name Ocarina in yellow, with the address ocarina.thibaut-lefrancois.com in mono below."
   caption="Steerkit's cover is set in the site's type; Ocarina's keeps the game's own colours and lettering."
 />
 

@@ -5,7 +5,7 @@
 export const principles = [
   {
     title: "The sheet is the layout",
-    text: "White cells bounded by hairlines on a sage ground. Structure is drawn by the content's own edges, never by a decorative grid.",
+    text: "White cells bounded by hairlines on a gray ground. Structure is drawn by the content's own edges, never by a decorative grid.",
   },
   {
     title: "The frame is quiet, the works are loud",
@@ -76,7 +76,7 @@ export const contrastPairs: readonly ContrastPairSpec[] = [
     foreground: "--color-link",
     background: "--color-ground",
     kind: "text",
-    use: "Links on the sage ground",
+    use: "Links on the gray ground",
     refused: true,
   },
   {

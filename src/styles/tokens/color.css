@@ -1,19 +1,19 @@
 /* Colour roles. Radix primitives are read here and nowhere else; the rest of
    the code uses these names. Three Radix roles fail WCAG 2.2 AA and are not
-   used: teal-11 as body text on sage, white on teal-9, teal-7 as focus ring.
+   used: teal-11 as body text on gray, white on teal-9, teal-7 as focus ring.
    See docs/design/direction.md#colour. */
-@import "@radix-ui/colors/sage.css" layer(tokens);
+@import "@radix-ui/colors/gray.css" layer(tokens);
 @import "@radix-ui/colors/teal.css" layer(tokens);
 
 @layer tokens {
   :root {
     color-scheme: light;
 
-    --color-ground: var(--sage-2);
+    --color-ground: var(--gray-2);
     --color-surface: #fff;
-    --color-text: var(--sage-12);
-    --color-text-muted: var(--sage-11);
-    --color-line: var(--sage-7);
+    --color-text: var(--gray-12);
+    --color-text-muted: var(--gray-11);
+    --color-line: var(--gray-7);
     --color-accent: var(--teal-9);
     --color-accent-text: var(--teal-12);
 

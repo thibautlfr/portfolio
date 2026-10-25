@@ -2,7 +2,7 @@
 // src/styles/tokens/ at build time, so the page cannot describe a system other than the one the
 // site uses. What each token is for lives in src/data/design-system.ts; the test beside this
 // file fails when a token and its description part ways.
-import sageCss from "@radix-ui/colors/sage.css?raw";
+import grayCss from "@radix-ui/colors/gray.css?raw";
 import tealCss from "@radix-ui/colors/teal.css?raw";
 
 import {
@@ -35,7 +35,7 @@ export const tokenFiles = {
 };
 
 const colorScope = new Map([
-  ...toScope(parseTokens(sageCss)),
+  ...toScope(parseTokens(grayCss)),
   ...toScope(parseTokens(tealCss)),
   ...toScope(tokenFiles.color),
 ]);
@@ -49,7 +49,7 @@ function hexOf(name: string): string {
 
 export interface ColorRole {
   name: string;
-  /** The Radix step it points at ("sage-12"), when it points at one. */
+  /** The Radix step it points at ("gray-12"), when it points at one. */
   primitive: string | undefined;
   hex: string;
   use: string;

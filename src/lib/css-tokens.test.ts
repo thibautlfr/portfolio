@@ -26,11 +26,11 @@ describe("parseTokens", () => {
 
 describe("resolveHex", () => {
   const scope = toScope(
-    parseTokens(":root { --sage-12: #1A211E; --text: var(--sage-12); --white: #fff; --odd: color(display-p3 1 1 1); }"),
+    parseTokens(":root { --gray-12: #202020; --text: var(--gray-12); --white: #fff; --odd: color(display-p3 1 1 1); }"),
   );
 
   it("follows references and normalises", () => {
-    expect(resolveHex("var(--text)", scope)).toBe("#1a211e");
+    expect(resolveHex("var(--text)", scope)).toBe("#202020");
     expect(resolveHex("#fff", scope)).toBe("#ffffff");
   });
 

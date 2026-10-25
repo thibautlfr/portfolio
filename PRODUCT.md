@@ -45,7 +45,7 @@ A rigorous engineer with taste. The frame (layout, type, rhythm, structure) stay
 
 ## Brand Commitments
 
-- Accent colour: Radix teal. Neutral: Radix sage (Radix's natural pairing).
+- Accent colour: Radix teal. Neutral: Radix gray, so teal is the frame's one colour.
 - The user explicitly rejects the "AI landing page" look: gradient blobs, glassmorphism, generic bento, "Hi, I'm X 👋", decorative icons, Inter with Instrument Serif italic accents.
 - Writing: no em dashes, no "it's not X, it's Y", no forced triads, no decorative emoji.
 - Thibaut's own graphic language (from his posters): visible structural grids and hairlines, numbered annotations, mixed display faces, heavy expressive display type, halftone dot screens (from his drawn avatar).

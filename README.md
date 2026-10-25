@@ -39,7 +39,7 @@ src/
 ```
 
 - **Little JavaScript.** Astro's `ClientRouter` for page transitions, the hero shader (2.6 KB gzipped, loaded after the largest paint, never under reduced motion) and a few small scripts that load only on the pages that need them (previews, image viewer, section index, one live demo). Each is justified in `docs/architecture.md`.
-- **CSS from tokens only.** Radix sage and teal behind semantic tokens; Stylelint rejects raw values outside `src/styles/tokens/`.
+- **CSS from tokens only.** Radix gray and teal behind semantic tokens; Stylelint rejects raw values outside `src/styles/tokens/`.
 - **Self-hosted, subset fonts**, rebuilt by `scripts/fonts.sh`.
 - **SEO**: per-page metadata, JSON-LD, sitemap, RSS, `llms.txt`, Open Graph images rendered at build time.
 - **No Content Security Policy**: Astro does not support one with the `ClientRouter`, and the site has no form, account or user content.
