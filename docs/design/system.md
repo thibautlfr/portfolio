@@ -92,7 +92,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                             |
 | `TagList`      | Technologies as small tags framed by a hairline, in the text face                                       |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                                              |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus                 |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's mouse hover or keyboard focus  |
 | `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape             |
 | `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable                   |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                      |

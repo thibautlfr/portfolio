@@ -14,7 +14,9 @@ const { loop, ...media } = Astro.props;
 
 <div class="loop-media">
   <Media {...media} />
-  {loop && <video src={loop} muted loop playsinline preload="none" aria-hidden="true" data-loop-video />}
+  {loop && (
+    <video class="media-loop" src={loop} muted loop playsinline preload="none" aria-hidden="true" data-loop-video />
+  )}
 </div>
 
 {loop && <script>
@@ -27,7 +29,9 @@ const { loop, ...media } = Astro.props;
   }
 
   /* The loop sits on its image and only shows once it plays, so a loading video never
-     covers the image with an empty frame. */
+     covers the image with an empty frame. It carries the image's frame too: drawn on its own
+     layer, the video is rounded to whole pixels and would cover part of the image's outline.
+     Its frame turns teal with the image's, at the pace of a line being drawn. */
   video {
     position: absolute;
     inset: 0;
@@ -35,7 +39,10 @@ const { loop, ...media } = Astro.props;
     block-size: 100%;
     object-fit: cover;
     opacity: 0;
-    transition: opacity var(--duration-quick) var(--ease-snap);
+    outline: var(--border-hairline);
+    transition:
+      opacity var(--duration-quick) var(--ease-snap),
+      outline-color var(--duration-draw) var(--ease-snap);
   }
 
   video:global(.is-playing) {

@@ -179,7 +179,7 @@ export const componentRoles: Record<string, string> = {
   ExternalMark:
     "Inside a link that leaves the site: a drawn arrow in the link's colour, and the fact for screen readers.",
   FactList: "Term and value pairs. Data values are set in mono, lists are shown as tags.",
-  LoopMedia: "A Media with an optional preview loop over it, played by an ancestor's hover or focus.",
+  LoopMedia: "A Media with an optional preview loop over it, played by an ancestor's mouse hover or keyboard focus.",
   Media: "Images as AVIF with a hairline frame and an optional ratio.",
   ScrambleText: "Mono data that scrambles when an ancestor is pointed at. The real text stays readable.",
   SectionIndex: "The body's sections, numbered like their titles and kept in view. Marks the one being read.",
