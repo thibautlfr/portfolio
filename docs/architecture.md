@@ -47,7 +47,7 @@ src/
 │   └── format.ts             # Dates
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
 │   ├── hero-shader/          # boot.ts (inlined by the build, decides when), index.ts, renderer.ts, warp.frag
-│   ├── loop-video.ts         # Project and playground previews: play on hover or focus
+│   ├── loop-video.ts         # Project and playground previews: play on mouse hover or keyboard focus
 │   ├── scramble.ts           # Mono data resolves when pointed at (handles, coordinates)
 │   ├── lens-demo/            # The 3D carousel's fragment shader, live, its uniforms on sliders
 │   ├── back-link.ts          # A breadcrumb back to the previous page acts as history.back()

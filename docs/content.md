@@ -30,7 +30,7 @@ Every collection has these three, which drive the home page without touching cod
 
 - Images sit next to the entry and are referenced with a relative path: `src: ./cover.png`. Every image is an object with `src` and `alt`, so none can ship without alternative text. Write `alt` for someone who cannot see it: what it shows, not "image of".
 - Sources: PNG for flat artwork and screenshots, JPEG for photographs, SVG for vector placeholders. Up to 2400 px on the long side, sRGB. The build produces AVIF in every responsive size.
-- Videos are short loops next to the entry (`preview: ./preview.mp4`): H.264, 720p, about 6 seconds, no audio, 1.5 MB at most. They play on hover or focus and never under reduced motion; the image is their poster.
+- Videos are short loops next to the entry (`preview: ./preview.mp4`): H.264, 720p, about 6 seconds, no audio, 1.5 MB at most. They play on mouse hover or keyboard focus, never on a touch screen and never under reduced motion; the image is their poster.
 
 ## Projects
 
