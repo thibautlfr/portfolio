@@ -1,6 +1,7 @@
 /* Page transitions, run by Astro's ClientRouter: the next page slides up over the current
    one like a new sheet on the pile, and going back lifts it off again. The router marks the
-   direction on <html> (data-astro-transition) for the length of the transition. Under
+   direction on <html> (data-astro-transition) for the length of the transition; a step up
+   the site's tree counts as back (src/scripts/transition-direction.ts). Under
    reduced motion --duration-page is 0, so the pages swap at once. */
 @layer base {
   ::view-transition-group(root) {
