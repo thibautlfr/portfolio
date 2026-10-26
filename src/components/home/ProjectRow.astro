@@ -92,7 +92,7 @@ const { title, summary, award, context, client, year, role, stack, cover, previe
     transition-duration: var(--duration-draw);
   }
 
-  .row:hover :global(.media) {
+  .row:hover :global(:is(.media, .media-loop)) {
     outline-color: var(--color-accent);
   }
 

@@ -266,7 +266,7 @@ function mark() {
 }
 
 function sheet(kit, rows) {
-  const node = element("div", "kit-sheet", rows);
+  const node = element("div", "kit-sheet kit-framed", rows);
   node.style.gridTemplateRows = rows.map((row) => (row.dataset.grow ? "minmax(0, 1fr)" : "auto")).join(" ");
   const page = element("div", "kit-page", node);
   kit.layer.append(page);
