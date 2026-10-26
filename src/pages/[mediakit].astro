@@ -157,6 +157,13 @@ const index = Object.entries(recipes).map(([path, { default: recipe }]) => ({
     border-inline-start: var(--border-hairline);
   }
 
+  /* A sheet in the same piece as a capture set in the sheet, such as a reel opening on the
+     cover, takes the capture's margin: a page sliding over the cover lands on the same frame
+     instead of zooming in. */
+  .layer :global(.kit-sheet.kit-framed) {
+    inset: var(--frame-margin, var(--space-12));
+  }
+
   .layer :global(.kit-row) {
     display: grid;
     grid-auto-columns: minmax(0, 1fr);
