@@ -3,6 +3,7 @@
 //   card    the title card: the mark, the name, what it is and three facts, over a faint crowd
 //           wandering on the white cell. The cover, and the first frame of the reel.
 //   reel    the preview loop: the card, then three use cases of the library, back to the card.
+//           `pace` stretches every page (1 by default; a feed, read once, wants about 1.75).
 //   arrive  one agent overshooting a target and turning back inside the slowing distance: the
 //           figure of the case study.
 import {
@@ -478,6 +479,7 @@ function cardShot(kit) {
 function reel(kit) {
   // Pages change as the site's do: the next one slides up over the current one.
   const slide = 0.55;
+  const pace = Number(kit.params.get("pace") ?? 1);
   const parts = [
     { length: 1.2, ...card(kit) },
     {
@@ -518,7 +520,7 @@ function reel(kit) {
     },
   ];
   let offset = 0;
-  for (const part of parts) [part.begin, offset] = [offset, offset + part.length];
+  for (const part of parts) [part.begin, offset] = [offset, offset + part.length * pace];
   const duration = offset;
 
   return {
