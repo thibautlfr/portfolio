@@ -68,7 +68,7 @@ const { title, experiments } = Astro.props;
     transition-duration: var(--duration-draw);
   }
 
-  .card:hover :global(.media) {
+  .card:hover :global(:is(.media, .media-loop)) {
     outline-color: var(--color-accent);
   }
 

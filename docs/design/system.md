@@ -80,7 +80,7 @@ Links are ruled by a 1px teal line at rest. On hover or focus a 2px line is draw
 
 Data in mono that a visitor points at resolves like a reading: the social handles and the hero coordinates scramble for 420ms, each character through others of its own kind (digits through digits), then settle from left to right. Punctuation and symbols hold still. Only there, only with a mouse, never under reduced motion: it is a signature, and repeated everywhere it would become a tic.
 
-Page transitions are View Transitions run by Astro's `ClientRouter`, in the sheet style: the next page slides up over the current one, which lifts and darkens slightly, and going back runs it in reverse; rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
+Page transitions are View Transitions run by Astro's `ClientRouter`, in the sheet style: the next page slides up over the current one, which lifts and darkens slightly, and going back runs it in reverse, whether back in the history or up the site's tree (from a note to the list of notes, from any page to the home page); rows and notes rise in on scroll with CSS scroll-driven animations. Both are off under reduced motion and absent where unsupported. A breadcrumb that leads back to the page the visitor came from acts as the browser's back button, so that page returns scrolled to where it was left.
 
 ## Components
 
@@ -92,7 +92,7 @@ Page transitions are View Transitions run by Astro's `ClientRouter`, in the shee
 | `FactList`     | Term and value pairs; `data` values set in mono, lists shown as a `TagList`                             |
 | `TagList`      | Technologies as small tags framed by a hairline, in the text face                                       |
 | `Media`        | Images as AVIF with a hairline frame and an optional ratio                                              |
-| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's hover or focus                 |
+| `LoopMedia`    | A `Media` with an optional preview loop over it, played by an ancestor's mouse hover or keyboard focus  |
 | `ZoomMedia`    | A `Media` that opens larger in the viewer: a sheet of ground over the page, Close or Escape             |
 | `ScrambleText` | Mono data that scrambles when an ancestor is pointed at; the real text stays readable                   |
 | `EmailLink`    | The email in Notch, fitted to its cell, on one line at every width                                      |
