@@ -14,9 +14,15 @@ gallery:
   - src: ./game.png
     alt: The scene after Press Start. A blue ocarina floats above a tree stump in the middle of a round wooden room with a bed and a table, while four glowing fairies fly around it, and three pixel buttons sit in a corner.
 preview: ./preview.mp4
+award: Written up for Codrops, at their invitation
 links:
   - { label: Play it, url: "https://ocarina.thibaut-lefrancois.com", kind: live }
   - { label: Source on GitHub, url: "https://github.com/thibautlfr/ocarina", kind: source }
+  - {
+      label: Article on Codrops,
+      url: "https://tympanus.net/codrops/2026/10/27/songs-of-hyrule-from-a-fans-idea-to-a-three-js-mini-game-in-a-few-days/",
+      kind: article,
+    }
 decisions:
   - Songs match the end of the notes played, and a test checks no song ends another, so none hides inside a longer one.
   - Sound and recognition listen to the same `noteDown` apart, so a note never waits for the detector.
@@ -85,4 +91,4 @@ Their flight started as hand-written vector maths: each fairy aimed for a random
 
 ## Outcome
 
-Ocarina has been live since late September, with all 21 songs of both games and a song book that fills as they are learned. About ten friends tested the prototype before release, and nearly all of them asked for some kind of completion: the full book now ends on a celebration of the fairies. Anonymous analytics on that first version showed notes played without a single song learned, which is where the "Learn a song" hint comes from, eight seconds after the first note. Feedback now goes through the repository's issues. **steerkit came out of its fairies** and is published on npm.
+Ocarina has been live since late September, with all 21 songs of both games and a song book that fills as they are learned. About ten friends tested the prototype before release, and nearly all of them asked for some kind of completion: the full book now ends on a celebration of the fairies. Anonymous analytics on that first version showed notes played without a single song learned, which is where the "Learn a song" hint comes from, eight seconds after the first note. Feedback now goes through the repository's issues. **steerkit came out of its fairies** and is published on npm. After the release, **[Codrops](https://tympanus.net/codrops/) contacted me to write about it** for its community, and the article tells how Ocarina was built.
