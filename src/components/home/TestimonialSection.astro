@@ -1,0 +1,124 @@
+---
+import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
+import Sheet from "@/components/ui/Sheet.astro";
+import type { Testimonial } from "@/data/profile";
+
+interface Props {
+  /** Read by assistive technology only: the pulled sentence is the section's visible title. */
+  title: string;
+  testimonial: Testimonial;
+  /** Who the author speaks for, after their role. */
+  organisation: string;
+  /** Where the testimonial was given, before the translation note. */
+  source: string;
+}
+
+const { title, testimonial, organisation, source } = Astro.props;
+const { quote, pull, author, authorUrl, role, translatedFrom } = testimonial;
+---
+
+<Sheet aria-labelledby="testimonial-title">
+  <Cell as="figure" class="pull">
+    <h2 id="testimonial-title" class="visually-hidden">
+      {title}
+    </h2>
+    <blockquote>
+      <p class="pull-line">{pull}</p>
+    </blockquote>
+    <figcaption>
+      {authorUrl ? (
+        <a href={authorUrl} class="author tap">
+          {author}
+          <ExternalMark href={authorUrl} />
+        </a>
+      ) : (
+        <span class="author">{author}</span>
+      )}
+      <span class="muted">
+        {role}, {organisation}
+      </span>
+    </figcaption>
+  </Cell>
+  <Cell span={8} class="full">
+    <details>
+      <summary class="tap">Read the full recommendation</summary>
+      <blockquote class="full-text">
+        {quote.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </blockquote>
+    </details>
+  </Cell>
+  <Cell span={4} class="note">
+    <p class="muted">
+      {source}
+      {translatedFrom && `, translated from ${translatedFrom}`}
+    </p>
+  </Cell>
+</Sheet>
+
+<style>
+  /* One sentence of the quote is the display line, in the title face; the whole text waits
+     behind a disclosure, so the section reads at a glance and the words stay complete. */
+  .pull {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-12);
+  }
+
+  /* Three lines for a sentence of about eighty characters on wide screens, so the line fills
+     its cell instead of stopping halfway. Typographic marks say it is someone's words. */
+  .pull-line {
+    max-inline-size: 32ch;
+    font-family: var(--font-title);
+    font-size: var(--font-size-step-4);
+    font-weight: var(--font-weight-title);
+    line-height: var(--line-height-title);
+    letter-spacing: var(--letter-spacing-title);
+  }
+
+  figcaption {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-1);
+  }
+
+  .pull-line::before {
+    content: open-quote;
+  }
+
+  .pull-line::after {
+    content: close-quote;
+  }
+
+  .author {
+    font-weight: var(--font-weight-strong);
+  }
+
+  .muted {
+    color: var(--color-text-muted);
+  }
+
+  .full,
+  .note {
+    padding-block: var(--space-6);
+  }
+
+  summary {
+    color: var(--color-link);
+    cursor: pointer;
+  }
+
+  .full-text {
+    display: grid;
+    gap: var(--space-4);
+    max-inline-size: var(--layout-measure-wide);
+    padding-block-start: var(--space-4);
+    line-height: var(--line-height-lede);
+  }
+
+  .note p {
+    font-size: var(--font-size-step-minus-1);
+  }
+</style>

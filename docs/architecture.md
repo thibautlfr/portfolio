@@ -31,7 +31,7 @@ src/
 │   ├── site/                 # SiteFooter, SkipLink
 │   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ZoomMedia, ScrambleText, FactList, TagList, CodeText, ArticleBody, SectionIndex
 │   ├── design-system/        # Parts of the design system page: ColorRole, ContrastPair, TokenList
-│   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
+│   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, TestimonialSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
 │   ├── project/              # Case study parts: ProjectBrief (decisions and figures)
 │   ├── note/                 # NoteListItem
 │   ├── mdx/                  # Components available inside MDX bodies: Figure, Video
