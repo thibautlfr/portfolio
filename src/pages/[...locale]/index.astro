@@ -10,7 +10,7 @@ import WorkSection from "@/components/home/WorkSection.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
 import { getLocalizedCollection } from "@/i18n/content";
-import { localeOf, localeStaticPaths, locales } from "@/i18n/locales";
+import { localeOf, localeStaticPaths, locales, ogPath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectFeatured, selectLatest } from "@/lib/content";
 import { profilePage } from "@/lib/seo/json-ld";
@@ -28,7 +28,7 @@ const artworks = selectFeatured(await getLocalizedCollection("artworks", locale)
 const notes = selectLatest(await getLocalizedCollection("notes", locale), 3);
 const recommended = Object.values(profile.collaborations).find((collaboration) => collaboration.testimonial);
 const instagram = profile.socials.find((social) => social.label === "Instagram");
-const person = await author(Astro.site ?? Astro.url);
+const person = await author(Astro.site ?? Astro.url, locale);
 ---
 
 <BaseLayout
@@ -38,7 +38,8 @@ const person = await author(Astro.site ?? Astro.url);
     city: profile.location.city,
     positioning: profile.positioning,
   })}
-  jsonLd={[profilePage(person)]}
+  ogImage={ogPath("/home", locale)}
+  jsonLd={[profilePage(person, locale)]}
   {locales}
   hero
 >

@@ -12,7 +12,7 @@ import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
 import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
-import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
+import { localeOf, localeParam, locales, localizePath, ogPath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectPublished } from "@/lib/content";
 import { formatClient, formatContext } from "@/lib/format";
@@ -70,7 +70,7 @@ const source = links.find((link) => link.kind === "source");
 <BaseLayout
   title={`${seo?.title ?? title}, ${t("work.titleSuffix")} · ${profile.name}`}
   description={seo?.description ?? summary}
-  ogImage={`/og/work/${project.id}.png`}
+  ogImage={ogPath(`/work/${project.id}`, locale)}
   type="article"
   jsonLd={[
     work({
@@ -79,6 +79,7 @@ const source = links.find((link) => link.kind === "source");
       description: summary,
       url,
       authorUrl: site.href,
+      inLanguage: contentLocale,
       keywords: stack,
       ...(year && { year }),
       ...(source && { codeRepository: source.url }),

@@ -40,11 +40,12 @@ export function person(input: PersonInput) {
   };
 }
 
-/** The home page: a profile page about the person. */
-export function profilePage(personData: ReturnType<typeof person>) {
+/** The home page: a profile page about the person, in the page's language ("en", "fr"). */
+export function profilePage(personData: ReturnType<typeof person>, inLanguage: string) {
   return {
     "@context": "https://schema.org",
     "@type": "ProfilePage",
+    inLanguage,
     mainEntity: personData,
   };
 }
@@ -55,6 +56,8 @@ interface WorkInput {
   description: string;
   url: string;
   authorUrl: string;
+  /** The language of the page, "en" or "fr". */
+  inLanguage: string;
   image?: string;
   year?: number;
   keywords: readonly string[];
@@ -79,6 +82,7 @@ export function work(input: WorkInput) {
     name: input.name,
     description: input.description,
     url: input.url,
+    inLanguage: input.inLanguage,
     author: { "@id": `${input.authorUrl}#person` },
     keywords: input.keywords.join(", "),
     ...(input.image && { image: input.image }),
@@ -94,6 +98,8 @@ interface PostingInput {
   description: string;
   url: string;
   authorUrl: string;
+  /** The language of the page, "en" or "fr". */
+  inLanguage: string;
   datePublished: string;
   dateModified?: string;
   keywords: readonly string[];
@@ -107,6 +113,7 @@ export function blogPosting(input: PostingInput) {
     headline: input.headline,
     description: input.description,
     url: input.url,
+    inLanguage: input.inLanguage,
     mainEntityOfPage: input.url,
     author: { "@id": `${input.authorUrl}#person` },
     datePublished: input.datePublished,

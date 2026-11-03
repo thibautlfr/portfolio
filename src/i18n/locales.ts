@@ -30,6 +30,11 @@ export function localizePath(pathname: string, locale: Locale): string {
   return locale === defaultLocale ? path : `/${locale}${path}`;
 }
 
+/** The Open Graph image of a page: "/work/youbook" in French is "/og/fr/work/youbook.png". */
+export function ogPath(path: string, locale: Locale): string {
+  return `/og${localizePath(path, locale)}.png`;
+}
+
 /** The locale a page is rendered in, read from its URL. */
 export function localeOf(url: URL): Locale {
   return splitLocale(url.pathname).locale;

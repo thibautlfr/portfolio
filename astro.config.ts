@@ -36,6 +36,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
+      // Each page lists its other language (xhtml:link), as the hreflang links in its head do.
+      i18n: { defaultLocale: "en", locales: { en: "en", fr: "fr" } },
       // Redirect pages and the 404 are not content.
       filter: (page) =>
         !page.endsWith("/404/") && !Object.keys(legacyRedirects).some((path) => page.endsWith(`${path}/`)),

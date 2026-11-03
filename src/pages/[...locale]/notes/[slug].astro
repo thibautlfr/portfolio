@@ -10,7 +10,7 @@ import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
 import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
-import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
+import { localeOf, localeParam, locales, localizePath, ogPath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectLatest } from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
@@ -51,7 +51,7 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
 <BaseLayout
   title={`${title} · ${profile.name}`}
   {description}
-  ogImage={`/og/notes/${note.id}.png`}
+  ogImage={ogPath(`/notes/${note.id}`, locale)}
   type="article"
   jsonLd={[
     blogPosting({
@@ -59,6 +59,7 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
       description,
       url,
       authorUrl: site.href,
+      inLanguage: contentLocale,
       datePublished: isoDate(pubDate),
       ...(updatedDate && { dateModified: isoDate(updatedDate) }),
       keywords: tags,

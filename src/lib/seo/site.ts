@@ -1,11 +1,14 @@
 // Site-wide structured data: the author every page points to by @id.
 import { getImage } from "astro:assets";
 
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import type { Locale } from "@/i18n/locales";
 
 import { person } from "./json-ld";
 
-export async function author(site: URL) {
+/** The author, described in the page's language; the same person, by the same @id, in both. */
+export async function author(site: URL, locale: Locale) {
+  const profile = localProfile(locale);
   const portrait = await getImage({ src: profile.portrait.src, width: 800, format: "jpeg" });
   return person({
     name: profile.name,

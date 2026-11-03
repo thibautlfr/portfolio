@@ -22,8 +22,9 @@ const author = person({
 
 describe("person and profile page", () => {
   it("wraps the person as the main entity, with a stable id", () => {
-    const page = profilePage(author);
+    const page = profilePage(author, "fr");
     expect(page["@type"]).toBe("ProfilePage");
+    expect(page.inLanguage).toBe("fr");
     expect(page.mainEntity["@id"]).toBe(`${site}#person`);
     expect(page.mainEntity.email).toBe("mailto:hello@thibaut-lefrancois.com");
   });
@@ -37,9 +38,11 @@ describe("work", () => {
       description: "Steering behaviors.",
       url: `${site}work/steerkit/`,
       authorUrl: site,
+      inLanguage: "en",
       keywords: ["TypeScript", "Three.js"],
     });
     expect(data.author).toEqual({ "@id": `${site}#person` });
+    expect(data.inLanguage).toBe("en");
     expect(data.keywords).toBe("TypeScript, Three.js");
     expect(data).not.toHaveProperty("dateCreated");
     expect(data).not.toHaveProperty("image");
@@ -53,6 +56,7 @@ describe("work", () => {
       description: "A marketplace.",
       url: `${site}work/youbook/`,
       authorUrl: site,
+      inLanguage: "en",
       keywords: ["Kotlin"],
       producer: { name: "Raccourci Agency", url: "https://www.raccourci.fr", group: "Groupe Yoni" },
     });
@@ -72,6 +76,7 @@ describe("blogPosting", () => {
       description: "About something.",
       url: `${site}notes/a-note/`,
       authorUrl: site,
+      inLanguage: "fr",
       datePublished: "2026-10-01",
       keywords: [],
     });

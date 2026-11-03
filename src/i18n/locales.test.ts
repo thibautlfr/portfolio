@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { localeOf, localeStaticPaths, localizePath, splitLocale } from "./locales";
+import { localeOf, localeStaticPaths, localizePath, ogPath, splitLocale } from "./locales";
 
 describe("splitLocale", () => {
   it("reads the prefix of a translated page and keeps the root in English", () => {
@@ -22,6 +22,14 @@ describe("localizePath", () => {
     expect(localizePath("/fr/work/youbook/", "en")).toBe("/work/youbook/");
     expect(localizePath("/", "fr")).toBe("/fr/");
     expect(localizePath("/fr/", "fr")).toBe("/fr/");
+  });
+});
+
+describe("ogPath", () => {
+  it("puts a French page's image under the same prefix as the page", () => {
+    expect(ogPath("/work/youbook", "en")).toBe("/og/work/youbook.png");
+    expect(ogPath("/work/youbook", "fr")).toBe("/og/fr/work/youbook.png");
+    expect(ogPath("/home", "fr")).toBe("/og/fr/home.png");
   });
 });
 
