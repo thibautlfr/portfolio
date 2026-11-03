@@ -1,0 +1,80 @@
+---
+title: Ocarina · Songs of Hyrule
+summary: "L'ocarina d'Ocarina of Time dans le navigateur : les notes du jeu sur un clavier ou un téléphone, et 21 chansons reconnues pendant qu'on les joue."
+role: Design et développement
+cover:
+  alt: L'écran titre d'Ocarina dans un cadre blanc. Dans une pièce en bois sombre, un ocarina bleu flotte au-dessus d'une souche, derrière un triangle doré en pixel art, le nom Ocarina en lettres pixel jaunes, « Songs of Hyrule » et « Press Start ». Les cinq boutons de note et leurs touches sont listés dans un coin.
+gallery:
+  - alt: Le carnet de chansons ouvert au-dessus de la pièce floutée. Sur une dalle de pierre, deux rangées d'icônes de notes, six blanches, puis verte, rouge, bleue, deux grisées pour les chansons pas encore apprises et une jaune, et celle sélectionnée, la Berceuse de Zelda, écrite sur une portée en dessous sous forme de six boutons ronds.
+  - alt: La scène après Press Start. Un ocarina bleu flotte au-dessus d'une souche au milieu d'une pièce ronde en bois avec un lit et une table, pendant que quatre fées lumineuses volent autour, et trois boutons pixel sont posés dans un coin.
+award: Raconté pour Codrops, à leur invitation
+links:
+  - label: Jouer
+  - label: Code source sur GitHub
+  - label: Article sur Codrops
+decisions:
+  - Une chanson est reconnue à la fin des notes jouées, et un test vérifie qu'aucune ne se termine par une autre, plus courte.
+  - Le son et la reconnaissance écoutent chacun le même `noteDown`, donc une note n'attend jamais le détecteur.
+  - Les modèles et les sons restent dans un dépôt privé, récupérés au build et vérifiés par leurs empreintes SHA-256.
+  - Les fées volent avec des steering behaviors nommés de steerkit au lieu d'un calcul vectoriel anonyme.
+figures:
+  items:
+    - { label: "chansons d'Ocarina of Time et de Majora's Mask, reconnues pendant qu'on les joue" }
+    - { value: "3 jours", label: "pour le prototype jouable, du premier commit aux chansons et aux fées" }
+    - { label: "framework d'interface : Three.js sans surcouche, et les menus sont des éléments `<dialog>` natifs" }
+  source: D'après la liste des chansons du dépôt et l'historique du prototype, du 16 au 18 septembre 2026.
+---
+
+import detection from "./detection.png";
+
+## Contexte
+
+Le 8 septembre 2026, la bande-annonce du remake d'_Ocarina of Time_ a montré de nouvelles façons de jouer de l'ocarina : en fredonnant dans le micro de la console, avec un vrai instrument, avec un instrument virtuel dans une application compagnon. Deux jours plus tard s'ouvrait à Paris la première [Three.js Conf](https://threejs.paris/), où Bruno Simon a donné ses [sept règles d'or](https://ics.media/en/entry/260925/#seven-golden-rules-for-creating-web-experiences) des expériences web : tout animer, traiter le son comme une fonctionnalité, publier tôt. Je les ai prises comme un brief. Ocarina met l'instrument dans le navigateur, sur la souche de la maison de Link, pour les fans qui attendent le remake, et **je voulais le sortir avant le jeu**.
+
+## Contraintes
+
+- **Un temps limité.** L'idée n'avait de sens que tant que le remake faisait l'actualité, donc le prototype avait trois jours.
+- **Des assets qui ne sont pas à moi.** Les modèles et les sons appartiennent à Nintendo ou à des créateurs de la communauté. Ils peuvent être servis à un navigateur, jamais publiés dans un dépôt public ni dans son historique.
+- **Le son est le produit.** Les navigateurs bloquent l'audio jusqu'à un geste de l'utilisateur, et iOS n'en accepte que certains, donc la première chose à l'écran doit mériter ce geste.
+- **Clavier et tactile.** Les cinq mêmes notes doivent marcher avec Espace et les flèches sur un ordinateur, et avec les pouces sur un téléphone, plusieurs tenues à la fois.
+- **Les joueurs ne tiennent pas le tempo.** La plupart jouent une chanson de mémoire, à leur rythme.
+
+## Approche
+
+Je l'ai écrit en Three.js sans surcouche, avec TypeScript. L'expérience est presque entièrement en 3D et les menus sont des éléments `<dialog>` natifs, donc React Three Fiber aurait ajouté un moteur de rendu pour une interface qui existe à peine. Une classe racine `Experience` crée chaque classe dans l'ordre de leurs dépendances, et chaque classe lui demande ce dont elle a besoin. Les classes communiquent par **un petit émetteur mitt typé par module** plutôt que par un store partagé : l'état reste là où il vit (les réglages dans `Settings`, les chansons apprises dans `SongProgress`), et les événements disent seulement que quelque chose s'est passé.
+
+Les touches sont lues par `KeyboardEvent.code`, leur position physique, donc un clavier AZERTY joue les mêmes notes. Les boutons à l'écran pressent des touches du même module `Keyboard`, c'est pourquoi glisser un doigt ou tenir deux boutons n'a demandé aucun second chemin de code. L'ocarina écoute l'échantillonneur plutôt que le clavier : il anime ce qui sonne réellement, donc les rejeux d'une chanson le font bouger exactement comme le joueur.
+
+Chaque chanson est une courte partition dans la notation de la manette, un bouton et une durée en temps. Le détecteur garde les dernières notes jouées et vérifie, à chaque note, si elles se terminent par une chanson connue. **Le rythme est ignoré pour la reconnaissance** et ne sert qu'au rejeu, puisque les joueurs ne tiennent pas le tempo.
+
+```ts
+// Berceuse de Zelda : un bouton, puis sa durée en temps
+const score = "<2 ^1 >3 <2 ^1 >3";
+
+// Les notes jouées se terminent-elles par les boutons de la chanson ?
+const endsWith = (history, buttons) => {
+  const start = history.length - buttons.length;
+  if (start < 0) return false;
+  return buttons.every((b, i) => history[start + i] === b);
+};
+```
+
+Comparer la fin de l'historique ne marche que si aucune chanson n'en termine une autre, sinon la plus courte gagnerait toujours. **Un test vérifie qu'aucune des 21 ne le fait**, donc l'ordre de la liste n'a pas d'importance. Le détecteur et l'échantillonneur écoutent tous les deux le même `noteDown`, et le détecteur annonce une chanson dans une microtâche : la dernière note sonne et fait bouger l'ocarina avant que le jingle commence.
+
+<Figure
+  src={detection}
+  alt="Sur un fond sombre, une rangée de huit cellules contient les dernières notes jouées en symboles de manette : un triangle vers le haut et un disque en bleu-vert, puis six symboles ivoire sur des cellules bleu-vert foncé. Une accolade corail sous ces six les relie à une portée en dessous, où les mêmes six notes sont écrites, étiquetées Zelda's Lullaby. Au-dessus, l'appel endsWith(history, song.buttons)."
+  caption="Le détecteur garde huit notes, la longueur des plus longues chansons. Quoi qu'il y ait eu avant, les six dernières correspondent à la Berceuse de Zelda."
+/>
+
+## Notes d'ingénierie
+
+Le dépôt public contient le code et aucun fichier binaire. Les modèles et les sons vivent dans un dépôt privé avec un manifeste d'empreintes SHA-256 et de tailles. Au build, GitHub Actions charge une clé de déploiement en lecture seule, les récupère, et `scripts/assets.mjs` vérifie chaque fichier contre le manifeste avant de le copier : **un fichier manquant ou une empreinte différente fait échouer le build**, donc le site ne se déploie jamais sans ses vrais assets. Les modèles sont compressés avec des textures WebP et Meshopt, mais jamais avec `gltf-transform optimize`, qui aplatit et fusionne les nœuds. Le code trouve la place de l'ocarina grâce à un nœud vide, `ocarina_anchor`, que ce passage aurait supprimé.
+
+Les fées étaient l'autre détail qui valait le temps passé. Le modèle de Navi que j'ai trouvé avait une sphère de corps de 31 000 sommets ; j'ai gardé ses ailes et mis entre elles une sphère Three.js de 221 sommets. La lueur est un sprite additif dont la texture est **calculée pixel par pixel** plutôt que dessinée en dégradé de canvas : WebKit tramait les dégradés de canvas, et le bruit dans le bord pâle apparaissait en points colorés et noirs une fois ajouté à la scène.
+
+Leur vol a commencé comme un calcul vectoriel écrit à la main : chaque fée visait un point au hasard, ralentissait à l'arrivée et s'écartait de l'ocarina et de la caméra. Ça marchait, mais c'étaient les [steering behaviors](https://www.red3d.com/cwr/steer/) de Craig Reynolds sans leurs noms. Je l'ai extrait dans [steerkit](/fr/work/steerkit/), et les fées additionnent maintenant `arrive`, `brake` et `keepAway`, puis appellent `step`. Dans `#debug`, son `SteeringHelper` dessine la vitesse, la vitesse désirée et la force de steering de chaque fée.
+
+## Résultat
+
+Ocarina est en ligne depuis fin septembre, avec les 21 chansons des deux jeux et un carnet qui se remplit à mesure qu'on les apprend. Une dizaine d'amis ont testé le prototype avant la sortie, et presque tous ont demandé une forme d'accomplissement : le carnet complet se termine maintenant sur une fête des fées. Les statistiques anonymes de cette première version montraient des notes jouées sans une seule chanson apprise, d'où l'indice « Learn a song », huit secondes après la première note. Les retours passent désormais par les issues du dépôt. **steerkit est né de ses fées** et est publié sur npm. Après la sortie, **[Codrops](https://tympanus.net/codrops/) m'a contacté pour en parler** à sa communauté, et l'article raconte comment Ocarina a été construit.
