@@ -16,10 +16,9 @@ const translationsOf = {
 
 type Translatable = keyof typeof translationsOf;
 
-/** An entry in the page's language, with the language its text is actually written in. */
+/** An entry in the page's language. A published entry always has its French file (a test
+    checks it); a draft without one reads in English. */
 export type LocalizedEntry<C extends Translatable> = CollectionEntry<C> & {
-  /** The language of the text: the page's, or English while the entry has no translation. */
-  contentLocale: Locale;
   /** The French file, rendered in place of the English body when it exists. */
   translation?: CollectionEntry<(typeof translationsOf)[C]>;
 };
@@ -29,21 +28,17 @@ export async function getLocalizedCollection<C extends Translatable>(
   locale: Locale,
 ): Promise<LocalizedEntry<C>[]> {
   const entries = (await getCollection(collection)) as CollectionEntry<C>[];
-  if (locale === defaultLocale) return entries.map((entry) => ({ ...entry, contentLocale: defaultLocale }));
+  if (locale === defaultLocale) return entries as LocalizedEntry<C>[];
   const translations = new Map(
     ((await getCollection(translationsOf[collection])) as CollectionEntry<(typeof translationsOf)[C]>[]).map(
       (translation) => [translation.id, translation],
     ),
   );
+  // The generic entry types do not narrow per collection: the shape is the one built here.
   return entries.map((entry) => {
     const translation = translations.get(entry.id);
-    if (!translation) return { ...entry, contentLocale: defaultLocale };
-    return {
-      ...entry,
-      data: mergeTranslation(entry.data, translation.data),
-      contentLocale: locale,
-      translation,
-    };
+    if (!translation) return entry as LocalizedEntry<C>;
+    return { ...entry, data: mergeTranslation(entry.data, translation.data), translation } as LocalizedEntry<C>;
   });
 }
 

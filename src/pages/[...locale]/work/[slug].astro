@@ -59,8 +59,6 @@ const { Content, headings } = await renderLocalized(project);
 const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
-// An entry without its French file reads in English: the page says so and marks the text.
-const { contentLocale } = project;
 const home = localizePath("/", locale);
 const site = Astro.site ?? Astro.url;
 const url = new URL(localizePath(`/work/${project.id}/`, locale), site).href;
@@ -79,7 +77,7 @@ const source = links.find((link) => link.kind === "source");
       description: summary,
       url,
       authorUrl: site.href,
-      inLanguage: contentLocale,
+      inLanguage: locale,
       keywords: stack,
       ...(year && { year }),
       ...(source && { codeRepository: source.url }),
@@ -95,12 +93,7 @@ const source = links.find((link) => link.kind === "source");
   <article class="page">
     <Sheet as="div">
       <Breadcrumbs items={[{ label: profile.name, href: home }, { label: title }]} {locales} />
-      {contentLocale !== locale && (
-        <Cell class="untranslated">
-          <p>{t("work.untranslated")}</p>
-        </Cell>
-      )}
-      <Cell as="header" class:list={["title-block", { "has-cover": cover }]} lang={contentLocale}>
+      <Cell as="header" class:list={["title-block", { "has-cover": cover }]}>
         <div class="intro">
           <h1>{title}</h1>
           <p class="summary">{summary}</p>
@@ -141,14 +134,14 @@ const source = links.find((link) => link.kind === "source");
           </figure>
         )}
       </Cell>
-      {(decisions || figures) && <ProjectBrief {decisions} {figures} lang={contentLocale} />}
-      <ArticleBody {headings} lang={contentLocale}>
+      {(decisions || figures) && <ProjectBrief {decisions} {figures} />}
+      <ArticleBody {headings}>
         <Content components={{ Figure, Video }} />
       </ArticleBody>
       {next && next.id !== project.id && (
         <Cell as="footer" class="next card">
           <p class="next-label">{t("work.next")}</p>
-          <p class="next-title" lang={next.contentLocale}>
+          <p class="next-title">
             <a class="card-link" href={localizePath(`/work/${next.id}/`, locale)}>
               {next.data.title}
             </a>
@@ -162,12 +155,6 @@ const source = links.find((link) => link.kind === "source");
 <style>
   .page {
     padding-block-start: var(--layout-gutter);
-  }
-
-  /* Until the entry has its French file (docs/i18n.md, phase 4). */
-  .untranslated {
-    color: var(--color-text-muted);
-    font-size: var(--font-size-step-minus-1);
   }
 
   .title-block {

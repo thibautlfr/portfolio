@@ -39,8 +39,6 @@ const { Content, headings } = await renderLocalized(note);
 const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
-// A note without its French file reads in English: the page says so and marks the text.
-const { contentLocale } = note;
 const home = localizePath("/", locale);
 const list = localizePath("/notes/", locale);
 const site = Astro.site ?? Astro.url;
@@ -59,7 +57,7 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
       description,
       url,
       authorUrl: site.href,
-      inLanguage: contentLocale,
+      inLanguage: locale,
       datePublished: isoDate(pubDate),
       ...(updatedDate && { dateModified: isoDate(updatedDate) }),
       keywords: tags,
@@ -78,13 +76,8 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
         items={[{ label: profile.name, href: home }, { label: t("notes.title"), href: list }, { label: title }]}
         {locales}
       />
-      {contentLocale !== locale && (
-        <Cell class="untranslated">
-          <p>{t("note.untranslated")}</p>
-        </Cell>
-      )}
       <Cell as="header" class="title-block">
-        <h1 lang={contentLocale}>{title}</h1>
+        <h1>{title}</h1>
         <div class="facts">
           <FactList
             facts={[
@@ -102,7 +95,7 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
           )}
         </div>
       </Cell>
-      <ArticleBody {headings} lang={contentLocale}>
+      <ArticleBody {headings}>
         <Content components={{ Figure, Video }} />
       </ArticleBody>
     </Sheet>
@@ -112,12 +105,6 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
 <style>
   .page {
     padding-block-start: var(--layout-gutter);
-  }
-
-  /* Until the entry has its French file (docs/i18n.md, phase 4). */
-  .untranslated {
-    color: var(--color-text-muted);
-    font-size: var(--font-size-step-minus-1);
   }
 
   /* As on a case study, one step down: a note's title is a sentence, not a name. */

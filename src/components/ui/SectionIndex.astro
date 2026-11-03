@@ -6,17 +6,15 @@ import { useTranslations } from "@/i18n/ui";
 
 interface Props {
   headings: { slug: string; text: string }[];
-  /** The language of the headings, when it is not the page's. */
-  lang?: string | undefined;
 }
 
-const { headings, lang } = Astro.props;
+const { headings } = Astro.props;
 const t = useTranslations(localeOf(Astro.url));
 const number = (index: number) => String(index + 1).padStart(2, "0");
 ---
 
 <nav aria-label={t("site.sections")} data-section-index>
-  <ol role="list" {lang}>
+  <ol role="list">
     {headings.map((heading, index) => (
       <li>
         <span class="index" aria-hidden="true">

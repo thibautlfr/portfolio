@@ -70,7 +70,6 @@ const en = {
   "work.next": "Next case study",
   "work.decisions": "Decisions",
   "work.figures": "Figures",
-  "work.untranslated": "This case study is not translated yet: it reads in English.",
 
   // Notes
   "notes.description":
@@ -79,7 +78,6 @@ const en = {
   "note.published": "Published",
   "note.updated": "Updated",
   "note.source": "Originally posted on {platform}",
-  "note.untranslated": "This note is not translated yet: it reads in English.",
 
   // Legal notice
   "legal.title": "Legal notice",
@@ -201,7 +199,6 @@ const fr: Record<UiKey, string> = {
   "work.next": "Étude de cas suivante",
   "work.decisions": "Décisions",
   "work.figures": "Chiffres",
-  "work.untranslated": "Cette étude de cas n'est pas encore traduite\u202f: elle est en anglais.",
 
   "notes.description":
     "Des notes courtes sur le développement web, les shaders et le freelance\u202f: des expériences, des choses apprises, et des posts d'abord publiés sur X et LinkedIn.",
@@ -209,8 +206,6 @@ const fr: Record<UiKey, string> = {
   "note.published": "Publiée le",
   "note.updated": "Mise à jour le",
   "note.source": "Publiée d'abord sur {platform}",
-  "note.untranslated": "Cette note n'est pas encore traduite\u202f: elle est en anglais.",
-
   "legal.title": "Mentions légales",
   "legal.description": "L'éditeur, l'hébergeur et les données personnelles du site de {name}.",
   "legal.intro": "Qui publie ce site, qui l'héberge, et ce que deviennent vos données.",

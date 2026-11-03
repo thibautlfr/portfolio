@@ -10,11 +10,9 @@ import { useTranslations } from "@/i18n/ui";
 interface Props {
   decisions?: string[] | undefined;
   figures?: { items: { value: string; label: string }[]; source: string } | undefined;
-  /** The language of the decisions and figures, when it is not the page's. */
-  lang?: string | undefined;
 }
 
-const { decisions, figures, lang } = Astro.props;
+const { decisions, figures } = Astro.props;
 const t = useTranslations(localeOf(Astro.url));
 const span = decisions && figures ? 6 : 12;
 ---
@@ -22,7 +20,7 @@ const span = decisions && figures ? 6 : 12;
 {decisions && (
   <Cell {span} class="brief">
     <h2>{t("work.decisions")}</h2>
-    <ol role="list" class="decisions" {lang}>
+    <ol role="list" class="decisions">
       {decisions.map((decision) => (
         <li>
           <span>
@@ -36,7 +34,7 @@ const span = decisions && figures ? 6 : 12;
 {figures && (
   <Cell {span} class="brief">
     <h2>{t("work.figures")}</h2>
-    <dl class="figures" {lang}>
+    <dl class="figures">
       {figures.items.map(({ value, label }) => (
         <div class="figure">
           <dt>{value}</dt>
@@ -46,9 +44,7 @@ const span = decisions && figures ? 6 : 12;
         </div>
       ))}
     </dl>
-    <p class="source" {lang}>
-      {figures.source}
-    </p>
+    <p class="source">{figures.source}</p>
   </Cell>
 )}
 
