@@ -1,5 +1,5 @@
 // The site's languages and the paths between them. English is at the root, every other
-// language under its own prefix with the same slugs (see docs/i18n.md).
+// language under its own prefix with the same slugs (see the Languages section of docs/architecture.md).
 
 export const locales = ["en", "fr"] as const;
 

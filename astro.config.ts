@@ -17,7 +17,7 @@ export default defineConfig({
   // Scoped styles through a class rather than a data attribute on every element: shorter HTML.
   scopedStyleStrategy: "class",
   redirects: legacyRedirects,
-  // English at the root, French under /fr/ with the same slugs: see docs/i18n.md.
+  // English at the root, French under /fr/ with the same slugs: see the Languages section of docs/architecture.md.
   i18n: { locales: ["en", "fr"], defaultLocale: "en", routing: { prefixDefaultLocale: false } },
   // Code blocks look like an editor, VS Code's default dark theme: the one place the site does
   // not set its own colours, so a developer reads the code at a glance.
