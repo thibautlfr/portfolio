@@ -1,0 +1,86 @@
+---
+title: Steerkit
+summary: Les steering behaviors de Craig Reynolds en petites fonctions typées pour JavaScript et Three.js, sans allocation par frame, avec une démo pour chacun.
+role: Auteur
+cover:
+  alt: La carte titre de steerkit, posée comme une feuille de cellules blanches. Un carré sombre avec une flèche claire se tient à côté du nom en gras, au-dessus de la ligne « Steering behaviors for games, as small typed functions », avec de légères flèches grises qui errent derrière. En dessous, une ligne de faits indique npm i steerkit, TypeScript sans dépendance, et l'adaptateur Three.js.
+links:
+  - label: Démos interactives
+  - label: Code source sur GitHub
+  - label: Paquet npm
+decisions:
+  - Tout `{ x, y, z }` est un vecteur, donc `THREE.Vector3` et les types d'un moteur passent tels quels.
+  - Chaque behavior écrit dans un vecteur `out` passé en dernier, donc rien n'est alloué par appel.
+  - "Deux formes par combinateur : `blend` et `prioritize` se lisent bien, `zero` et `add` n'allouent rien."
+  - Three.js reste dans une entrée optionnelle `steerkit/three`, et le cœur n'a aucune dépendance.
+figures:
+  items:
+    - { value: "0,7 ms", label: "une frame de 1 000 boids avec la grille spatiale, contre 12 ms en parcourant toute la foule" }
+    - { value: "1 Kio", label: "de déchets par frame pour 1 000 agents avec `zero` et `add`, contre 190 Kio avec `blend`" }
+    - { value: "4,1 kB", label: "toute la bibliothèque, minifiée et compressée en brotli ; `seek` seul fait 170 o" }
+    - { value: "18", label: "behaviors, chacun avec sa propre démo interactive" }
+  source: Node 26 sur un M1 Pro, d'après le benchmark et le budget de taille du dépôt.
+---
+
+import arriveFrame from "./arrive.png";
+
+## Contexte
+
+Steerkit est né du vol des fées dans [Ocarina](/fr/work/ocarina/) : quelques centaines de lignes de calcul vectoriel qui les faisaient voler vers une cible, ralentir, planer et s'écarter de la caméra. Je voulais le même mouvement dans d'autres projets et je n'ai **rien trouvé d'assez petit pour l'emporter**. [Yuka](https://github.com/Mugen87/yuka), la bibliothèque la plus proche, est un framework complet d'IA de jeu construit autour de ses propres vecteur, véhicule et gestionnaire d'entités. J'ai donc extrait le module dans une bibliothèque à part, avec l'[article de Craig Reynolds à la GDC 1999](https://www.red3d.com/cwr/steer/gdc99/) comme spécification, et je m'en suis servi pour publier un paquet comme j'aimerais en dépendre.
+
+## Contraintes
+
+- Un behavior tourne pour chaque agent, à chaque frame. Avec mille agents à 60 fps, tout objet créé par appel est **un déchet que le ramasse-miettes doit balayer**, et ses pauses se voient en saccades.
+- Il fallait travailler sur les vecteurs qu'un projet a déjà : `THREE.Vector3`, des objets simples, les types d'un autre moteur. Aucune dépendance à l'exécution.
+- Le steering se règle à l'œil. Sans voir les forces, **chaque paramètre est une supposition**.
+- Un projet qui n'a besoin que de `seek` ne doit pas payer pour le flocking.
+
+## Approche
+
+Tout `{ x, y, z }` est un vecteur. Le typage structurel de TypeScript laisse **passer `THREE.Vector3` tel quel**, donc un agent peut prêter la `position` de son propre mesh, et `step` déplace directement le mesh. Une classe de vecteur à moi aurait imposé de copier à l'entrée et à la sortie à chaque frame.
+
+Chaque behavior prend l'agent en premier et écrit sa force dans **un vecteur `out` passé en dernier**, qu'il renvoie. Renvoyer un nouveau vecteur se lit un peu mieux et alloue à chaque appel. Toutes les entrées sont lues avant d'écrire dans `out`, donc `out` peut être n'importe laquelle d'entre elles, et un test le vérifie.
+
+```ts
+import { arrive, blend, keepAway, step } from "steerkit";
+
+const fairy = {
+  position: mesh.position, // un THREE.Vector3, tel quel
+  velocity: new THREE.Vector3(),
+  maxSpeed: 2,
+  maxForce: 4,
+};
+const [force, goal, away] = [vec(), vec(), vec()]; // créés une fois
+
+// À chaque frame
+blend(
+  force,
+  [arrive(fairy, target, { slowingDistance: 1.2 }, goal), 1],
+  [keepAway(fairy, camera, { radius: 1 }, away), 2],
+);
+step(fairy, force, dt);
+```
+
+C'est en combinant les forces que bien se lire et ne rien allouer se séparent. `blend` et `prioritize` prennent leurs forces en arguments et créent de petits tableaux à chaque appel ; `zero`, `add` et `addWithin` écrivent les mêmes sommes sans eux. J'ai **gardé les deux formes** et documenté quand passer de l'une à l'autre : trois agents prennent la plus lisible, une foule l'autre. Three.js vit dans une entrée optionnelle `steerkit/three`, avec `three` en peer optionnelle : le cœur ne l'importe jamais.
+
+Chaque behavior a sa page de démo, prérendue pour la recherche et les aperçus de liens, avec les forces dessinées et un curseur pour chaque paramètre. Un bouton Copy prompt donne à un agent de code l'objectif, les valeurs choisies sur la page et un lien vers `llms.txt`, dont la section API est générée à partir des sources de la bibliothèque avec le compilateur TypeScript. Les exemples du README tournent comme des tests, donc aucun des deux ne peut s'écarter du code.
+
+<Figure
+  src={arriveFrame}
+  alt="Un agent en forme de flèche juste après une cible au centre d'un cercle en pointillés, sous l'appel arrive(agent, target, { slowingDistance: 2.2 }, force). Une flèche ivoire pointe devant lui, une courte flèche bleu-vert en pointillés et une flèche corail pointent vers la cible."
+  caption="arrive(), dessiné à partir des forces que la bibliothèque renvoie. La force de steering (corail) est la vitesse désirée (bleu-vert en pointillés) moins la vitesse (ivoire) : elle fait faire demi-tour à l'agent, et dans le cercle en pointillés la vitesse désirée baisse jusqu'à l'arrêt sur la cible."
+/>
+
+## Notes d'ingénierie
+
+Zéro allocation n'est **qu'une promesse tant qu'on ne l'a pas mesuré**. Le test d'allocation lit `total_allocated_bytes` de V8 autour de 50 000 appels de chaque behavior et échoue quand un appel alloue un objet. Il a trouvé ce que la lecture du code n'avait pas vu : `Math.hypot` alloue un tableau temporaire quand V8 n'optimise pas l'appel, donc les normes utilisent `Math.sqrt`, et `Math.random` alloue aussi, donc les tests utilisent un générateur avec graine sur un tableau typé.
+
+Le cas subtil était le **boxing**. V8 range un nombre sur le tas quand il traverse un appel qu'il n'a pas inliné, et dans une grosse frame son budget d'inlining s'épuise. `keepAway` appelait `flee`, n'allouait rien seul et fuyait au milieu d'une foule. Il calcule désormais sa force dans des variables locales, et les boucles sur les voisins n'appellent plus aucune fonction utilitaire. Pour 1 000 agents qui combinent `wander`, `arrive` et `keepAway`, les déchets sont passés d'environ 5 Kio à environ 1 Kio par frame.
+
+Un test ne repère ça que si le code tourne comme dans une frame, donc un benchmark Node simple sert de seconde vérification, chaque variante dans son propre processus pour que le JIT n'optimise pas les fonctions partagées pour celle qui a tourné en premier. Sur un M1 Pro avec Node 26, le `blend` lisible laisse environ 190 Kio de déchets par frame pour 1 000 agents, contre environ 1 Kio avec `zero` et `add`. Pour 1 000 boids, une grille spatiale triée une fois par frame, d'après les [Ten Minute Physics](https://matthias-research.github.io/pages/tenMinutePhysics/) de Matthias Müller, fait passer une frame **de 12 ms à 0,7 ms**.
+
+Des tests de propriétés avec fast-check lancent des valeurs aléatoires et extrêmes sur chaque fonction et vérifient que les sorties restent finies, les vitesses sous `maxSpeed` et les forces sous `maxForce`.
+
+## Résultat
+
+Steerkit est sur npm en 0.4, sous licence MIT : 18 behaviors, les combinateurs, une grille spatiale et l'adaptateur Three.js, 4,1 kB minifiés et compressés en brotli en tout, et 170 o pour `seek` seul. **Les fées d'Ocarina volent désormais avec lui** : `arrive`, `brake`, `keepAway` et `step` ont remplacé les forces écrites à la main, et `faceVelocity` la rotation faite maison. Les versions passent par Changesets et sont mises en attente sur npm avec provenance, puis approuvées avec une double authentification avant que quiconque puisse les installer.
