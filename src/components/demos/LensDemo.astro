@@ -2,6 +2,9 @@
 // The 3D carousel's lens, live, for the note on its first shaders: the project's fragment shader
 // on a canvas, its two uniforms on sliders. Import it in the note's MDX body. Without JavaScript
 // or WebGL, the sliders stay at the project's values and a line says what is missing.
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
 interface Props {
   /** Describes what the canvas shows, for people who cannot see it. */
   label: string;
@@ -9,6 +12,7 @@ interface Props {
 }
 
 const { label, caption } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 
 // The project's own values (src/experience/world/image.ts) are the defaults.
 const uniforms = [
@@ -22,12 +26,12 @@ const digits = (step: string) => step.split(".")[1]?.length ?? 0;
   <div class="stage">
     <canvas data-lens-demo-canvas role="img" aria-label={label}></canvas>
     <p class="fallback" data-lens-demo-fallback>
-      The live lens needs JavaScript and WebGL.
+      {t("lens.fallback")}
     </p>
   </div>
   <form class="controls">
     <fieldset data-lens-demo-controls disabled>
-      <legend class="visually-hidden">The lens's uniforms</legend>
+      <legend class="visually-hidden">{t("lens.uniforms")}</legend>
       {uniforms.map(({ name, id, min, max, step, value }) => (
         <div class="control">
           <label for={id}>
@@ -38,7 +42,7 @@ const digits = (step: string) => step.split(".")[1]?.length ?? 0;
         </div>
       ))}
       <button type="reset" class="tap">
-        Back to the project's values
+        {t("lens.reset")}
       </button>
     </fieldset>
   </form>

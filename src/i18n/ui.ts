@@ -110,6 +110,11 @@ const en = {
   "legal.lawText":
     "This legal notice is governed by French law. In the event of a dispute, French courts have exclusive jurisdiction.",
 
+  // The lens demo, in the note on the 3D carousel
+  "lens.fallback": "The live lens needs JavaScript and WebGL.",
+  "lens.uniforms": "The lens's uniforms",
+  "lens.reset": "Back to the project's values",
+
   // Not found
   "notFound.title": "This page does not exist",
   "notFound.text":
@@ -222,6 +227,10 @@ const fr: Record<UiKey, string> = {
   "legal.law": "Droit applicable",
   "legal.lawText":
     "Les présentes mentions légales sont régies par le droit français. En cas de litige, les tribunaux français sont seuls compétents.",
+
+  "lens.fallback": "La lentille en direct a besoin de JavaScript et de WebGL.",
+  "lens.uniforms": "Les uniforms de la lentille",
+  "lens.reset": "Revenir aux valeurs du projet",
 
   "notFound.title": "Cette page n'existe pas",
   "notFound.text":

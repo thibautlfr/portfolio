@@ -1,0 +1,104 @@
+---
+title: "Mes premiers shaders GLSL : un carrousel 3D qui se courbe et se dédouble autour du curseur"
+description: "Une sinusoïde dans le vertex shader, un décalage RVB autour du curseur dans le fragment shader, et le bug de pixel ratio qui plaçait l'effet au mauvais endroit."
+---
+
+import carousel from "./carousel.mp4";
+import retina from "./retina.mp4";
+import LensDemo from "@/components/demos/LensDemo.astro";
+
+Je ne pensais pas être content de revoir des sinus et des cosinus. Écrire mes premiers shaders m'a ramené à la trigonométrie apprise au lycée sans savoir à quoi elle servait : la vague qui courbe chaque image est un sinus, et l'anneau qui porte les images est un sinus et un cosinus.
+
+Le projet est un carrousel 3D. Douze images de _Souvenirs de Marnie_, du studio Ghibli, sont suspendues en anneau qui tourne quand on fait défiler, et chaque image ondule, son rouge et son bleu écartés autour du curseur. C'était mon premier projet solo après les leçons sur les shaders de [Three.js Journey](https://threejs-journey.com/), construit comme j'apprends le mieux : lire sur un sujet, puis faire quelque chose de petit qui s'en sert. Je ne suis pas un expert des shaders, et c'est la visite que j'aurais aimé avoir avant de commencer, avec le bug qui m'a renvoyé dans le code l'après-midi même.
+
+<Video
+  src={carousel}
+  label="L'anneau d'images de film tourne dans un sens puis revient quand la molette défile ; autour du curseur, au centre, les bords des images se séparent en franges rouges et bleues."
+  caption="Six crans de molette dans un sens, puis retour. Un frottement de 0,7 par frame transforme chaque cran en 0,08 rad de rotation."
+/>
+
+## La mise en place
+
+La scène tourne sur mon propre boilerplate Three.js : un singleton `Experience` possède le renderer, la caméra, les ressources et la boucle de rendu, et chaque partie du monde, le carrousel ou une image, le récupère avec `Experience.getInstance()`. Les shaders sont des fichiers `.glsl` importés directement dans TypeScript grâce à [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl), donc ils ont leur coloration syntaxique au lieu de vivre dans des chaînes de caractères.
+
+L'anneau lui-même, c'est de la trigonométrie simple : l'image `i` sur 12 se place à l'angle `i / 12 × 2π`, en `x = sin(angle) × 4.5` et `z = cos(angle) × 4.5`, et `lookAt(0, 0, 0)` la tourne vers le centre, à l'intérieur de l'anneau, là où se tient la caméra. Le défilement s'ajoute à une vitesse de rotation qui perd 30 % d'elle-même à chaque frame sur ordinateur, et quand elle passe sous 0,0005 rad par frame, l'anneau continue de dériver seul à ce rythme.
+
+## Une vague dans le vertex shader
+
+Le vertex shader tourne une fois par sommet et décide où il arrive à l'écran. Chaque image est une `PlaneGeometry` de 32 segments sur 32, donc 1 089 sommets, assez pour une courbe lisse. Toute la déformation tient en trois lignes :
+
+```glsl
+float elevation = sin(modelPosition.x * uFrequency.x) * 0.1;
+elevation += sin(modelPosition.y * uFrequency.y) * 0.1;
+modelPosition.z += elevation;
+```
+
+Un sinus de la position du sommet, entre -1 et 1, réduit à 0,1. `uFrequency` est un uniform, une valeur envoyée depuis JavaScript et partagée par tous les sommets du mesh, et elle règle le serré de la vague : 3,5 sur x et 0 sur y, donc les images n'ondulent qu'à l'horizontale.
+
+Un détail que je n'ai compris que plus tard : `modelPosition` est le sommet dans l'espace du monde, après la position et la rotation propres du mesh. La vague reste où elle est dans la scène, et les images la traversent quand l'anneau tourne, c'est pourquoi la courbe semble se déplacer sur chacune. Le shader déclare aussi un `uTime` que chaque image met à jour à chaque frame et que le shader ne lit jamais.
+
+## Trois lectures pour un pixel
+
+Le fragment shader tourne une fois par pixel couvert par l'image et décide de sa couleur. `texture2D(uTexture, vUv)` lit l'image aux coordonnées UV transmises par le vertex shader et renvoie le rouge, le vert, le bleu et l'alpha. En l'essayant, j'ai compris que rien n'oblige les trois couleurs à venir du même endroit :
+
+```glsl
+float r = texture2D(uTexture, vUv + uvOffset).r;
+float g = texture2D(uTexture, vUv).g;
+float b = texture2D(uTexture, vUv - uvOffset).b;
+```
+
+Le rouge est lu un peu en avant, le bleu un peu en arrière, le vert reste en place, et les bords de l'image se séparent en franges colorées, l'aberration chromatique d'un objectif bon marché. Ce n'était pas prévu : **c'est venu en tâtonnant dans le fragment shader**, et ça coûte quatre lectures de texture au lieu d'une. Un vignettage ferme le shader : `dot(uv, uv)` est la distance au carré au centre de l'image, et la couleur s'assombrit avec elle.
+
+## Une lentille qui suit le curseur
+
+L'étape suivante était de la faire répondre à la souris au lieu de rester fixe. Le shader compare chaque pixel au curseur et garde l'effet dans un rayon :
+
+```glsl
+vec2 screenUv = gl_FragCoord.xy / uResolution;
+
+float aspect = uResolution.x / uResolution.y;
+vec2 diff = screenUv - uMouse;
+diff.x *= aspect;
+
+float dist = length(diff);
+float mask = smoothstep(uStereoRadius, 0.0, dist);
+vec2 dir = dist > 0.001 ? normalize(diff) : vec2(0.0);
+
+vec2 uvOffset = dir * uStereoStrength * mask;
+uvOffset.x /= aspect;
+```
+
+`gl_FragCoord` est la position du pixel dans le canvas ; divisée par la taille du canvas, elle va de 0 à 1 sur les deux axes, comme le curseur. Son origine est le coin en bas à gauche alors que le DOM compte depuis le haut, donc le y du curseur est inversé en JavaScript : `1.0 - e.clientY / innerHeight`. La différence est multipliée par le rapport d'aspect avant d'être mesurée, sinon un rayon serait plus large que haut sur un écran en paysage, et le décalage est redivisé par lui pour revenir en unités de 0 à 1. `smoothstep` transforme la distance en masque, 1 sous le curseur et 0 au-delà de `uStereoRadius`, 0,2 de la hauteur de l'écran, et les couleurs s'écartent du curseur jusqu'à `uStereoStrength`, 0,04.
+
+<LensDemo
+  label="Un canvas sombre quadrillé d'une grille ivoire. Autour du pointeur, ou au centre quand aucun pointeur ne le survole, les lignes de la grille se séparent en franges rouges et bleues dans un cercle. Deux curseurs en dessous règlent le rayon du cercle et l'écart des couleurs."
+  caption="Le fragment shader du projet, inchangé, avec uResolution dans les pixels dessinés. Ici l'image remplit le canvas, donc l'effet reste rond."
+/>
+
+## À mi-chemin du curseur sur un écran Retina
+
+Sur mon écran Retina, la lentille ne suivait pas le curseur. Elle se tenait entre le curseur et le coin en bas à gauche, exactement à mi-chemin, et deux fois plus petite que prévu.
+
+<Video
+  src={retina}
+  label="Deux écrans sombres quadrillés d'une grille ivoire, avec le même curseur corail qui fait une boucle dans chacun et un cercle en pointillés autour. À gauche, avant la correction, une petite tache de franges rouges et bleues voyage à mi-chemin entre le curseur et le coin en bas à gauche. À droite, après la correction, les franges remplissent le cercle en pointillés sous le curseur."
+  caption="Le fragment shader du projet avec un pixel ratio de 2. Le cercle en pointillés est uStereoRadius, 0,2 de la hauteur de l'écran, autour du curseur."
+/>
+
+`gl_FragCoord` compte en pixels de l'appareil. Avec un pixel ratio de 2, le canvas est dessiné à deux fois sa taille CSS, et j'avais envoyé `uResolution` en pixels CSS. **`screenUv` allait de 0 à 2 au lieu de 0 à 1**, donc il correspondait au curseur à la moitié de ses coordonnées, et chaque distance sortait deux fois trop longue, ce qui divisait le rayon par deux. Avec un ratio de 1, les deux unités sont les mêmes et le bug ne peut pas se voir. La correction est arrivée deux heures et demie après l'effet :
+
+{/* prettier-ignore */}
+```ts
+image.uniforms.uResolution.value.set(
+  sizes.width * sizes.pixelRatio,
+  sizes.height * sizes.pixelRatio,
+);
+```
+
+Le ratio doit être celui auquel le renderer dessine, pas `window.devicePixelRatio`. Le projet le plafonne avec `Math.min(window.devicePixelRatio, 2)` et passe la même valeur à `renderer.setPixelRatio`. Sur un écran de ratio 3, la valeur brute enverrait cette fois la lentille au-delà du curseur, une fois et demie plus loin du coin.
+
+## Ce qui cloche encore
+
+Le décalage est mesuré à l'écran mais appliqué aux UV de l'image, et les deux n'ont pas les mêmes proportions. U parcourt la largeur de l'image et v sa hauteur, donc un effet qui devrait être rond ressort étiré du rapport de l'image divisé par celui de la fenêtre. Les images font 1920 sur 1038, un rapport de 1,85, donc dans une fenêtre en 16:10 l'effet est environ 16 % plus large que haut, et sa taille suit celle de l'image à l'écran. Les rapports sont assez proches pour que ça se voie à peine. Pour le corriger, je convertirais le décalage avec `dFdx(vUv)` et `dFdy(vUv)`, qui disent de combien les UV changent d'un pixel au suivant à l'écran. Je ne l'ai pas encore essayé.
+
+La [démo](https://3d-carousel.thibaut-lefrancois.com) tourne dans le navigateur, et le code source est sur [GitHub](https://github.com/thibautlfr/3d-carousel).

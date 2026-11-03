@@ -1,0 +1,46 @@
+---
+title: "Un design system pour le site et pour tout ce que je fais autour"
+description: "Les tokens du site dessinent aussi ses images Open Graph, son favicon et les médias des projets. Ce qu'il laisse de côté compte autant que le reste."
+---
+
+import covers from "./covers.png";
+import roles from "./roles.png";
+import surfaces from "./surfaces.png";
+
+Un design system pour une seule personne, ça ressemble à une blague, et c'en serait une s'il s'arrêtait au site. Dès le premier brief de cette version, l'idée était de tirer du portfolio une identité que je pourrais réutiliser pour ma communication et mes projets, pour que tout ce que je fais autour du site lui ressemble sans que j'aie à vérifier à chaque fois. L'image Open Graph d'une note, le favicon, la couverture d'une étude de cas et sa boucle d'aperçu sortent déjà des mêmes tokens. Les suivants sont les schémas de mon article pour Codrops et l'annonce de Steerkit sur LinkedIn, sans date pour aucun des deux.
+
+## Des tokens nommés par ce qu'ils font
+
+Le système lui-même est petit : des cellules blanches bordées de filets d'un pixel sur un fond gris, cinq polices avec chacune un rôle, une échelle d'espacement en multiples de 4 px. Ce qui lui permet de voyager, c'est que **les tokens sont nommés par rôle dès le départ**. `--color-text` pointe vers le `gray-12` de Radix, et rien en dehors de `color.css` ne lit `gray-12`. Un composant demande la couleur du texte, comme tout ce que je dessine d'autre, donc changer le gris du texte tient en une ligne, à un seul endroit.
+
+<Figure
+  src={roles}
+  alt="Une feuille de cellules blanches sur le fond gris. Six échantillons de couleur, chacun au-dessus du nom de son token en mono et de son code hexadécimal : le fond gris pâle, la surface blanche, le texte presque noir, le texte atténué gris, le filet gris clair et l'accent bleu-vert. En dessous, trois exemples de texte : Selected work en Headline gras, Running text en Stack Sans Text, et 46.16° N en Fragment Mono, chacun avec son token et sa police."
+  caption="Six des onze rôles de couleur et trois des six rôles typographiques, chacun peint ou composé avec son propre token."
+/>
+
+Les polices suivent la même règle. `--font-title` est un rôle, composé aujourd'hui en Stack Sans Headline, donc une nouvelle police de titre changerait une ligne et aucun composant. Tous les rôles, avec ce à quoi chacun sert et chaque paire de couleurs mesurée contre le WCAG 2.2 AA, sont sur la [page du design system](/design-system/), qui les lit dans les feuilles de style au moment du build.
+
+## Là où il tourne déjà hors du CSS
+
+Les médias d'un projet ne sont pas des captures collées depuis un outil de design. Ils sont composés sur une page de développement du site, `/media-kit/`, qui charge les vrais tokens, les vraies polices et la palette du shader, puis rendus en PNG et en MP4 depuis là. **Un média ne peut pas utiliser un gris que le site n'a pas**, parce que la page sur laquelle il est dessiné ne l'a pas non plus. Les figures de cette note y ont été faites aussi. Le favicon est un carré sombre dans la couleur du texte avec un TL clair, le monogramme du logotype.
+
+<Figure
+  src={surfaces}
+  alt="Deux cellules côte à côte sur le fond gris. À gauche, la carte Open Graph de cette note : une cellule blanche avec la mention Note et le titre de la note en gras, au-dessus d'un pied avec le nom Thibaut Lefrançois et un recadrage de l'image fixe du shader de l'accueil. À droite, une figure de l'étude de cas Steerkit : sur une cellule encre, un agent ivoire fait demi-tour dans un cercle bleu-vert en pointillés vers une cible corail, sous l'appel arrive(agent, target, { slowingDistance: 2.2 }, force) en mono."
+  caption="La carte Open Graph de cette note et une figure de l'étude de cas Steerkit : l'une dessinée par Satori au build, l'autre sur le media kit."
+/>
+
+Les images Open Graph sont la fuite. Elles sont rendues au build par Satori, qui ne sait pas lire les propriétés personnalisées CSS, donc `og-colors.ts` contient des copies littérales de sept couleurs. C'est le seul endroit où une valeur est écrite deux fois, alors **un test compare chacune au token qu'elle reflète** : le jour où je change un hexadécimal dans `color.css` sans toucher à `og-colors.ts`, `pnpm verify` échoue. Le même fichier de test mesure chaque paire de couleurs du site contre le WCAG 2.2 AA.
+
+## Ce que le système laisse de côté
+
+La couverture, c'est ce qui fait reconnaître un projet sur la page d'accueil. La première que j'ai dessinée, celle de Steerkit, est une carte titre dans le style du site : la marque, le nom, une ligne qui dit ce que c'est, une rangée de faits. Elle convient à une bibliothèque dont le seul visage est son API. Pour Ocarina et Ocean Heartbeat, la couverture est le projet lui-même, capturé et posé dans une cellule blanche de la feuille avec son adresse et la taille de la fenêtre en mono en dessous, et Youbook, un projet client, pose son nom à côté de captures de son widget de réservation et de son panier. **Une rangée de cartes titres dans un même style ferait passer chaque projet pour un produit de la même gamme**, ce qui est l'inverse du rôle d'une couverture.
+
+<Figure
+  src={covers}
+  alt="Deux couvertures côte à côte sur le fond gris. À gauche, la carte titre de Steerkit : un carré sombre avec une flèche claire à côté du nom steerkit en gras, la ligne Steering behaviors for games, as small typed functions, et une rangée de trois faits, avec de légères flèches grises éparpillées derrière. À droite, la couverture d'Ocarina : l'écran titre du jeu lui-même, un ocarina bleu au-dessus d'une souche dans une pièce en bois sombre, sous un triangle doré en pixels et le nom Ocarina en jaune, avec l'adresse ocarina.thibaut-lefrancois.com en mono en dessous."
+  caption="La couverture de Steerkit est composée dans la typographie du site ; celle d'Ocarina garde les couleurs et le lettrage du jeu."
+/>
+
+Le cadre reste donc discret et le travail parle fort. Seuls les médias qui expliquent comment quelque chose marche, les boucles d'aperçu et les figures dans le corps du texte, parlent la langue du site : une cellule encre où tourne le code du projet, aux couleurs du shader. La détection des notes d'Ocarina et le `arrive()` de Steerkit sont dessinés ainsi. Les schémas pour Codrops et le post LinkedIn passeront par le media kit comme le reste, donc ils partiront des mêmes tokens.

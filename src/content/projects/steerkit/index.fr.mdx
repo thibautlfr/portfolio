@@ -15,8 +15,14 @@ decisions:
   - Three.js reste dans une entrée optionnelle `steerkit/three`, et le cœur n'a aucune dépendance.
 figures:
   items:
-    - { value: "0,7 ms", label: "une frame de 1 000 boids avec la grille spatiale, contre 12 ms en parcourant toute la foule" }
-    - { value: "1 Kio", label: "de déchets par frame pour 1 000 agents avec `zero` et `add`, contre 190 Kio avec `blend`" }
+    - {
+        value: "0,7 ms",
+        label: "une frame de 1 000 boids avec la grille spatiale, contre 12 ms en parcourant toute la foule",
+      }
+    - {
+        value: "1 Kio",
+        label: "de déchets par frame pour 1 000 agents avec `zero` et `add`, contre 190 Kio avec `blend`",
+      }
     - { value: "4,1 kB", label: "toute la bibliothèque, minifiée et compressée en brotli ; `seek` seul fait 170 o" }
     - { value: "18", label: "behaviors, chacun avec sa propre démo interactive" }
   source: Node 26 sur un M1 Pro, d'après le benchmark et le budget de taille du dépôt.
