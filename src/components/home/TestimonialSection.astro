@@ -1,5 +1,6 @@
 ---
 import Cell from "@/components/ui/Cell.astro";
+import ExternalMark from "@/components/ui/ExternalMark.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import type { Testimonial } from "@/data/profile";
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const { title, testimonial, organisation, source } = Astro.props;
-const { quote, pull, author, role, translatedFrom } = testimonial;
+const { quote, pull, author, authorUrl, role, translatedFrom } = testimonial;
 ---
 
 <Sheet aria-labelledby="testimonial-title">
@@ -26,7 +27,14 @@ const { quote, pull, author, role, translatedFrom } = testimonial;
       <p class="pull-line">{pull}</p>
     </blockquote>
     <figcaption>
-      <span class="author">{author}</span>
+      {authorUrl ? (
+        <a href={authorUrl} class="author tap">
+          {author}
+          <ExternalMark href={authorUrl} />
+        </a>
+      ) : (
+        <span class="author">{author}</span>
+      )}
       <span class="muted">
         {role}, {organisation}
       </span>
@@ -59,8 +67,10 @@ const { quote, pull, author, role, translatedFrom } = testimonial;
     padding-block: var(--space-12);
   }
 
+  /* Three lines for a sentence of about eighty characters on wide screens, so the line fills
+     its cell instead of stopping halfway. Typographic marks say it is someone's words. */
   .pull-line {
-    max-inline-size: 20ch;
+    max-inline-size: 32ch;
     font-family: var(--font-title);
     font-size: var(--font-size-step-4);
     font-weight: var(--font-weight-title);
@@ -70,7 +80,16 @@ const { quote, pull, author, role, translatedFrom } = testimonial;
 
   figcaption {
     display: grid;
+    justify-items: start;
     gap: var(--space-1);
+  }
+
+  .pull-line::before {
+    content: open-quote;
+  }
+
+  .pull-line::after {
+    content: close-quote;
   }
 
   .author {

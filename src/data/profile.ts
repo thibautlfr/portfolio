@@ -23,6 +23,8 @@ export interface Testimonial {
   /** The display line on the home page: one whole sentence of the quote, never cut. */
   pull: string;
   author: string;
+  /** The author's public profile, linked from their name. */
+  authorUrl?: string;
   /** The author's role at the time, for example "CTO". */
   role: string;
   /** The language it was written in, when the quote is a translation. */
