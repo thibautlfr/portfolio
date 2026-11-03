@@ -15,6 +15,20 @@ const socials: readonly Social[] = [
   { label: "Instagram", url: "https://www.instagram.com/thibautlfr/" },
 ];
 
+/** Words a client or partner wrote about the work, published with their agreement. Never
+    paraphrased, never invented; a translation stays as close to the original as English allows. */
+export interface Testimonial {
+  /** One string per paragraph. */
+  quote: readonly string[];
+  /** The display line on the home page: one whole sentence of the quote, never cut. */
+  pull: string;
+  author: string;
+  /** The author's role at the time, for example "CTO". */
+  role: string;
+  /** The language it was written in, when the quote is a translation. */
+  translatedFrom?: string;
+}
+
 /** A client or partner, named in a row under the About offers. Worded so it stays true once
     the work is over. */
 interface Collaboration {
@@ -24,14 +38,27 @@ interface Collaboration {
   credit: string;
   /** The group it belongs to, or what it is (llms.txt). */
   detail?: string;
+  testimonial?: Testimonial;
 }
 
-const collaborations = {
+const collaborations: Readonly<Record<string, Collaboration>> = {
   raccourci: {
     name: "Raccourci Agency",
     url: "https://www.raccourci.fr",
     credit: "Youbook, for Groupe Yoni's tourism software",
     detail: "Groupe Yoni",
+    // LinkedIn recommendation of 2026-11-02, translated from French.
+    testimonial: {
+      quote: [
+        "As CTO, I place great importance on a developer's ability to take on complex architecture problems while keeping a sense of the product. During his work-study years, Thibaut went well beyond our expectations on both counts.",
+        "He played a decisive role in building the sales funnel of our product YouBook. It is a critical project, on which he brilliantly handled workflow orchestration with Temporal.io to make stock deduction across several third-party APIs reliable in parallel, while keeping the front end flawlessly responsive with Server-Sent Events (SSE).",
+        "Thibaut shows a technical maturity that is rare for a work-study profile: rigorous about good practices, autonomous, and with an excellent team spirit. He is a solid asset for any tech team, and I recommend him without the slightest hesitation for his future professional challenges.",
+      ],
+      pull: "He played a decisive role in building the sales funnel of our product YouBook.",
+      author: "Nicolas Péridont",
+      role: "CTO",
+      translatedFrom: "French",
+    },
   },
   areti: {
     name: "Areti",
@@ -39,7 +66,7 @@ const collaborations = {
     credit: "Development partner of the studio",
     detail: "a creative and technical studio",
   },
-} satisfies Record<string, Collaboration>;
+};
 
 export const profile = {
   name: "Thibaut Lefrançois",

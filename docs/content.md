@@ -194,6 +194,8 @@ The page shows the title, the date and the source link above the body. The `desc
 
 Name, role, positioning, email, location, stack, socials, collaborations and legal facts live in [`src/data/profile.ts`](../src/data/profile.ts), typed and read everywhere else. The CV link appears once `cvPath` is set and the PDF is in `public/cv/`. `availability` is shown in the hero above the email; set it to `undefined` when not taking missions. `collaborations` are the clients and partners named in a row under the About offers (the name as a link, then `credit`; `detail` is used in `llms.txt`). Word them so they stay true once the work is over, and name a company only with its agreement.
 
+A collaboration can carry a `testimonial`: the words its author wrote, one string per paragraph in `quote`, published with their agreement. Never paraphrase or invent one; a translation stays as close to the original as English allows and sets `translatedFrom`. `pull` is one whole sentence of the quote, never cut (a test checks it): it is the display line of the section under About on the home page, with the full text behind a disclosure. The first collaboration with a testimonial is shown; nothing renders while none has one.
+
 ## Before launch
 
 Placeholder copy uses lorem ipsum on purpose: the deploy job refuses to publish while `src/content` contains it.
