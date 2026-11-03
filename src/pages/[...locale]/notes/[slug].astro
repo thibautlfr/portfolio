@@ -1,6 +1,4 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
-
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
@@ -10,33 +8,48 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
+import { localeOf, localeParam, locales, localizePath, ogPath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { selectLatest } from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
 import { blogPosting, breadcrumbs } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
-  const notes = selectLatest(await getCollection("notes"));
-  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+  const paths = await Promise.all(
+    locales.map(async (locale) =>
+      selectLatest(await getLocalizedCollection("notes", locale)).map((note) => ({
+        params: { locale: localeParam(locale), slug: note.id },
+        props: { note },
+      })),
+    ),
+  );
+  return paths.flat();
 }
 
 interface Props {
-  note: CollectionEntry<"notes">;
+  note: LocalizedEntry<"notes">;
 }
 
 const { note } = Astro.props;
 const { title, description, pubDate, updatedDate, tags, source } = note.data;
-const { Content, headings } = await render(note);
+const { Content, headings } = await renderLocalized(note);
 
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const profile = localProfile(locale);
+const home = localizePath("/", locale);
+const list = localizePath("/notes/", locale);
 const site = Astro.site ?? Astro.url;
-const url = new URL(`/notes/${note.id}/`, site).href;
+const url = new URL(localizePath(`/notes/${note.id}/`, locale), site).href;
 const platforms = { x: "X", linkedin: "LinkedIn" };
 ---
 
 <BaseLayout
   title={`${title} · ${profile.name}`}
   {description}
-  ogImage={`/og/notes/${note.id}.png`}
+  ogImage={ogPath(`/notes/${note.id}`, locale)}
   type="article"
   jsonLd={[
     blogPosting({
@@ -44,35 +57,38 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
       description,
       url,
       authorUrl: site.href,
+      inLanguage: locale,
       datePublished: isoDate(pubDate),
       ...(updatedDate && { dateModified: isoDate(updatedDate) }),
       keywords: tags,
     }),
     breadcrumbs([
-      { name: profile.name, url: site.href },
-      { name: "Notes", url: new URL("/notes/", site).href },
+      { name: profile.name, url: new URL(home, site).href },
+      { name: t("notes.title"), url: new URL(list, site).href },
       { name: title, url },
     ]),
   ]}
+  {locales}
 >
   <article class="page">
     <Sheet as="div">
       <Breadcrumbs
-        items={[{ label: profile.name, href: "/" }, { label: "Notes", href: "/notes/" }, { label: title }]}
+        items={[{ label: profile.name, href: home }, { label: t("notes.title"), href: list }, { label: title }]}
+        {locales}
       />
       <Cell as="header" class="title-block">
         <h1>{title}</h1>
         <div class="facts">
           <FactList
             facts={[
-              { term: "Published", value: formatDate(pubDate), data: true },
-              ...(updatedDate ? [{ term: "Updated", value: formatDate(updatedDate), data: true }] : []),
+              { term: t("note.published"), value: formatDate(pubDate, locale), data: true },
+              ...(updatedDate ? [{ term: t("note.updated"), value: formatDate(updatedDate, locale), data: true }] : []),
             ]}
           />
           {source && (
             <p class="source">
               <a class="tap" href={source.url}>
-                Originally posted on {platforms[source.platform]}
+                {t("note.source", { platform: platforms[source.platform] })}
                 <ExternalMark href={source.url} />
               </a>
             </p>

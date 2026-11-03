@@ -1,0 +1,62 @@
+---
+import { localeNames, localeOf, localizePath, type Locale } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
+interface Props {
+  /** The languages this page exists in; nothing shows while there is only one. */
+  available: readonly Locale[];
+}
+
+// Leads to the same page in the other language, never to its home. Each language is written
+// as its code and read out by its own name.
+const { available } = Astro.props;
+const current = localeOf(Astro.url);
+const t = useTranslations(current);
+---
+
+{available.length > 1 && (
+  <nav class="language-switch" aria-label={t("site.language")}>
+    <ul role="list">
+      {available.map((locale) => (
+        <li lang={locale}>
+          {locale === current ? (
+            <span aria-current="true">
+              <span aria-hidden="true">{locale.toUpperCase()}</span>
+              <span class="visually-hidden">{localeNames[locale]}</span>
+            </span>
+          ) : (
+            <a
+              class="tap"
+              href={localizePath(Astro.url.pathname, locale)}
+              hreflang={locale}
+              data-umami-event="language"
+            >
+              <span aria-hidden="true">{locale.toUpperCase()}</span>
+              <span class="visually-hidden">{localeNames[locale]}</span>
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  ul {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--font-size-step-minus-1);
+    line-height: var(--line-height-text);
+    white-space: nowrap;
+  }
+
+  li:not(:last-child)::after {
+    content: "/";
+    margin-inline-start: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  [aria-current] {
+    font-weight: var(--font-weight-strong);
+  }
+</style>

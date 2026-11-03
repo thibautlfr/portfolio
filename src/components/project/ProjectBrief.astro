@@ -4,6 +4,8 @@
 // alone.
 import Cell from "@/components/ui/Cell.astro";
 import CodeText from "@/components/ui/CodeText.astro";
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 interface Props {
   decisions?: string[] | undefined;
@@ -11,12 +13,13 @@ interface Props {
 }
 
 const { decisions, figures } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const span = decisions && figures ? 6 : 12;
 ---
 
 {decisions && (
   <Cell {span} class="brief">
-    <h2>Decisions</h2>
+    <h2>{t("work.decisions")}</h2>
     <ol role="list" class="decisions">
       {decisions.map((decision) => (
         <li>
@@ -30,7 +33,7 @@ const span = decisions && figures ? 6 : 12;
 )}
 {figures && (
   <Cell {span} class="brief">
-    <h2>Figures</h2>
+    <h2>{t("work.figures")}</h2>
     <dl class="figures">
       {figures.items.map(({ value, label }) => (
         <div class="figure">

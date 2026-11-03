@@ -1,13 +1,17 @@
 ---
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
 interface Props {
   target: string;
 }
 
 const { target } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 ---
 
 <a class="skip-link" href={`#${target}`}>
-  Skip to content
+  {t("site.skip")}
 </a>
 
 <style>

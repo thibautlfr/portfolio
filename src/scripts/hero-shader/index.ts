@@ -123,7 +123,8 @@ async function startHeroShader(root: HTMLElement) {
   toggle.addEventListener("click", () => {
     paused = !paused;
     toggle.setAttribute("aria-pressed", String(paused));
-    toggle.textContent = paused ? "Play animation" : "Pause animation";
+    // Labels in the page's language, written by Hero.astro.
+    toggle.textContent = (paused ? toggle.dataset["labelPlay"] : toggle.dataset["labelPause"]) ?? "";
     sync();
   });
 

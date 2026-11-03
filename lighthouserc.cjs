@@ -1,5 +1,5 @@
 // Lighthouse CI: mobile emulation and simulated 4G (Lighthouse defaults), three
-// runs per page, on the home, a case study and the notes index.
+// runs per page, on the home, a case study and the notes index, in English and French.
 // Performance asserts 0.95 to absorb CI noise; 100 is checked on a median run.
 //
 // LCP blocks at 2 s, not at the 1.5 s the site aims for (PRODUCT.md): the simulation steps by
@@ -26,7 +26,7 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: "./dist",
-      url: ["/", "/work/youbook/", "/notes/", "/design-system/"],
+      url: ["/", "/work/youbook/", "/notes/", "/design-system/", "/fr/", "/fr/work/youbook/"],
       numberOfRuns: 3,
     },
     assert: { assertions },

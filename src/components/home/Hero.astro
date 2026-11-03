@@ -5,14 +5,26 @@ import shaderFrame from "@/assets/images/shader-frame.jpg";
 // Built by Vite as a standalone ES module (vite.worker.format is "es"); only its URL ships in
 // the page, so nothing is requested before the boot step below decides to load it.
 import shaderModule from "@/scripts/hero-shader/index.ts?worker&url";
+import LanguageSwitch from "@/components/site/LanguageSwitch.astro";
 import Cell from "@/components/ui/Cell.astro";
 import EmailLink from "@/components/ui/EmailLink.astro";
 import Media from "@/components/ui/Media.astro";
 import ScrambleText from "@/components/ui/ScrambleText.astro";
 import Sheet from "@/components/ui/Sheet.astro";
-import { profile } from "@/data/profile";
+import type { profile as englishProfile } from "@/data/profile";
 import TagList from "@/components/ui/TagList.astro";
+import { localeOf, type Locale } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
+interface Props {
+  /** The profile in the page's language. */
+  profile: typeof englishProfile;
+  /** The languages the home page exists in, for the switch beside the role. */
+  locales: readonly Locale[];
+}
+
+const { profile, locales } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const stack = Object.values(profile.stack).flat();
 ---
 
@@ -22,7 +34,10 @@ const stack = Object.values(profile.stack).flat();
       <span>{profile.givenName}</span>
       <span>{profile.familyName}</span>
     </h1>
-    <p class="role">{profile.role}</p>
+    <div class="hero-name-foot">
+      <p class="role">{profile.role}</p>
+      <LanguageSwitch available={locales} />
+    </div>
   </Cell>
 
   <Cell span={3} flush as="figure" class="hero-portrait">
@@ -52,11 +67,19 @@ const stack = Object.values(profile.stack).flat();
     </div>
     <figcaption>
       <span>
-        I like it when the details are alive. <span class="hint hint--pointer">Hover to check.</span>
-        <span class="hint hint--touch">Tap to check.</span>
+        {t("hero.shaderCaption")} <span class="hint hint--pointer">{t("hero.hintPointer")}</span>
+        <span class="hint hint--touch">{t("hero.hintTouch")}</span>
       </span>
-      <button type="button" class="tap" data-hero-shader-toggle aria-pressed="false" hidden>
-        Pause animation
+      <button
+        type="button"
+        class="tap"
+        data-hero-shader-toggle
+        data-label-pause={t("hero.pause")}
+        data-label-play={t("hero.play")}
+        aria-pressed="false"
+        hidden
+      >
+        {t("hero.pause")}
       </button>
     </figcaption>
   </Cell>
@@ -70,7 +93,7 @@ const stack = Object.values(profile.stack).flat();
   </Cell>
 
   <Cell span={4} class="hero-base" data-scramble-trigger>
-    <p class="label">Base</p>
+    <p class="label">{t("hero.base")}</p>
     <p>
       {profile.location.city}, {profile.location.country}
     </p>
@@ -79,11 +102,11 @@ const stack = Object.values(profile.stack).flat();
     </p>
   </Cell>
   <Cell span={4} class="hero-mobility">
-    <p class="label">Mobility</p>
+    <p class="label">{t("hero.mobility")}</p>
     <p>{profile.mobility}.</p>
   </Cell>
   <Cell span={4} class="hero-stack">
-    <p class="label">Stack</p>
+    <p class="label">{t("hero.stack")}</p>
     <TagList items={stack} />
   </Cell>
 </Sheet>
@@ -172,6 +195,15 @@ const stack = Object.values(profile.stack).flat();
 
   .wordmark span {
     display: block;
+  }
+
+  /* The role, and the way to the other language on the same line, at the far end. */
+  .hero-name-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
   }
 
   .role {

@@ -5,6 +5,8 @@ import FactList from "@/components/ui/FactList.astro";
 import LoopMedia from "@/components/ui/LoopMedia.astro";
 import { formatClient, formatContext } from "@/lib/format";
 import { resolveVideo } from "@/lib/media";
+import { localeOf, localizePath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 interface Props {
   project: CollectionEntry<"projects">;
@@ -12,6 +14,8 @@ interface Props {
 
 const { project } = Astro.props;
 const { title, summary, award, context, client, year, role, stack, cover, preview } = project.data;
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
 ---
 
 <!-- The whole row is the link and the hover target: it draws the title's line, frames the cover
@@ -19,7 +23,7 @@ const { title, summary, award, context, client, year, role, stack, cover, previe
 <li class:list={["row", "card", { "row--text": !cover }]} data-loop-video-trigger>
   <div class="row-main">
     <h3 class="row-title">
-      <a class="card-link" href={`/work/${project.id}/`}>
+      <a class="card-link" href={localizePath(`/work/${project.id}/`, locale)}>
         {title}
       </a>
     </h3>
@@ -29,10 +33,10 @@ const { title, summary, award, context, client, year, role, stack, cover, previe
   <div class="row-facts">
     <FactList
       facts={[
-        { term: "Context", value: formatContext(context, year) },
-        ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
-        { term: "Role", value: role },
-        { term: "Stack", value: stack },
+        { term: t("facts.context"), value: formatContext(t(`context.${context}`), year) },
+        ...(client ? [{ term: t("facts.client"), value: formatClient(client) }] : []),
+        { term: t("facts.role"), value: role },
+        { term: t("facts.stack"), value: stack },
       ]}
     />
   </div>

@@ -1,4 +1,7 @@
 ---
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
 import Cell from "./Cell.astro";
 import SectionIndex from "./SectionIndex.astro";
 
@@ -11,7 +14,9 @@ interface Props {
   headings: { depth: number; slug: string; text: string }[];
 }
 
-const sections = Astro.props.headings.filter((heading) => heading.depth === 2);
+const { headings } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
+const sections = headings.filter((heading) => heading.depth === 2);
 const number = (index: number) => String(index + 1).padStart(2, "0");
 ---
 
@@ -19,7 +24,7 @@ const number = (index: number) => String(index + 1).padStart(2, "0");
   {/* On narrow screens the index beside the body is hidden: the sections are listed here
       instead, once, so a reader can go straight to one. */}
   {sections.length > 1 && (
-    <nav class="contents" aria-label="Sections">
+    <nav class="contents" aria-label={t("site.sections")}>
       <ol role="list">
         {sections.map((heading, index) => (
           <li>

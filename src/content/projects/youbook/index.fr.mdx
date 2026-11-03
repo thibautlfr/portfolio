@@ -1,0 +1,63 @@
+---
+title: Youbook
+summary: La place de marché d'activités des destinations touristiques françaises, de l'import du catalogue de chaque prestataire à un panier et un paiement communs.
+role: Développeur full-stack
+cover:
+  alt: "La carte titre de Youbook, posée comme une feuille de cellules blanches. À gauche, les deux o bleus du logo Youbook à côté du nom Youbook en gras, au-dessus de la ligne One cart and one payment for every activity of a destination, sous la mention Client work, Raccourci Agency, 2026. À droite, sur le fond gris, une capture du widget de réservation avec un créneau choisi, et devant elle une capture du panier sur téléphone, la visite réservée pour 29 minutes 47 au-dessus d'un bouton de paiement orange. En dessous, une ligne de faits : la réservation native, la deuxième version ; Kotlin, Temporal, PostgreSQL ; des widgets Vue 3 sur n'importe quel site."
+gallery:
+  - alt: "Le widget de réservation sur une page desktop. Sous le titre Choisissez vos dates, vos options, un billet standard et le samedi 24 octobre sont choisis ; la visite de la brasserie propose trois créneaux à 2,50 euros, 10:00, 16:00 sélectionné en orange, et 17:00 avec moins de dix places restantes, au-dessus du détail du prix. À côté, un encadré indique à partir de 2,50 euros avec un bouton pour réserver une date."
+  - alt: "Le panier sur une page desktop, titré Panier. Une ligne contient la visite de la brasserie le samedi 24 octobre à 16:00 pour une personne, avec un badge bleu disant que la réservation est garantie pendant 29 minutes 50 et une corbeille pour la retirer. Un encadré rouge demande les informations des participants, puis viennent le détail du prix, un total de 2,50 euros et un large bouton de paiement orange."
+links:
+  - label: Youbook sur le site de Raccourci
+decisions:
+  - Chaque connecteur remplit un squelette d'import commun, si bien qu'un champ oublié ne compile plus et que les retraits sont gérés une fois.
+  - Les réglages d'import de chaque destination vivent dans un seul outil et suivent chaque exécution, au lieu de variables d'environnement.
+  - Le navigateur n'envoie que des identifiants. Le serveur relit les prix chez le prestataire, donc personne ne paie un prix qu'il a écrit.
+  - L'id du panier est celui du workflow, donc un second clic retrouve le paiement déjà en cours au lieu d'en lancer un autre.
+---
+
+import template from "./template.png";
+
+## Contexte
+
+Youbook est la place de marché d'activités que Raccourci construit pour les destinations touristiques. Des offices de tourisme comme [celui de Marseille](https://www.marseille-tourisme.com/experience/club-marseille-experience/top-5-erreurs-sur-marseille-experience/) affichent les activités des prestataires locaux sur leur propre site, pendant que chaque prestataire garde son logiciel de réservation.
+
+Je suis arrivé en avril 2024 comme stagiaire sans avoir jamais écrit de Kotlin, je suis resté en alternance puis en freelance, et j'ai travaillé sur toutes les couches du produit : l'import des catalogues des prestataires, l'outil qui le configure pour chaque destination, le front, et **la deuxième version, qui réserve et encaisse dans Youbook** au lieu du widget de chaque prestataire.
+
+## Contraintes
+
+- **Chaque logiciel de prestataire est différent**, et les premiers connecteurs avaient chacun été écrits de zéro par un développeur différent, si bien qu'un même champ était calculé de plusieurs façons.
+- Chaque destination a ses propres identifiants et réglages chez chaque prestataire. L'import les lisait dans des variables d'environnement : un déploiement par changement.
+- Les widgets tournent sur les sites d'autres, dans un shadow DOM. Tout ce que le navigateur envoie peut être réécrit avant d'arriver.
+- Les prestataires bloquent une réservation pour un temps limité et confirment chacune séparément, une fois le paiement autorisé, donc un panier payé peut finir à moitié réservé.
+- L'équipe était petite et a changé au fil des années, et **je suis devenu celui qui connaissait le produit de bout en bout**, back et front.
+
+## Approche
+
+L'import est venu en premier. Chaque connecteur construisait le modèle commun à la main, en quelques centaines de lignes qui divergeaient. Je les ai remplacés par une [méthode patron](https://refactoring.guru/fr/design-patterns/template-method) : une classe de base assemble le modèle et demande à chaque connecteur un champ à la fois, si bien qu'un champ oublié dans un nouveau connecteur ne compile plus. Quatre mois plus tard, j'ai déplacé le pipeline lui-même dans la classe de base : charger l'existant, importer, enregistrer, puis dépublier ce que le prestataire ne propose plus, ce qu'aucun connecteur ne faisait avant.
+
+<Figure
+  src={template}
+  alt="Deux schémas côte à côte. À gauche, sous Before : un pipeline par connecteur, trois blocs, les connecteurs A, B et C, chacun récupère, construit chaque champ, enregistre, compte et journalise. À droite, sous After : un seul squelette, un pipeline de base encadré en bleu-vert lance le démarrage, l'import, l'enregistrement et la dépublication de ce qui a disparu, et trois petits blocs A, B et C l'étendent, chacun avec seulement l'import et les getters."
+  caption="Dépublier ce qu'un prestataire ne propose plus s'écrit une fois, dans le pipeline de base, pour tous les connecteurs."
+/>
+
+Les réglages sont venus ensuite. Un import servait une destination par déploiement, alors j'ai donné un contexte d'import à chaque exécution, puis j'ai reconstruit l'outil de configuration à partir d'un projet vide : chaque connecteur déclare des champs typés, chaque destination les remplit, et une tâche planifiée les publie sur une file que l'import écoute. J'ai choisi un planificateur et une file parce que Temporal n'était pas encore déployé. Les mêmes champs sont ensuite devenus des interrupteurs par destination, comme celui qui active la réservation native.
+
+En 2025, je suis passé au front avec le mode carte, que la Fédération française de voile a demandé pour [Destination Voile](https://www.destinationvoile.com/toutes-les-activites/). Il ne charge que la zone visible quand la carte s'arrête de bouger et annule la requête précédente, parce que le moteur de recherche calcule ses filtres sur tous les résultats qu'il renvoie.
+
+La réservation native est la plus grosse partie. Le widget ne parle qu'à **une API de panier, la seule entrée publique**, et envoie des identifiants. Le serveur relit la disponibilité et le prix auprès d'un service de réservation qui parle [OCTO](https://docs.octo.travel/), le standard ouvert des activités, bloque la réservation à ce prix et encaisse ce qu'il a enregistré.
+
+La transaction tourne dans un workflow [Temporal](https://temporal.io/) dont l'id est celui du panier, si bien que l'orchestrateur garantit lui-même une transaction par panier. Le workflow confirme les réservations dans un workflow enfant, une activité par réservation avec ses propres reprises. Quand certaines échouent, il les montre au visiteur et attend son choix : **encaisser seulement les réservations confirmées, ou toutes les annuler**. Tout encaisser ferait payer une activité manquante, et annuler sans demander jetterait le reste du panier.
+
+## Notes d'ingénierie
+
+Deux problèmes m'ont le plus appris, à deux ans d'écart, et tous les deux venaient d'un état gardé un niveau trop haut.
+
+Dans l'import, mon premier pipeline gardait le produit en cours dans un champ de la classe de base, et les connecteurs étaient des `object` Kotlin, donc des singletons. Dès que deux imports tournaient en même temps, l'un écrasait le produit en cours de l'autre. La correction a été de transformer les pipelines en classes créées pour chaque exécution, avec leur état passé au constructeur, et la leçon m'est restée : **une méthode patron qui garde un état ne peut pas vivre dans un singleton**. Le même mois, j'ai remplacé une simple map partagée entre coroutines par une map concurrente.
+
+Dans le workflow de paiement, l'id du panier est devenu celui du workflow, pour qu'un second clic retrouve le paiement déjà en cours. Ça a cassé autre chose. La clé envoyée au prestataire de paiement pour l'[idempotence](https://docs.stripe.com/api/idempotent_requests) était construite à partir de l'id du workflow et de celui de l'activité, donc après une tentative échouée, une nouvelle exécution pour le même panier aurait envoyé la même clé, et **le prestataire aurait renvoyé la session de paiement de la tentative précédente** depuis son cache. J'ai ajouté l'id de l'exécution à la clé le jour même : chaque tentative a sa propre session, et les reprises d'une même tentative partagent toujours la leur. Ça n'est jamais arrivé en production.
+
+## Résultat
+
+Le squelette d'import a porté tous les prestataires ajoutés depuis, écrits par d'autres développeurs sur la même classe de base. L'outil de configuration est en production depuis février 2026, le mode carte depuis 2025, et la réservation native depuis septembre 2026, activée produit par produit, d'abord sur les [Semaines du tourisme économique et des savoir-faire](https://semaines-tourisme-economique.bzh/) en Bretagne. Youbook est utilisé par [plus de dix destinations](https://www.raccourci.fr/nos-produits/youbook/), et la Région Sud fait tourner sa [propre place de marché](https://provence-alpes-cotedazur.com/espace-pro/professionnel-de-la-region/youbook-by-region-sud-la-nouvelle-marketplace-dediee-aux-activites-touristiques/) dessus. Pendant ces années, j'ai accueilli trois développeurs sur le produit.

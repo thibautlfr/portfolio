@@ -11,14 +11,18 @@ Astro 7, static output, deployed to GitHub Pages from `main`. TypeScript strict.
 ```
 src/
 ├── content.config.ts         # Collection schemas: the single source of truth for content shape
-├── content/                  # One folder per entry, its assets beside it
-│   ├── projects/<slug>/      # index.mdx, cover, preview video
+├── content/                  # One folder per entry, its assets beside it, in English and French
+│   ├── projects/<slug>/      # index.mdx, index.fr.mdx, cover, preview video
 │   │   └── _template/        # Copy this folder to add a project (ignored by the loader)
-│   ├── playground/<slug>/    # index.md, thumbnail, preview video
-│   ├── artworks/<slug>/      # index.md, image
-│   └── notes/<slug>/         # index.mdx and any assets
+│   ├── playground/<slug>/    # index.md, index.fr.md, thumbnail, preview video
+│   ├── artworks/<slug>/      # index.md, index.fr.md, image
+│   └── notes/<slug>/         # index.mdx, index.fr.mdx and any assets
+├── i18n/
+│   ├── locales.ts            # The languages, the path from a page to its other language, the Open Graph path
+│   ├── ui.ts                 # Every piece of UI copy, English and French, typed key for key
+│   └── content.ts            # Collections as a page in one language reads them (the French file over the English entry)
 ├── data/
-│   ├── profile.ts            # Identity, contact, location, socials, stack, legal: typed, read by pages and JSON-LD
+│   ├── profile.ts            # Identity, contact, location, socials, stack, legal: typed, read by pages and JSON-LD; localProfile() for French
 │   ├── legacy-redirects.ts   # V1 URLs sent to the home page (read by astro.config.ts)
 │   └── design-system.ts      # What /design-system/ says about each token, pair and component (never the values)
 ├── assets/
@@ -28,7 +32,7 @@ src/
 │   └── BaseLayout.astro      # Document shell: head, skip link, main, footer (no header by design; inner pages pin their breadcrumbs)
 ├── components/
 │   ├── seo/                  # SeoHead, JsonLd
-│   ├── site/                 # SiteFooter, SkipLink
+│   ├── site/                 # SiteFooter, SkipLink, Breadcrumbs, LanguageSwitch, LanguageHint
 │   ├── ui/                   # Small shared pieces: Sheet, Cell, Media, LoopMedia, ZoomMedia, ScrambleText, FactList, TagList, CodeText, ArticleBody, SectionIndex
 │   ├── design-system/        # Parts of the design system page: ColorRole, ContrastPair, TokenList
 │   ├── home/                 # One component per home section: Hero, WorkSection, ProjectRow, AboutSection, TestimonialSection, PlaygroundSection, ArtworkSection, NotesSection, ContactSection
@@ -37,7 +41,8 @@ src/
 │   ├── mdx/                  # Components available inside MDX bodies: Figure, Video
 │   └── demos/                # Live demos, each imported by the one entry it belongs to: LensDemo
 ├── lib/                      # Plain TypeScript, no Astro imports where avoidable, unit tested
-│   ├── content.ts            # Queries: draft filtering, featured and order sorting, in one place
+│   ├── content.ts            # Queries: draft filtering, featured and order sorting, in one place; mergeTranslation
+│   ├── language-hint.ts      # Whether an English page offers its French version
 │   ├── media.ts              # Resolves colocated videos to built URLs
 │   ├── css-tokens.ts         # Reads custom properties out of the token stylesheets
 │   ├── contrast.ts           # WCAG contrast between two colours
@@ -45,7 +50,7 @@ src/
 │   ├── og-colors.ts          # The Open Graph images' colours, compared to the tokens by a test
 │   ├── seo/json-ld.ts        # Builders for ProfilePage, Person, projects, notes, BreadcrumbList
 │   ├── transition-direction.ts # Whether a page sits above or below another
-│   └── format.ts             # Dates
+│   └── format.ts             # Dates, in either language
 ├── scripts/                  # Client-side behaviour, one folder or module per feature
 │   ├── hero-shader/          # boot.ts (inlined by the build, decides when), index.ts, renderer.ts, warp.frag
 │   ├── loop-video.ts         # Project and playground previews: play on mouse hover or keyboard focus
@@ -55,6 +60,7 @@ src/
 │   ├── transition-direction.ts # A page transition follows the site's tree: up is back, down is forward
 │   ├── image-viewer.ts       # Case study covers, gallery and body figures open larger in a dialog
 │   ├── analytics-opt-out.ts  # The legal notice's switch that stops Umami for this browser
+│   ├── language-hint.ts      # The one-time offer of the French page
 │   └── section-index.ts      # The list of sections beside a long read marks the one being read
 ├── styles/
 │   ├── global.css            # Layer order and imports, nothing else
@@ -62,29 +68,41 @@ src/
 │   ├── base/                 # reset, elements, prose, transitions
 │   └── utilities.css         # visually-hidden and the card link, nothing else unless it earns its place
 └── pages/
-    ├── index.astro
-    ├── 404.astro
-    ├── legal-notice.astro
-    ├── design-system.astro   # The design system, read from the tokens at build time
+    ├── [...locale]/          # Every page served in both languages: English at the root, French under /fr/
+    │   ├── index.astro
+    │   ├── legal-notice.astro
+    │   ├── work/[slug].astro
+    │   ├── notes/index.astro
+    │   └── notes/[slug].astro
+    ├── 404.astro             # One page for every missing address, in both languages
+    ├── design-system.astro   # The design system, read from the tokens at build time, English only
     ├── [mediakit].astro      # Composition page for project media, dev only (see Project media)
-    ├── work/[slug].astro
-    ├── notes/index.astro
-    ├── notes/[slug].astro
-    ├── rss.xml.ts, robots.txt.ts, llms.txt.ts
-    └── og/[...path].png.ts   # Open Graph images, rendered at build time
+    ├── rss.xml.ts, robots.txt.ts, llms.txt.ts   # English only
+    └── og/[...path].png.ts   # Open Graph images, rendered at build time, one per page and language
 ```
 
 Outside `src/`: `astro.config.ts`, `public/` (CNAME, `.nojekyll`, the CV under `public/cv/`), `media/` (see [Project media](#project-media)), `docs/`, `.github/workflows/`.
 
 ## Conventions
 
-**Naming.** English everywhere. Components in PascalCase, one per file. TypeScript modules, folders, routes and slugs in kebab-case. The `@/*` alias points to `src/*`.
+**Naming.** English everywhere in the code, file names, folders and slugs included, French pages too. Components in PascalCase, one per file. TypeScript modules, folders, routes and slugs in kebab-case. The `@/*` alias points to `src/*`.
 
-**Components.** Small and single-purpose, with an exported `interface Props`. A component never holds copy or data: pages compose components and pass UI copy, content comes from collections, identity from `profile.ts`. Any logic beyond a `map` or a simple condition moves to `src/lib`, where it is tested.
+**Components.** Small and single-purpose, with an exported `interface Props`. A component never holds copy or data: UI copy comes from the dictionary (`src/i18n/ui.ts`), content from collections, identity from `profile.ts`. Any logic beyond a `map` or a simple condition moves to `src/lib`, where it is tested.
 
 **Content, presentation, behaviour.** Content in `src/content` and `src/data`; presentation in `.astro` components and CSS; behaviour in `src/scripts`. Scripts find their elements through `data-*` attributes, never through class names. Component variants go through custom properties (for example `--cell-span`), not modifier soup.
 
 **Comments** explain why, never what. No dead code: knip runs in CI.
+
+## Languages
+
+The site is in English and French. English is at the root, French under `/fr/` with the same slugs (`/fr/work/youbook/`), through Astro's i18n routing with `prefixDefaultLocale: false`, so no English URL moved. `/design-system/`, the media kit, `llms.txt` and the RSS feed stay in English.
+
+- **Pages.** A page served in both languages lives in `src/pages/[...locale]/`: its `getStaticPaths` lists one path per language (`localeStaticPaths`, or `localeParam` for pages with a slug), and it reads its language with `localeOf(Astro.url)`. It passes `locales` to `BaseLayout`, which sets `<html lang>`, the `hreflang` alternates, `og:locale` and the switch; a page that leaves `locales` out exists in English only.
+- **UI copy.** `useTranslations(locale)` returns `t(key, values)` over `src/i18n/ui.ts`. English is the reference: a key missing in French fails `astro check`, and a test checks that every key is written and keeps the same `{placeholders}` in both. French copy uses a narrow no-break space (`\u202f`) before `: ; ? !`.
+- **Content.** Each entry has a French file beside its English one (`index.fr.mdx`), loaded as a collection of its own (`projectsFr`, `notesFr`…) with the entry's id. It holds only what reads differently: titles, summaries, decisions, figure labels, link labels, `alt` texts and the body. `getLocalizedCollection(collection, locale)` lays it over the English entry (`mergeTranslation`: objects key by key, lists of objects item by item, lists of words replaced whole) and `renderLocalized` renders its body. `src/lib/translations.test.ts` fails when a published entry has no French file. Media are shared: only their `alt` texts are translated.
+- **Identity.** `localProfile(locale)` returns the profile with its French role, positioning, availability, mobility, credits, `alt` texts and the recommendation as Nicolas Péridont wrote it.
+- **Machines.** One Open Graph card per page and language (`ogPath`), `inLanguage` in the structured data, and the sitemap lists each page's other language.
+- **Finding the other language.** No redirect: GitHub Pages has no server, and a script redirect hurts search engines and visitors whose browser language is not their reading language. The `LanguageSwitch` (`EN / FR`) sits beside the role in the hero, at the end of the breadcrumb bar and in the footer, and leads to the same page in the other language. On an English page, `LanguageHint` offers the French page once to a browser whose first language is French; `?lang-hint` in the address forces it, to check it.
 
 ## CSS
 
@@ -122,6 +140,7 @@ As little as possible. Each script is isolated, justified here, and loaded as la
 | `section-index`        | The section being read, beside a long read    | Module, case studies and notes with sections                                                                           | 1 KB gzip   |
 | `lens-demo`            | The shader a note explains, to play with      | Module, on that note only; WebGL starts when the demo nears the viewport (2.4 KB, shader included)                     | 3 KB gzip   |
 | `analytics-opt-out`    | Stop Umami for this browser                   | Inlined by the build, legal notice only (0.4 KB)                                                                       | 1 KB gzip   |
+| `language-hint`        | Offer the French page once                    | Module on English pages that exist in French; remembers the answer in `localStorage`                                   | 0.5 KB gzip |
 | Umami                  | Cookieless analytics                          | `defer`, third party; counts visits on the production domain only (`data-domains`)                                     | 2.3 KB      |
 
 **Page transitions.** Astro's `ClientRouter` fetches the next page and swaps it into the current document inside a View Transition. Native cross-document View Transitions were tried first and dropped: Vivaldi showed a flash on every click, which same-document transitions do not have. The cost is the router's script and the loss of the Content Security Policy, which Astro does not support with the `ClientRouter`; for a static site with no form, account or user content, the policy protected little. The animation itself, the sheet, is in `src/styles/base/transitions.css`: the next page slides up over the current one, and going back lifts it off. Back means up the site's tree as well as back in the history: `transition-direction` sets the router's direction when one page is the other's parent, so the breadcrumb from a note to the list of notes lifts the note off even when the visitor came from the home page. View transitions are judged on a production build (`pnpm build && pnpm preview`): in dev, Vite re-injects every page's styles with JavaScript after the first render, which makes them flash.

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
+import { localeOf, localizePath } from "@/i18n/locales";
 import { formatDate, isoDate } from "@/lib/format";
 
 interface Props {
@@ -12,13 +13,14 @@ interface Props {
 const { note, headingLevel = 3 } = Astro.props;
 const Heading = headingLevel === 2 ? "h2" : "h3";
 const { title, description, pubDate } = note.data;
+const locale = localeOf(Astro.url);
 ---
 
 <li class="note card">
-  <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+  <time datetime={isoDate(pubDate)}>{formatDate(pubDate, locale)}</time>
   <div>
     <Heading class="title">
-      <a class="card-link" href={`/notes/${note.id}/`}>
+      <a class="card-link" href={localizePath(`/notes/${note.id}/`, locale)}>
         {title}
       </a>
     </Heading>

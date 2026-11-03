@@ -5,6 +5,12 @@ import Media from "@/components/ui/Media.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
+import { useTranslations } from "@/i18n/ui";
+
+// GitHub Pages serves this one page for every missing address, French ones included: it says
+// it in both languages, each leading to its own home page.
+const en = useTranslations("en");
+const fr = useTranslations("fr");
 ---
 
 <BaseLayout title={`Page not found · ${profile.name}`} description="This page does not exist." noindex>
@@ -20,13 +26,22 @@ import { profile } from "@/data/profile";
         />
       </Cell>
       <Cell span={8} class="message">
-        <h1 id="not-found-title">This page does not exist</h1>
-        <p>It may have moved when the site was rebuilt. The home page has everything, and the email still works.</p>
+        <h1 id="not-found-title">{en("notFound.title")}</h1>
+        <p>{en("notFound.text")}</p>
         <p>
           <a class="tap" href="/">
-            Back to the home page
+            {en("notFound.home")}
           </a>
         </p>
+        <div class="other-language" lang="fr">
+          <p class="other-title">{fr("notFound.title")}</p>
+          <p>{fr("notFound.text")}</p>
+          <p>
+            <a class="tap" href="/fr/">
+              {fr("notFound.home")}
+            </a>
+          </p>
+        </div>
         <EmailLink />
       </Cell>
     </Sheet>
@@ -47,5 +62,18 @@ import { profile } from "@/data/profile";
 
   h1 {
     font-size: var(--font-size-step-3);
+  }
+
+  .other-language {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-hairline);
+    color: var(--color-text-muted);
+  }
+
+  .other-title {
+    color: var(--color-text);
+    font-weight: var(--font-weight-strong);
   }
 </style>

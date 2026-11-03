@@ -1,24 +1,46 @@
 ---
 import { profile } from "@/data/profile";
+import { defaultLocale, localeOf, localizePath, ogLocales } from "@/i18n/locales";
 import type { Seo } from "@/lib/seo/types";
 
 type Props = Seo;
 
-const { title, description, ogImage = "/og/home.png", type = "website", noindex = false, jsonLd = [] } = Astro.props;
+const {
+  title,
+  description,
+  ogImage = "/og/home.png",
+  type = "website",
+  noindex = false,
+  locales = [defaultLocale],
+  jsonLd = [],
+} = Astro.props;
 const site = Astro.site ?? Astro.url;
 const canonical = new URL(Astro.url.pathname, site);
 const image = new URL(ogImage, site);
+const locale = localeOf(Astro.url);
+// Each language of the page names the others, and English answers for the rest of the world.
+const alternates = locales.length > 1 ? locales : [];
+const hrefIn = (target: typeof locale) => new URL(localizePath(Astro.url.pathname, target), site);
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex" />}
+{alternates.map((target) => (
+  <link rel="alternate" hreflang={target} href={hrefIn(target)} />
+))}
+{alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={hrefIn(defaultLocale)} />}
 <link rel="alternate" type="application/rss+xml" title={`${profile.name}, notes`} href="/rss.xml" />
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={profile.name} />
-<meta property="og:locale" content="en_GB" />
+<meta property="og:locale" content={ogLocales[locale]} />
+{alternates
+  .filter((target) => target !== locale)
+  .map((target) => (
+    <meta property="og:locale:alternate" content={ogLocales[target]} />
+  ))}
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />

@@ -17,6 +17,8 @@ export default defineConfig({
   // Scoped styles through a class rather than a data attribute on every element: shorter HTML.
   scopedStyleStrategy: "class",
   redirects: legacyRedirects,
+  // English at the root, French under /fr/ with the same slugs: see the Languages section of docs/architecture.md.
+  i18n: { locales: ["en", "fr"], defaultLocale: "en", routing: { prefixDefaultLocale: false } },
   // Code blocks look like an editor, VS Code's default dark theme: the one place the site does
   // not set its own colours, so a developer reads the code at a glance.
   markdown: { shikiConfig: { theme: "dark-plus" } },
@@ -34,6 +36,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
+      // Each page lists its other language (xhtml:link), as the hreflang links in its head do.
+      i18n: { defaultLocale: "en", locales: { en: "en", fr: "fr" } },
       // Redirect pages and the 404 are not content.
       filter: (page) =>
         !page.endsWith("/404/") && !Object.keys(legacyRedirects).some((path) => page.endsWith(`${path}/`)),
