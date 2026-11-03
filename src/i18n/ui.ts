@@ -110,6 +110,12 @@ const en = {
   "legal.lawText":
     "This legal notice is governed by French law. In the event of a dispute, French courts have exclusive jurisdiction.",
 
+  // The one-time hint towards the other language
+  "hint.label": "Language",
+  "hint.text": "This page is also in English.",
+  "hint.link": "Read it in English",
+  "hint.close": "Close",
+
   // Open Graph cards
   "og.caseStudy": "Case study",
   "og.note": "Note",
@@ -232,6 +238,11 @@ const fr: Record<UiKey, string> = {
   "legal.law": "Droit applicable",
   "legal.lawText":
     "Les présentes mentions légales sont régies par le droit français. En cas de litige, les tribunaux français sont seuls compétents.",
+
+  "hint.label": "Langue",
+  "hint.text": "Cette page existe aussi en français.",
+  "hint.link": "La lire en français",
+  "hint.close": "Fermer",
 
   "og.caseStudy": "Étude de cas",
   "og.note": "Note",

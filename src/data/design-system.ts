@@ -147,6 +147,7 @@ export const layoutUse: Record<string, string> = {
   "--trail-band-bleed": "How far the band of ground above the breadcrumb reaches past the sheet.",
   "--trail-index-offset": "Where the list of sections sticks beside a long read.",
   "--layer-trail": "Stacking: the pinned breadcrumb covers the page scrolling under it.",
+  "--layer-hint": "Stacking: the one-time language hint covers the pinned breadcrumb.",
   "--layer-skip-link": "Stacking: the skip link covers everything.",
   "--layer-card-link": "Stacking: a card's link, spread over its media.",
   "--layer-transition-top": "Stacking: the page snapshot that covers the other during a transition.",
@@ -185,6 +186,7 @@ export const componentRoles: Record<string, string> = {
   SectionIndex: "The body's sections, numbered like their titles and kept in view. Marks the one being read.",
   SectionTitle: "The title cell of a section, with an optional aside link.",
   Sheet: "A block of cells: draws the top and left hairlines.",
+  LanguageHint: "Once, on an English page, a line in French offering the French page to a browser set to French.",
   LanguageSwitch:
     "The same page in the other language, never its home: beside the role on the home page and in the footer.",
   SiteFooter: "The year, the legal notice, this page and the language switch.",

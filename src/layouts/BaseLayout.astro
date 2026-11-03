@@ -5,6 +5,7 @@ import { PUBLIC_UMAMI_WEBSITE_ID } from "astro:env/client";
 
 import SeoHead from "@/components/seo/SeoHead.astro";
 import SiteFooter from "@/components/site/SiteFooter.astro";
+import LanguageHint from "@/components/site/LanguageHint.astro";
 import SkipLink from "@/components/site/SkipLink.astro";
 import { defaultLocale, localeOf } from "@/i18n/locales";
 import type { Seo } from "@/lib/seo/types";
@@ -16,9 +17,10 @@ interface Props extends Seo {
 }
 
 const { hero = false, locales = [defaultLocale], ...seo } = Astro.props;
+const locale = localeOf(Astro.url);
 ---
 
-<html lang={localeOf(Astro.url)}>
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -54,6 +56,7 @@ const { hero = false, locales = [defaultLocale], ...seo } = Astro.props;
       <slot />
     </main>
     <SiteFooter {locales} />
+    {locale === defaultLocale && locales.includes("fr") && <LanguageHint />}
     <script>
       import "@/scripts/transition-direction";
     </script>

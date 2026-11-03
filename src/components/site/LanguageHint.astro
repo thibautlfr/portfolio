@@ -1,0 +1,71 @@
+---
+import { localizePath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
+// On an English page that exists in French, a line in French offering that page, shown once
+// by its script to a browser set to French. It speaks French whatever the page's language,
+// since it is meant for the visitor who reads it more easily.
+const fr = useTranslations("fr");
+const href = localizePath(Astro.url.pathname, "fr");
+---
+
+<aside class="language-hint" data-language-hint lang="fr" aria-label={fr("hint.label")} hidden>
+  <p>
+    {fr("hint.text")}{" "}
+    <a class="tap" href={href} hreflang="fr">
+      {fr("hint.link")}
+    </a>
+  </p>
+  <button type="button" class="tap">
+    {fr("hint.close")}
+  </button>
+</aside>
+
+<script>
+  import "@/scripts/language-hint";
+</script>
+
+<style>
+  /* A cell of the sheet, set apart at the bottom of the window: it covers a strip of the page
+     until it is answered, never the page's own controls for long. */
+  .language-hint {
+    position: fixed;
+    inset-block-end: var(--layout-gutter);
+    inset-inline-end: var(--layout-gutter);
+    z-index: var(--layer-hint);
+    max-inline-size: min(30rem, calc(100% - 2 * var(--layout-gutter)));
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-hairline);
+    background: var(--color-surface);
+    font-size: var(--font-size-step-minus-1);
+    line-height: var(--line-height-text);
+  }
+
+  .language-hint:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    white-space: nowrap;
+  }
+
+  /* Set like the hero's pause button: a word underlined, quieter than the link. */
+  button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--color-line);
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+</style>
