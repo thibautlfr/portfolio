@@ -8,7 +8,7 @@ export const legacyRedirects: Record<string, string> = {
   "/labs": "/",
   "/blog": "/",
   "/blog/first-steps-glsl-shaders-threejs": "/notes/first-steps-glsl-shaders-threejs/",
-  "/blog/first-steps-glsl-shaders-threejs/fr": "/notes/first-steps-glsl-shaders-threejs/",
+  "/blog/first-steps-glsl-shaders-threejs/fr": "/fr/notes/first-steps-glsl-shaders-threejs/",
   "/blog/why-i-chose-astro-for-my-portfolio": "/",
   "/blog/why-i-chose-astro-for-my-portfolio/fr": "/",
 };

@@ -1,5 +1,8 @@
 ---
+import LanguageSwitch from "@/components/site/LanguageSwitch.astro";
 import Cell from "@/components/ui/Cell.astro";
+import { defaultLocale, localeOf, type Locale } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 // Inner pages have no header: the trail is how they lead back home. It is the first cell of
 // the page's sheet and stays pinned to the top of the viewport while the page scrolls.
@@ -10,25 +13,31 @@ interface Crumb {
 
 interface Props {
   items: Crumb[];
+  /** The languages the page exists in, for the switch at the end of the bar. English only by default. */
+  locales?: readonly Locale[];
 }
 
-const { items } = Astro.props;
+const { items, locales = [defaultLocale] } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 ---
 
-<Cell as="nav" class="trail" aria-label="Breadcrumb">
-  <ol role="list">
-    {items.map((item) => (
-      <li>
-        {item.href ? (
-          <a class="tap" href={item.href} data-back-link>
-            {item.label}
-          </a>
-        ) : (
-          <span aria-current="page">{item.label}</span>
-        )}
-      </li>
-    ))}
-  </ol>
+<Cell class="trail">
+  <nav aria-label={t("site.breadcrumb")}>
+    <ol role="list">
+      {items.map((item) => (
+        <li>
+          {item.href ? (
+            <a class="tap" href={item.href} data-back-link>
+              {item.label}
+            </a>
+          ) : (
+            <span aria-current="page">{item.label}</span>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <LanguageSwitch available={locales} />
 </Cell>
 
 <script>
@@ -41,6 +50,9 @@ const { items } = Astro.props;
      it opens, so it never moves; the top hairline sits over the sheet's own and becomes the
      bar's edge once it is pinned. */
   .trail.cell {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
     position: sticky;
     inset-block-start: var(--layout-gutter);
     z-index: var(--layer-trail);
@@ -62,6 +74,11 @@ const { items } = Astro.props;
 
   :global(html) {
     scroll-padding-block-start: var(--trail-clearance);
+  }
+
+  /* The trail gives way first: the switch at the end of the bar keeps its width. */
+  nav {
+    min-inline-size: 0;
   }
 
   ol {

@@ -12,17 +12,21 @@ import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { selectPublished } from "@/lib/content";
 import { formatClient, formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
   const projects = selectPublished(await getCollection("projects"));
-  return projects.map((project, index) => ({
-    params: { slug: project.id },
-    props: { project, next: projects[(index + 1) % projects.length] },
-  }));
+  return locales.flatMap((locale) =>
+    projects.map((project, index) => ({
+      params: { locale: localeParam(locale), slug: project.id },
+      props: { project, next: projects[(index + 1) % projects.length] },
+    })),
+  );
 }
 
 interface Props {
@@ -50,13 +54,20 @@ const {
 } = project.data;
 const { Content, headings } = await render(project);
 
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const profile = localProfile(locale);
+// The language the entry is written in. Every entry is in English until its French file
+// exists (docs/i18n.md, phase 4); the page then says so and marks the text as English.
+const contentLocale = "en";
+const home = localizePath("/", locale);
 const site = Astro.site ?? Astro.url;
-const url = new URL(`/work/${project.id}/`, site).href;
+const url = new URL(localizePath(`/work/${project.id}/`, locale), site).href;
 const source = links.find((link) => link.kind === "source");
 ---
 
 <BaseLayout
-  title={`${seo?.title ?? title}, case study · ${profile.name}`}
+  title={`${seo?.title ?? title}, ${t("work.titleSuffix")} · ${profile.name}`}
   description={seo?.description ?? summary}
   ogImage={`/og/work/${project.id}.png`}
   type="article"
@@ -73,15 +84,21 @@ const source = links.find((link) => link.kind === "source");
       ...(client && { producer: client }),
     }),
     breadcrumbs([
-      { name: profile.name, url: site.href },
+      { name: profile.name, url: new URL(home, site).href },
       { name: title, url },
     ]),
   ]}
+  {locales}
 >
   <article class="page">
     <Sheet as="div">
-      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
-      <Cell as="header" class:list={["title-block", { "has-cover": cover }]}>
+      <Breadcrumbs items={[{ label: profile.name, href: home }, { label: title }]} {locales} />
+      {contentLocale !== locale && (
+        <Cell class="untranslated">
+          <p>{t("work.untranslated")}</p>
+        </Cell>
+      )}
+      <Cell as="header" class:list={["title-block", { "has-cover": cover }]} lang={contentLocale}>
         <div class="intro">
           <h1>{title}</h1>
           <p class="summary">{summary}</p>
@@ -89,10 +106,10 @@ const source = links.find((link) => link.kind === "source");
           <div class="facts">
             <FactList
               facts={[
-                { term: "Context", value: formatContext(context, year) },
-                ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
-                { term: "Role", value: role },
-                { term: "Stack", value: stack },
+                { term: t("facts.context"), value: formatContext(t(`context.${context}`), year) },
+                ...(client ? [{ term: t("facts.client"), value: formatClient(client) }] : []),
+                { term: t("facts.role"), value: role },
+                { term: t("facts.stack"), value: stack },
               ]}
             />
             {links.length > 0 && (
@@ -122,15 +139,15 @@ const source = links.find((link) => link.kind === "source");
           </figure>
         )}
       </Cell>
-      {(decisions || figures) && <ProjectBrief {decisions} {figures} />}
-      <ArticleBody {headings}>
+      {(decisions || figures) && <ProjectBrief {decisions} {figures} lang={contentLocale} />}
+      <ArticleBody {headings} lang={contentLocale}>
         <Content components={{ Figure, Video }} />
       </ArticleBody>
       {next && next.id !== project.id && (
         <Cell as="footer" class="next card">
-          <p class="next-label">Next case study</p>
-          <p class="next-title">
-            <a class="card-link" href={`/work/${next.id}/`}>
+          <p class="next-label">{t("work.next")}</p>
+          <p class="next-title" lang={contentLocale}>
+            <a class="card-link" href={localizePath(`/work/${next.id}/`, locale)}>
               {next.data.title}
             </a>
           </p>
@@ -143,6 +160,12 @@ const source = links.find((link) => link.kind === "source");
 <style>
   .page {
     padding-block-start: var(--layout-gutter);
+  }
+
+  /* Until the entry has its French file (docs/i18n.md, phase 4). */
+  .untranslated {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
   }
 
   .title-block {

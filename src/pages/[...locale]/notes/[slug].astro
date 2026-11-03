@@ -10,14 +10,18 @@ import Cell from "@/components/ui/Cell.astro";
 import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { selectLatest } from "@/lib/content";
 import { formatDate, isoDate } from "@/lib/format";
 import { blogPosting, breadcrumbs } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
   const notes = selectLatest(await getCollection("notes"));
-  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+  return locales.flatMap((locale) =>
+    notes.map((note) => ({ params: { locale: localeParam(locale), slug: note.id }, props: { note } })),
+  );
 }
 
 interface Props {
@@ -28,8 +32,15 @@ const { note } = Astro.props;
 const { title, description, pubDate, updatedDate, tags, source } = note.data;
 const { Content, headings } = await render(note);
 
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const profile = localProfile(locale);
+// Every note is in English until its French file exists (docs/i18n.md, phase 4).
+const contentLocale = "en";
+const home = localizePath("/", locale);
+const list = localizePath("/notes/", locale);
 const site = Astro.site ?? Astro.url;
-const url = new URL(`/notes/${note.id}/`, site).href;
+const url = new URL(localizePath(`/notes/${note.id}/`, locale), site).href;
 const platforms = { x: "X", linkedin: "LinkedIn" };
 ---
 
@@ -49,37 +60,44 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
       keywords: tags,
     }),
     breadcrumbs([
-      { name: profile.name, url: site.href },
-      { name: "Notes", url: new URL("/notes/", site).href },
+      { name: profile.name, url: new URL(home, site).href },
+      { name: t("notes.title"), url: new URL(list, site).href },
       { name: title, url },
     ]),
   ]}
+  {locales}
 >
   <article class="page">
     <Sheet as="div">
       <Breadcrumbs
-        items={[{ label: profile.name, href: "/" }, { label: "Notes", href: "/notes/" }, { label: title }]}
+        items={[{ label: profile.name, href: home }, { label: t("notes.title"), href: list }, { label: title }]}
+        {locales}
       />
+      {contentLocale !== locale && (
+        <Cell class="untranslated">
+          <p>{t("note.untranslated")}</p>
+        </Cell>
+      )}
       <Cell as="header" class="title-block">
-        <h1>{title}</h1>
+        <h1 lang={contentLocale}>{title}</h1>
         <div class="facts">
           <FactList
             facts={[
-              { term: "Published", value: formatDate(pubDate), data: true },
-              ...(updatedDate ? [{ term: "Updated", value: formatDate(updatedDate), data: true }] : []),
+              { term: t("note.published"), value: formatDate(pubDate, locale), data: true },
+              ...(updatedDate ? [{ term: t("note.updated"), value: formatDate(updatedDate, locale), data: true }] : []),
             ]}
           />
           {source && (
             <p class="source">
               <a class="tap" href={source.url}>
-                Originally posted on {platforms[source.platform]}
+                {t("note.source", { platform: platforms[source.platform] })}
                 <ExternalMark href={source.url} />
               </a>
             </p>
           )}
         </div>
       </Cell>
-      <ArticleBody {headings}>
+      <ArticleBody {headings} lang={contentLocale}>
         <Content components={{ Figure, Video }} />
       </ArticleBody>
     </Sheet>
@@ -89,6 +107,12 @@ const platforms = { x: "X", linkedin: "LinkedIn" };
 <style>
   .page {
     padding-block-start: var(--layout-gutter);
+  }
+
+  /* Until the entry has its French file (docs/i18n.md, phase 4). */
+  .untranslated {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-step-minus-1);
   }
 
   /* As on a case study, one step down: a note's title is a sentence, not a name. */

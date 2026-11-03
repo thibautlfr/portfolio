@@ -35,7 +35,12 @@ export function localeOf(url: URL): Locale {
   return splitLocale(url.pathname).locale;
 }
 
+/** The `[...locale]` route parameter: empty for English, at the root. */
+export function localeParam(locale: Locale): string | undefined {
+  return locale === defaultLocale ? undefined : locale;
+}
+
 /** getStaticPaths for a page served in every language through a `[...locale]` folder. */
 export function localeStaticPaths() {
-  return locales.map((locale) => ({ params: { locale: locale === defaultLocale ? undefined : locale } }));
+  return locales.map((locale) => ({ params: { locale: localeParam(locale) } }));
 }

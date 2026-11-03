@@ -4,20 +4,25 @@
 // alone.
 import Cell from "@/components/ui/Cell.astro";
 import CodeText from "@/components/ui/CodeText.astro";
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 interface Props {
   decisions?: string[] | undefined;
   figures?: { items: { value: string; label: string }[]; source: string } | undefined;
+  /** The language of the decisions and figures, when it is not the page's. */
+  lang?: string | undefined;
 }
 
-const { decisions, figures } = Astro.props;
+const { decisions, figures, lang } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const span = decisions && figures ? 6 : 12;
 ---
 
 {decisions && (
   <Cell {span} class="brief">
-    <h2>Decisions</h2>
-    <ol role="list" class="decisions">
+    <h2>{t("work.decisions")}</h2>
+    <ol role="list" class="decisions" {lang}>
       {decisions.map((decision) => (
         <li>
           <span>
@@ -30,8 +35,8 @@ const span = decisions && figures ? 6 : 12;
 )}
 {figures && (
   <Cell {span} class="brief">
-    <h2>Figures</h2>
-    <dl class="figures">
+    <h2>{t("work.figures")}</h2>
+    <dl class="figures" {lang}>
       {figures.items.map(({ value, label }) => (
         <div class="figure">
           <dt>{value}</dt>
@@ -41,7 +46,9 @@ const span = decisions && figures ? 6 : 12;
         </div>
       ))}
     </dl>
-    <p class="source">{figures.source}</p>
+    <p class="source" {lang}>
+      {figures.source}
+    </p>
   </Cell>
 )}
 

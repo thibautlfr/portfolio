@@ -4,7 +4,7 @@ import type { CollectionEntry } from "astro:content";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import NoteListItem from "@/components/note/NoteListItem.astro";
-import { localeOf } from "@/i18n/locales";
+import { localeOf, localizePath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 
 interface Props {
@@ -13,13 +13,14 @@ interface Props {
 }
 
 const { title, notes } = Astro.props;
-const t = useTranslations(localeOf(Astro.url));
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
 ---
 
 <Sheet aria-labelledby="notes-title">
   <SectionTitle id="notes-title">
     {title}
-    <a slot="aside" class="tap" href="/notes/">
+    <a slot="aside" class="tap" href={localizePath("/notes/", locale)}>
       {t("notes.all")}
     </a>
   </SectionTitle>

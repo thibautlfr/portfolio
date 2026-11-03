@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-import { localeOf } from "@/i18n/locales";
+import { localeOf, localizePath } from "@/i18n/locales";
 import { formatDate, isoDate } from "@/lib/format";
 
 interface Props {
@@ -20,7 +20,7 @@ const locale = localeOf(Astro.url);
   <time datetime={isoDate(pubDate)}>{formatDate(pubDate, locale)}</time>
   <div>
     <Heading class="title">
-      <a class="card-link" href={`/notes/${note.id}/`}>
+      <a class="card-link" href={localizePath(`/notes/${note.id}/`, locale)}>
         {title}
       </a>
     </Heading>
