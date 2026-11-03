@@ -36,7 +36,7 @@ const current = Astro.url.pathname.replace(/\/?$/, "/");
       ),
     )}
   </p>
-  <!-- Outside the paragraph: the switch is a nav, which a p cannot hold. -->
+  {/* Outside the paragraph: the switch is a nav, which a p cannot hold. */}
   <div class="languages">
     <LanguageSwitch available={locales} />
   </div>
