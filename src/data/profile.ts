@@ -58,6 +58,7 @@ const collaborations: Readonly<Record<string, Collaboration>> = {
       ],
       pull: "He played a decisive role in building the sales funnel of our product YouBook.",
       author: "Nicolas Péridont",
+      authorUrl: "https://www.linkedin.com/in/nicolas-p%C3%A9ridont-27297452/",
       role: "CTO",
       translatedFrom: "French",
     },
