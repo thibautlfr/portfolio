@@ -10,10 +10,18 @@ import PlaygroundSection from "@/components/home/PlaygroundSection.astro";
 import TestimonialSection from "@/components/home/TestimonialSection.astro";
 import WorkSection from "@/components/home/WorkSection.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import { localeOf, localeStaticPaths, locales } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { selectFeatured, selectLatest } from "@/lib/content";
 import { profilePage } from "@/lib/seo/json-ld";
 import { author } from "@/lib/seo/site";
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const profile = localProfile(locale);
 
 const projects = selectFeatured(await getCollection("projects"));
 const experiments = selectFeatured(await getCollection("playground"));
@@ -26,46 +34,46 @@ const person = await author(Astro.site ?? Astro.url);
 
 <BaseLayout
   title={`${profile.name}, ${profile.role}`}
-  description={`${profile.role} based in ${profile.location.city}. ${profile.positioning}`}
+  description={t("home.description", {
+    role: profile.role,
+    city: profile.location.city,
+    positioning: profile.positioning,
+  })}
   jsonLd={[profilePage(person)]}
+  {locales}
   hero
 >
   <div class="page">
-    <Hero />
-    <WorkSection title="Selected work" {projects} />
+    <Hero {profile} {locales} />
+    <WorkSection title={t("work.title")} {projects} />
     <AboutSection
-      title="About"
+      title={t("about.title")}
       offers={[
-        {
-          title: "Inside your team",
-          text: "Missions with product teams, directly or through ESNs. I join the team, its rituals and its codebase, and take features from the ticket to production.",
-        },
-        {
-          title: "For your product",
-          text: "Startups and agencies: a platform to build, a product to take to production, or a team to reinforce for a while.",
-        },
+        { title: t("about.teamTitle"), text: t("about.teamText") },
+        { title: t("about.productTitle"), text: t("about.productText") },
       ]}
-      factsTitle="Stack"
-      clientsTitle="Clients and partners"
+      factsTitle={t("about.factsTitle")}
+      clientsTitle={t("about.clientsTitle")}
+      {profile}
     />
     {recommended?.testimonial && (
       <TestimonialSection
-        title="Recommendation"
+        title={t("testimonial.title")}
         testimonial={recommended.testimonial}
         organisation={recommended.name}
-        source="LinkedIn recommendation"
+        source={t("testimonial.source")}
       />
     )}
-    {experiments.length > 0 && <PlaygroundSection title="Playground" {experiments} />}
+    {experiments.length > 0 && <PlaygroundSection title={t("playground.title")} {experiments} />}
     {artworks.length > 0 && (
       <ArtworkSection
-        title="Off the clock"
+        title={t("artworks.title")}
         {artworks}
-        more={instagram && { label: "More on Instagram", url: instagram.url }}
+        more={instagram && { label: t("artworks.more"), url: instagram.url }}
       />
     )}
-    {notes.length > 0 && <NotesSection title="Notes" {notes} />}
-    <ContactSection title="Have a project or a mission in mind?" socialsLabel="Elsewhere online" />
+    {notes.length > 0 && <NotesSection title={t("notes.title")} {notes} />}
+    <ContactSection title={t("contact.title")} socialsLabel={t("contact.socials")} />
   </div>
 </BaseLayout>
 

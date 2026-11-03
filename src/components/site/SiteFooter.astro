@@ -1,10 +1,21 @@
 ---
+import LanguageSwitch from "@/components/site/LanguageSwitch.astro";
 import { profile } from "@/data/profile";
+import { localeOf, type Locale } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
+interface Props {
+  /** The languages the page exists in, for the switch. */
+  locales: readonly Locale[];
+}
+
+const { locales } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const year = new Date().getFullYear();
+// Both stay in English until the legal notice is translated (docs/i18n.md, phase 3).
 const links = [
-  { label: "Design system", path: "/design-system/" },
-  { label: "Legal notice", path: "/legal-notice/" },
+  { label: t("footer.designSystem"), path: "/design-system/" },
+  { label: t("footer.legalNotice"), path: "/legal-notice/" },
 ];
 const current = Astro.url.pathname.replace(/\/?$/, "/");
 ---
@@ -23,6 +34,7 @@ const current = Astro.url.pathname.replace(/\/?$/, "/");
         </a>
       ),
     )}
+    <LanguageSwitch available={locales} />
   </p>
 </footer>
 

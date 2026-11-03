@@ -2,6 +2,7 @@
 // notice and structured data. Edit facts here, never in components.
 import avatar from "@/assets/images/avatar.png";
 import portrait from "@/assets/images/portrait.jpg";
+import type { Locale } from "@/i18n/locales";
 
 interface Social {
   label: string;
@@ -114,4 +115,57 @@ export const profile = {
       url: "https://github.com",
     },
   },
-} as const;
+};
+
+/** What reads differently in French. Everything else (names, links, stack, legal) is the same
+    in both languages. */
+const french = {
+  role: "Développeur full-stack freelance",
+  positioning:
+    "Je construis des plateformes web qui tournent en production, et je soigne ce que les gens voient. Java/Kotlin côté serveur, TypeScript, Vue et React côté navigateur.",
+  availability: "Disponible pour des missions dès maintenant" as string | undefined,
+  mobility: "Télétravail partout en France, sur site à Bordeaux, La Rochelle, Niort et alentours",
+  languages: ["Français", "Anglais"],
+  cvPath: "/cv/thibaut-lefrancois-cv-fr.pdf" as string | undefined,
+  portraitAlt: "Portrait en noir et blanc de Thibaut Lefrançois, souriant, en chemise blanche.",
+  avatarAlt: "Avatar dessiné de Thibaut, les cheveux en trame, un crayon derrière l'oreille.",
+  credits: {
+    raccourci: "Youbook, pour le logiciel touristique du Groupe Yoni",
+    areti: "Partenaire de développement du studio",
+  } as Readonly<Record<string, string>>,
+  // The recommendation as Nicolas Péridont wrote it on LinkedIn, 2026-11-02.
+  testimonials: {
+    raccourci: {
+      quote: [
+        "En tant que CTO, j'accorde une grande importance à la capacité d'un développeur à s'emparer de problématiques d'architecture complexes tout en gardant le sens du produit. Durant son alternance, Thibaut a largement dépassé nos attentes sur ces deux aspects.",
+        "Il a joué un rôle déterminant dans la construction du tunnel de vente de notre produit YouBook. C'est un chantier critique sur lequel il a brillamment géré l'orchestration de workflows sous Temporal.io pour fiabiliser le déstockage en parallèle via plusieurs API tierces, tout en assurant une réactivité sans faille côté front grâce à la mise en œuvre de Server-Sent Events (SSE).",
+        "Thibaut fait preuve d'une maturité technique rare pour un profil en alternance : rigoureux sur les bonnes pratiques, autonome, et doté d'un excellent esprit d'équipe. C'est un atout solide pour n'importe quelle équipe tech, et je le recommande sans la moindre hésitation pour ses futurs défis professionnels.",
+      ],
+      pull: "Il a joué un rôle déterminant dans la construction du tunnel de vente de notre produit YouBook.",
+      author: "Nicolas Péridont",
+      authorUrl: "https://www.linkedin.com/in/nicolas-p%C3%A9ridont-27297452/",
+      role: "CTO",
+    },
+  } as Readonly<Record<string, Testimonial>>,
+};
+
+/** The profile as a page in that language reads it. */
+export function localProfile(locale: Locale): typeof profile {
+  if (locale === "en") return profile;
+  const { credits, testimonials, portraitAlt, avatarAlt, ...text } = french;
+  return {
+    ...profile,
+    ...text,
+    collaborations: Object.fromEntries(
+      Object.entries(profile.collaborations).map(([key, collaboration]) => {
+        const testimonial = testimonials[key] ?? collaboration.testimonial;
+        return [
+          key,
+          { ...collaboration, credit: credits[key] ?? collaboration.credit, ...(testimonial && { testimonial }) },
+        ];
+      }),
+    ),
+    portrait: { ...profile.portrait, alt: portraitAlt },
+    avatar: { ...profile.avatar, alt: avatarAlt },
+  };
+}

@@ -2,6 +2,9 @@
 import type { ComponentProps } from "astro/types";
 import { getImage } from "astro:assets";
 
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
 import Media from "./Media.astro";
 
 type Props = ComponentProps<typeof Media> & {
@@ -11,6 +14,7 @@ type Props = ComponentProps<typeof Media> & {
 
 const { caption, ...media } = Astro.props;
 const { src } = media;
+const t = useTranslations(localeOf(Astro.url));
 
 // The viewer loads the largest useful width only when opened, up to the 2400 px a source may
 // have (docs/content.md). SVG placeholders stay vector.
@@ -35,7 +39,7 @@ const large =
   data-viewer-srcset={large?.srcSet.attribute}
   data-viewer-caption={caption}
 >
-  <span class="visually-hidden">View larger:</span>
+  <span class="visually-hidden">{t("site.viewLarger")}</span>
   <Media {...media} />
 </button>
 

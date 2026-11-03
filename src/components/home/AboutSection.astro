@@ -4,7 +4,9 @@ import ExternalMark from "@/components/ui/ExternalMark.astro";
 import FactList from "@/components/ui/FactList.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
-import { profile } from "@/data/profile";
+import type { profile as englishProfile } from "@/data/profile";
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 interface Offer {
   title: string;
@@ -18,9 +20,12 @@ interface Props {
   factsTitle: string;
   /** Label of the row naming clients and partners, under the offers. */
   clientsTitle: string;
+  /** The profile in the page's language. */
+  profile: typeof englishProfile;
 }
 
-const { title, offers, factsTitle, clientsTitle } = Astro.props;
+const { title, offers, factsTitle, clientsTitle, profile } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const { stack, languages, cvPath } = profile;
 const clients = Object.values(profile.collaborations);
 ---
@@ -37,16 +42,16 @@ const clients = Object.values(profile.collaborations);
     <h3>{factsTitle}</h3>
     <FactList
       facts={[
-        { term: "Languages", value: stack.languages },
-        { term: "Front-end", value: stack.frontEnd },
-        { term: "Back-end", value: stack.backEnd },
-        { term: "Speaks", value: languages.join(", ") },
+        { term: t("about.languages"), value: stack.languages },
+        { term: t("about.frontEnd"), value: stack.frontEnd },
+        { term: t("about.backEnd"), value: stack.backEnd },
+        { term: t("about.speaks"), value: languages.join(", ") },
       ]}
     />
     {cvPath && (
       <p class="cv">
         <a class="tap" href={cvPath} data-umami-event="cv">
-          Download my CV (PDF)
+          {t("about.cv")}
         </a>
       </p>
     )}
