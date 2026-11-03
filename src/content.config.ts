@@ -9,6 +9,19 @@ import { z } from "astro/zod";
 const entries = (collection: string, extensions: string) =>
   glob({ base: `./src/content/${collection}`, pattern: `[!_]*/index.${extensions}` });
 
+// The French file beside an entry (index.fr.mdx next to index.mdx), named by the entry's
+// folder so it shares its id. It holds only what reads differently in French; the rest comes
+// from the English file (see translatedEntries in src/i18n/content.ts).
+const translations = (collection: string, extensions: string) =>
+  glob({
+    base: `./src/content/${collection}`,
+    pattern: `[!_]*/index.fr.${extensions}`,
+    generateId: ({ entry }) => entry.split("/")[0] ?? entry,
+  });
+
+/** An image in a French file: only its alternative text, the file is the English entry's. */
+const translatedPicture = z.object({ alt: z.string().min(1) });
+
 /** Drives the home page without code: what shows, in which order. */
 const publishing = {
   featured: z.boolean().default(false),
@@ -131,4 +144,59 @@ const notes = defineCollection({
     }),
 });
 
-export const collections = { projects, playground, artworks, notes };
+const projectsFr = defineCollection({
+  loader: translations("projects", "mdx"),
+  schema: z.object({
+    title: z.string().max(60),
+    summary: z.string().max(160),
+    role: z.string().optional(),
+    cover: translatedPicture.optional(),
+    gallery: z.array(translatedPicture).max(2).optional(),
+    // Index for index with the English links: only the label is translated.
+    links: z.array(z.object({ label: z.string() })).optional(),
+    award: z.string().optional(),
+    decisions: z.array(z.string().max(140)).min(2).max(4).optional(),
+    figures: z
+      .object({
+        items: z.array(z.object({ value: z.string().max(12).optional(), label: z.string().max(110) })),
+        source: z.string().max(160),
+      })
+      .optional(),
+    seo: z
+      .object({
+        title: z.string().max(60).optional(),
+        description: z.string().max(160).optional(),
+      })
+      .optional(),
+  }),
+});
+
+const playgroundFr = defineCollection({
+  loader: translations("playground", "md"),
+  schema: z.object({
+    title: z.string().max(60).optional(),
+    description: z.string().max(100),
+    thumbnail: translatedPicture,
+  }),
+});
+
+const artworksFr = defineCollection({
+  loader: translations("artworks", "md"),
+  schema: z.object({
+    title: z.string().max(60).optional(),
+    image: translatedPicture,
+    description: z.string().max(160).optional(),
+  }),
+});
+
+const notesFr = defineCollection({
+  loader: translations("notes", "{md,mdx}"),
+  schema: z.object({
+    title: z.string().max(90),
+    description: z.string().max(160),
+    tags: z.array(z.string()).optional(),
+    cover: translatedPicture.optional(),
+  }),
+});
+
+export const collections = { projects, playground, artworks, notes, projectsFr, playgroundFr, artworksFr, notesFr };

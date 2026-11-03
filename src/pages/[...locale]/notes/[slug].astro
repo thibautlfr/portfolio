@@ -1,6 +1,4 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
-
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
@@ -11,6 +9,7 @@ import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
+import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
 import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectLatest } from "@/lib/content";
@@ -18,25 +17,30 @@ import { formatDate, isoDate } from "@/lib/format";
 import { blogPosting, breadcrumbs } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
-  const notes = selectLatest(await getCollection("notes"));
-  return locales.flatMap((locale) =>
-    notes.map((note) => ({ params: { locale: localeParam(locale), slug: note.id }, props: { note } })),
+  const paths = await Promise.all(
+    locales.map(async (locale) =>
+      selectLatest(await getLocalizedCollection("notes", locale)).map((note) => ({
+        params: { locale: localeParam(locale), slug: note.id },
+        props: { note },
+      })),
+    ),
   );
+  return paths.flat();
 }
 
 interface Props {
-  note: CollectionEntry<"notes">;
+  note: LocalizedEntry<"notes">;
 }
 
 const { note } = Astro.props;
 const { title, description, pubDate, updatedDate, tags, source } = note.data;
-const { Content, headings } = await render(note);
+const { Content, headings } = await renderLocalized(note);
 
 const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
-// Every note is in English until its French file exists (docs/i18n.md, phase 4).
-const contentLocale = "en";
+// A note without its French file reads in English: the page says so and marks the text.
+const { contentLocale } = note;
 const home = localizePath("/", locale);
 const list = localizePath("/notes/", locale);
 const site = Astro.site ?? Astro.url;

@@ -1,6 +1,4 @@
 ---
-import { getCollection } from "astro:content";
-
 import AboutSection from "@/components/home/AboutSection.astro";
 import ArtworkSection from "@/components/home/ArtworkSection.astro";
 import ContactSection from "@/components/home/ContactSection.astro";
@@ -11,6 +9,7 @@ import TestimonialSection from "@/components/home/TestimonialSection.astro";
 import WorkSection from "@/components/home/WorkSection.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
+import { getLocalizedCollection } from "@/i18n/content";
 import { localeOf, localeStaticPaths, locales } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectFeatured, selectLatest } from "@/lib/content";
@@ -23,10 +22,10 @@ const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
 
-const projects = selectFeatured(await getCollection("projects"));
-const experiments = selectFeatured(await getCollection("playground"));
-const artworks = selectFeatured(await getCollection("artworks"));
-const notes = selectLatest(await getCollection("notes"), 3);
+const projects = selectFeatured(await getLocalizedCollection("projects", locale));
+const experiments = selectFeatured(await getLocalizedCollection("playground", locale));
+const artworks = selectFeatured(await getLocalizedCollection("artworks", locale));
+const notes = selectLatest(await getLocalizedCollection("notes", locale), 3);
 const recommended = Object.values(profile.collaborations).find((collaboration) => collaboration.testimonial);
 const instagram = profile.socials.find((social) => social.label === "Instagram");
 const person = await author(Astro.site ?? Astro.url);

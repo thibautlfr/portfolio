@@ -1,6 +1,4 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
-
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import ProjectBrief from "@/components/project/ProjectBrief.astro";
@@ -13,6 +11,7 @@ import Sheet from "@/components/ui/Sheet.astro";
 import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
+import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
 import { localeOf, localeParam, locales, localizePath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectPublished } from "@/lib/content";
@@ -20,18 +19,21 @@ import { formatClient, formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
-  const projects = selectPublished(await getCollection("projects"));
-  return locales.flatMap((locale) =>
-    projects.map((project, index) => ({
-      params: { locale: localeParam(locale), slug: project.id },
-      props: { project, next: projects[(index + 1) % projects.length] },
-    })),
+  const paths = await Promise.all(
+    locales.map(async (locale) => {
+      const projects = selectPublished(await getLocalizedCollection("projects", locale));
+      return projects.map((project, index) => ({
+        params: { locale: localeParam(locale), slug: project.id },
+        props: { project, next: projects[(index + 1) % projects.length] },
+      }));
+    }),
   );
+  return paths.flat();
 }
 
 interface Props {
-  project: CollectionEntry<"projects">;
-  next: CollectionEntry<"projects"> | undefined;
+  project: LocalizedEntry<"projects">;
+  next: LocalizedEntry<"projects"> | undefined;
 }
 
 const { project, next } = Astro.props;
@@ -52,14 +54,13 @@ const {
   schemaType,
   seo,
 } = project.data;
-const { Content, headings } = await render(project);
+const { Content, headings } = await renderLocalized(project);
 
 const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
-// The language the entry is written in. Every entry is in English until its French file
-// exists (docs/i18n.md, phase 4); the page then says so and marks the text as English.
-const contentLocale = "en";
+// An entry without its French file reads in English: the page says so and marks the text.
+const { contentLocale } = project;
 const home = localizePath("/", locale);
 const site = Astro.site ?? Astro.url;
 const url = new URL(localizePath(`/work/${project.id}/`, locale), site).href;
@@ -146,7 +147,7 @@ const source = links.find((link) => link.kind === "source");
       {next && next.id !== project.id && (
         <Cell as="footer" class="next card">
           <p class="next-label">{t("work.next")}</p>
-          <p class="next-title" lang={contentLocale}>
+          <p class="next-title" lang={next.contentLocale}>
             <a class="card-link" href={localizePath(`/work/${next.id}/`, locale)}>
               {next.data.title}
             </a>

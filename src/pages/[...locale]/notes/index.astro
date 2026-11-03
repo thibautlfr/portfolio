@@ -1,12 +1,11 @@
 ---
-import { getCollection } from "astro:content";
-
 import NoteListItem from "@/components/note/NoteListItem.astro";
 import Breadcrumbs from "@/components/site/Breadcrumbs.astro";
 import Cell from "@/components/ui/Cell.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { localProfile } from "@/data/profile";
+import { getLocalizedCollection } from "@/i18n/content";
 import { localeOf, localeStaticPaths, locales, localizePath } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 import { selectLatest } from "@/lib/content";
@@ -18,7 +17,7 @@ const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const profile = localProfile(locale);
 const home = localizePath("/", locale);
-const notes = selectLatest(await getCollection("notes"));
+const notes = selectLatest(await getLocalizedCollection("notes", locale));
 const site = Astro.site ?? Astro.url;
 ---
 
