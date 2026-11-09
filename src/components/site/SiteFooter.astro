@@ -1,7 +1,7 @@
 ---
 import LanguageSwitch from "@/components/site/LanguageSwitch.astro";
 import { profile } from "@/data/profile";
-import { localeOf, localizePath, type Locale } from "@/i18n/locales";
+import { defaultLocale, localeOf, localizePath, type Locale } from "@/i18n/locales";
 import { useTranslations } from "@/i18n/ui";
 
 interface Props {
@@ -13,10 +13,14 @@ const { locales } = Astro.props;
 const locale = localeOf(Astro.url);
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
-// The design system is in English only.
+// The design system is in English only, and its link says so on a French page.
 const links = [
-  { label: t("footer.designSystem"), path: "/design-system/" },
-  { label: t("footer.legalNotice"), path: localizePath("/legal-notice/", locale) },
+  {
+    label: t("footer.designSystem"),
+    path: "/design-system/",
+    hreflang: locale === defaultLocale ? undefined : defaultLocale,
+  },
+  { label: t("footer.legalNotice"), path: localizePath("/legal-notice/", locale), hreflang: undefined },
 ];
 const current = Astro.url.pathname.replace(/\/?$/, "/");
 ---
@@ -26,11 +30,11 @@ const current = Astro.url.pathname.replace(/\/?$/, "/");
     &copy; {year} {profile.name}
   </p>
   <p class="links">
-    {links.map(({ label, path }) =>
+    {links.map(({ label, path, hreflang }) =>
       current === path ? (
         <span aria-current="page">{label}</span>
       ) : (
-        <a class="tap" href={path}>
+        <a class="tap" href={path} hreflang={hreflang}>
           {label}
         </a>
       ),
