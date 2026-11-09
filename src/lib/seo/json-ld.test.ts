@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { blogPosting, breadcrumbs, person, profilePage, webPage, work } from "./json-ld";
+import { blogPosting, breadcrumbs, person, profilePage, webPage, webSite, work } from "./json-ld";
 
 const site = "https://thibaut-lefrancois.com/";
 
@@ -27,6 +27,16 @@ describe("person and profile page", () => {
     expect(page.inLanguage).toBe("fr");
     expect(page.mainEntity["@id"]).toBe(`${site}#person`);
     expect(page.mainEntity.email).toBe("mailto:hello@thibaut-lefrancois.com");
+  });
+});
+
+describe("web site", () => {
+  it("names the site and keeps the bare domain as its alternate name", () => {
+    const data = webSite({ name: "Thibaut Lefrançois", url: site, inLanguage: "en" });
+    expect(data["@type"]).toBe("WebSite");
+    expect(data.name).toBe("Thibaut Lefrançois");
+    expect(data.alternateName).toBe("thibaut-lefrancois.com");
+    expect(data.url).toBe(site);
   });
 });
 

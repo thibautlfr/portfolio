@@ -50,6 +50,22 @@ export function profilePage(personData: ReturnType<typeof person>, inLanguage: s
   };
 }
 
+/**
+ * The site itself, for the name Google shows above the result. `alternateName`
+ * carries the bare domain, the fallback Google would otherwise pick alone.
+ */
+export function webSite(input: { name: string; url: string; inLanguage: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${input.url}#website`,
+    name: input.name,
+    alternateName: new URL(input.url).hostname,
+    url: input.url,
+    inLanguage: input.inLanguage,
+  };
+}
+
 interface WorkInput {
   type: "CreativeWork" | "SoftwareSourceCode" | "WebApplication" | "VideoGame";
   name: string;
