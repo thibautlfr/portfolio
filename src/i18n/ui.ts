@@ -143,7 +143,7 @@ const fr: Record<UiKey, string> = {
   "site.sections": "Sections",
   "site.breadcrumb": "Fil d'Ariane",
   "site.language": "Langue",
-  "footer.designSystem": "Design system",
+  "footer.designSystem": "Design system (en anglais)",
   "footer.legalNotice": "Mentions légales",
 
   "facts.context": "Contexte",
