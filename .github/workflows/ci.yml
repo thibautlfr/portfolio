@@ -56,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        url: ["/", "/work/youbook/", "/notes/", "/design-system/"]
+        url: ["/", "/work/youbook/", "/notes/", "/design-system/", "/fr/", "/fr/work/youbook/"]
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/setup
