@@ -7,7 +7,8 @@ How to add and edit content. This file is the reference for people and for writi
 1. Copy the `_template` folder of the collection, for example `src/content/projects/_template/`.
 2. Rename the copy to the entry's slug: English, kebab-case (`steerkit`, `ocean-heartbeat`). The folder name becomes the URL.
 3. Fill the frontmatter (the template lists every field, optional ones commented out), drop the images and videos next to `index.mdx`, set `draft: false`, and `featured: true` if it belongs on the home page.
-4. Run `pnpm dev`. A missing or invalid field stops the build with the entry and the field named:
+4. Write the French file beside it, `index.fr.mdx` (see [In French](#in-french)). A published entry without one fails `pnpm test`.
+5. Run `pnpm dev`. A missing or invalid field stops the build with the entry and the field named:
 
    ```
    [InvalidContentEntryDataError] projects → my-project data does not match collection schema.
@@ -15,6 +16,21 @@ How to add and edit content. This file is the reference for people and for writi
    ```
 
 Templates are never published: folders starting with `_` are ignored by the loader.
+
+## In French
+
+Every entry exists in English and in French. The English file (`index.mdx` or `index.md`) holds everything; the French file beside it (`index.fr.mdx` or `index.fr.md`) holds only what reads differently, and the rest is taken from the English file: the stack, the dates, the links' addresses, the media, `featured`, `order` and `draft`.
+
+| Collection | French fields                                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Projects   | `title`, `summary` (required), `role`, `award`, `decisions`, `figures`, `seo`, the `alt` of `cover` and `gallery`, the `label` of `links` |
+| Playground | `description` and `thumbnail.alt` (required), `title`                                                                                     |
+| Artworks   | `image.alt` (required), `title`, `description`                                                                                            |
+| Notes      | `title`, `description` (required), `tags`, `cover.alt`, and the body                                                                      |
+
+Lists of objects are matched item by item, in the English order: `links` and `figures.items` give a `label` per item (and a `value` when it reads differently, `0,7 ms` for `0.7 ms`), `gallery` an `alt` per image. `decisions` is replaced whole. The French file of a project or a note is MDX like the English one, imports the same media from the same folder, and has the same sections.
+
+**Writing in French.** The French text is a translation, not a second version: the same facts, figures, sections and bold, in the voice of the English one, first person and sober, with the same writing rules (no em dash, no "ce n'est pas X, c'est Y", no forced triads, no rhetorical question). The UI speaks to the reader with "vous". French typography: a narrow no-break space (U+202F) before `: ; ? !` and inside « », a no-break space in numbers (`1 000`) and before units (`7 h 40`, `30 %`), a decimal comma (`0,7`). Words drawn in a picture or shown by a project's own interface stay as they are and are quoted as they are (« Learn a song »). Links to the site's own pages point at their French version (`/fr/work/steerkit/`), except `/design-system/`, which is in English only. Media are shared between the languages: only their `alt` texts and captions are translated.
 
 ## Shared fields
 
@@ -194,7 +210,7 @@ The page shows the title, the date and the source link above the body. The `desc
 
 Name, role, positioning, email, location, stack, socials, collaborations and legal facts live in [`src/data/profile.ts`](../src/data/profile.ts), typed and read everywhere else. The CV link appears once `cvPath` is set and the PDF is in `public/cv/`. `availability` is shown in the hero above the email; set it to `undefined` when not taking missions. `collaborations` are the clients and partners named in a row under the About offers (the name as a link, then `credit`; `detail` is used in `llms.txt`). Word them so they stay true once the work is over, and name a company only with its agreement.
 
-A collaboration can carry a `testimonial`: the words its author wrote, one string per paragraph in `quote`, published with their agreement. Never paraphrase or invent one; a translation stays as close to the original as English allows and sets `translatedFrom`. `pull` is one whole sentence of the quote, never cut (a test checks it): it is the display line of the section under About on the home page, with the full text behind a disclosure. The first collaboration with a testimonial is shown; nothing renders while none has one.
+A collaboration can carry a `testimonial`: the words its author wrote, one string per paragraph in `quote`, published with their agreement. Never paraphrase or invent one; a translation stays as close to the original as English allows and sets `translatedFrom`. `pull` is one whole sentence of the quote, never cut (a test checks it): it is the display line of the section under About on the home page, with the full text behind a disclosure. The first collaboration with a testimonial is shown; nothing renders while none has one. The French texts of the profile (role, positioning, availability, mobility, credits, `alt` texts) and each testimonial in its original language, when that is French, are in the `french` object of the same file, read through `localProfile(locale)`.
 
 ## Before launch
 

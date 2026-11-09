@@ -4,61 +4,68 @@ import Cell from "@/components/ui/Cell.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { profile } from "@/data/profile";
+import { localeOf, localeStaticPaths, locales, localizePath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
+export const getStaticPaths = localeStaticPaths;
 
 const { legal, email } = profile;
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const [blockBefore, blockAfter] = t("legal.optOutBlock").split("{domain}");
 ---
 
 <BaseLayout
-  title={`Legal notice · ${profile.name}`}
-  description={`Publisher, hosting and personal data information for ${profile.name}'s website.`}
+  title={`${t("legal.title")} · ${profile.name}`}
+  description={t("legal.description", { name: profile.name })}
+  {locales}
 >
   <div class="page">
     <Sheet aria-labelledby="legal-title">
-      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: "Legal notice" }]} />
+      <Breadcrumbs
+        items={[{ label: profile.name, href: localizePath("/", locale) }, { label: t("legal.title") }]}
+        {locales}
+      />
       <Cell as="header" class="title-block">
-        <h1 id="legal-title">Legal notice</h1>
-        <p>Who publishes this website, who hosts it, and what happens to your data.</p>
+        <h1 id="legal-title">{t("legal.title")}</h1>
+        <p>{t("legal.intro")}</p>
       </Cell>
 
       <!-- One row per topic: the topic in a narrow cell, the text beside it. -->
       <Cell span={4} class="topic">
-        <h2>Publisher</h2>
+        <h2>{t("legal.publisher")}</h2>
       </Cell>
       <Cell span={8} class="statement">
         <dl class="facts">
           <div>
-            <dt>Name</dt>
-            <dd>{legal.publisher}, individual</dd>
+            <dt>{t("legal.name")}</dt>
+            <dd>{t("legal.individual", { name: legal.publisher })}</dd>
           </div>
           <div>
-            <dt>Contact</dt>
+            <dt>{t("legal.contact")}</dt>
             <dd>
               <a href={`mailto:${email}`}>{email}</a>
             </dd>
           </div>
         </dl>
-        <p>
-          In accordance with article 6-III-2 of French law no. 2004-575 of 21 June 2004 (LCEN), an individual publisher
-          is not required to disclose their personal address. This information has been communicated to the hosting
-          provider.
-        </p>
+        <p>{t("legal.address")}</p>
       </Cell>
 
       <Cell span={4} class="topic">
-        <h2>Hosting</h2>
+        <h2>{t("legal.hosting")}</h2>
       </Cell>
       <Cell span={8} class="statement">
         <dl class="facts">
           <div>
-            <dt>Name</dt>
+            <dt>{t("legal.name")}</dt>
             <dd>{legal.host.name}</dd>
           </div>
           <div>
-            <dt>Address</dt>
+            <dt>{t("legal.hostAddress")}</dt>
             <dd>{legal.host.address}</dd>
           </div>
           <div>
-            <dt>Website</dt>
+            <dt>{t("legal.website")}</dt>
             <dd>
               <a href={legal.host.url}>{legal.host.url.replace("https://", "")}</a>
             </dd>
@@ -67,49 +74,39 @@ const { legal, email } = profile;
       </Cell>
 
       <Cell span={4} class="topic">
-        <h2>Personal data</h2>
+        <h2>{t("legal.data")}</h2>
       </Cell>
       <Cell span={8} class="statement">
+        <p>{t("legal.dataText")}</p>
         <p>
-          This website sets no cookie, and stores nothing on your device unless you turn the count off. Audience is
-          measured with Umami Cloud, run by Umami Software, Inc., with the data hosted in the European Union, in
-          Frankfurt. Each visit records the page, the referring site, the browser, the operating system, the device type
-          and the approximate location. Your IP address is used to tell visits apart and to find the country, and is not
-          kept with the statistics. The figures are only read as totals, to know which pages are visited. They are not
-          shared, and are kept for six months.
-        </p>
-        <p>
-          To opt out, block <code>cloud.umami.is</code>, as most content blockers do.
+          {blockBefore}
+          <code>cloud.umami.is</code>
+          {blockAfter}
         </p>
         <!-- Shown by the script, which needs storage to keep the choice; it remembers it in this browser only. -->
         <div class="opt-out" data-analytics-opt-out aria-live="polite" hidden>
           <p data-opt-out-state="counted">
-            Visits from this browser are counted. <button type="button">Stop counting them</button>
+            {t("legal.counted")} <button type="button">{t("legal.stop")}</button>
           </p>
           <p data-opt-out-state="stopped" hidden>
-            Visits from this browser are no longer counted. <button type="button">Count them again</button>
+            {t("legal.stopped")} <button type="button">{t("legal.resume")}</button>
           </p>
         </div>
-        <p>Emails you send are only used to answer you.</p>
+        <p>{t("legal.emails")}</p>
       </Cell>
 
       <Cell span={4} class="topic">
-        <h2>Intellectual property</h2>
+        <h2>{t("legal.property")}</h2>
       </Cell>
       <Cell span={8} class="statement">
-        <p>
-          {`All content on this website (text, images, source code, graphic elements) is the property of ${legal.publisher} unless stated otherwise. Any reproduction without prior authorisation is prohibited.`}
-        </p>
+        <p>{t("legal.propertyText", { name: legal.publisher })}</p>
       </Cell>
 
       <Cell span={4} class="topic">
-        <h2>Applicable law</h2>
+        <h2>{t("legal.law")}</h2>
       </Cell>
       <Cell span={8} class="statement">
-        <p>
-          This legal notice is governed by French law. In the event of a dispute, French courts have exclusive
-          jurisdiction.
-        </p>
+        <p>{t("legal.lawText")}</p>
       </Cell>
     </Sheet>
   </div>

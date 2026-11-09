@@ -4,8 +4,8 @@ import { formatClient, formatContext, formatDate, formatHandle, isoDate, splitCo
 
 describe("formatContext", () => {
   it("names the context and adds the year when known", () => {
-    expect(formatContext("hackathon", 2024)).toBe("Hackathon, 2024");
-    expect(formatContext("open-source")).toBe("Open source");
+    expect(formatContext("Hackathon", 2024)).toBe("Hackathon, 2024");
+    expect(formatContext("Open source")).toBe("Open source");
   });
 });
 
@@ -20,6 +20,7 @@ describe("dates", () => {
   it("formats calendar days without shifting them across time zones", () => {
     const date = new Date("2026-10-01");
     expect(formatDate(date)).toBe("1 October 2026");
+    expect(formatDate(date, "fr")).toBe("1 octobre 2026");
     expect(isoDate(date)).toBe("2026-10-01");
   });
 });

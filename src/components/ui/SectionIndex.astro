@@ -1,15 +1,19 @@
 ---
 // The sections of a case study or a note, numbered like their titles in the body, kept in
 // view beside the text on wide screens.
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
+
 interface Props {
   headings: { slug: string; text: string }[];
 }
 
 const { headings } = Astro.props;
+const t = useTranslations(localeOf(Astro.url));
 const number = (index: number) => String(index + 1).padStart(2, "0");
 ---
 
-<nav aria-label="Sections" data-section-index>
+<nav aria-label={t("site.sections")} data-section-index>
   <ol role="list">
     {headings.map((heading, index) => (
       <li>

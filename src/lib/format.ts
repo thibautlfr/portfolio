@@ -1,16 +1,9 @@
 // Display formatting shared by pages, feeds and structured data.
+import type { Locale } from "@/i18n/locales";
 
-const contextLabels = {
-  client: "Client work",
-  "open-source": "Open source",
-  personal: "Side project",
-  hackathon: "Hackathon",
-} as const;
-
-export type ProjectContext = keyof typeof contextLabels;
-
-export function formatContext(context: ProjectContext, year?: number): string {
-  return year ? `${contextLabels[context]}, ${year}` : contextLabels[context];
+/** "Hackathon, 2024": the context, named in the page's language, then the year when known. */
+export function formatContext(label: string, year?: number): string {
+  return year ? `${label}, ${year}` : label;
 }
 
 interface Client {
@@ -23,16 +16,14 @@ export function formatClient(client: Client): string {
   return client.group ? `${client.name}, ${client.group}` : client.name;
 }
 
-const dateFormat = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
+const dateFormats = {
+  en: new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }),
+  fr: new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }),
+} satisfies Record<Locale, Intl.DateTimeFormat>;
 
-/** "17 October 2026": content dates are calendar days, so UTC avoids an off-by-one. */
-export function formatDate(date: Date): string {
-  return dateFormat.format(date);
+/** "17 October 2026", "17 octobre 2026": content dates are calendar days, so UTC avoids an off-by-one. */
+export function formatDate(date: Date, locale: Locale = "en"): string {
+  return dateFormats[locale].format(date);
 }
 
 /** ISO calendar day, for <time datetime> and structured data. */
