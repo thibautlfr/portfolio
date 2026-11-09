@@ -1,0 +1,64 @@
+---
+title: Ocean Heartbeat
+summary: Une scène 3D sous-marine où un cœur, un cerveau et des reins représentent les systèmes de l'océan, construite en une nuit pour la Nuit de l'Info 2024.
+role: Développeur 3D et front-end
+cover:
+  alt: La scène d'Ocean Heartbeat dans un cadre blanc. Un cœur rouge low poly flotte au-dessus d'un fond de sable entre des rochers gris-bleu et des algues, sous une eau bleu profond, avec l'étiquette « LE COEUR » et une flèche en dessous, et trois petites icônes dans un coin.
+gallery:
+  - alt: Le cœur cliqué, entouré de blanc, entre ses deux panneaux translucides. Celui de gauche compare les courants océaniques à un système circulatoire, celui de droite la circulation thermohaline au cœur qui garde la température du corps stable.
+  - alt: Le même fond marin en mode rétro, pixelisé en gros blocs carrés, le cœur rouge et les rochers réduits à de grossiers aplats de couleur.
+links:
+  - label: Explorer la scène
+  - label: Code source sur GitHub
+award: Lauréat du défi « On veut du gros pixel », Nuit de l'Info 2024
+decisions:
+  - Le fond marin est fait de modèles low poly gratuits, 716 Ko pour les onze que charge la scène, faute de temps pour modéliser en une nuit.
+  - Les trois organes sont montés une fois et échangés par leur échelle avec GSAP, donc un changement n'attend jamais le réseau.
+  - Les caustiques sont une vidéo en boucle projetée par un spot, au lieu d'un shader d'eau qui ne tenait pas dans la nuit.
+  - Le mode rétro remplace la chaîne de post-traitement par une seule passe `Pixelation` et laisse la scène intacte.
+---
+
+import retro from "./retro.png";
+
+## Contexte
+
+La [Nuit de l'Info](https://www.nuitdelinfo.com/) est un hackathon étudiant français qui se tient en une nuit. Son défi national 2024 demandait une application web pédagogique montrant comment chaque partie du corps humain trouve un écho dans l'océan. Colin Demouge et moi avons participé en équipe de deux, sur le défi national et cinq défis annexes proposés par des partenaires, dont l'un demandait un élément de jeu rétro.
+
+Nous avons répondu par une scène plutôt qu'une page. **Un organe tourne lentement sur le fond marin**, et deux panneaux tracent son parallèle avec l'océan : le cœur avec les courants qui transportent la chaleur autour de la planète, le cerveau avec l'océan comme réserve de données climatiques, les reins avec sa filtration.
+
+## Contraintes
+
+- **Une nuit.** Le premier commit de la scène est arrivé à 21 h 28 le 5 décembre, le rendu à 7 h 40 le lendemain matin. Ce qui ne pouvait pas être fini à temps devait être abandonné tôt.
+- **Deux personnes dans un dépôt.** Nous travaillions sur des branches séparées, fusionnées dans `main` au fil de la nuit, donc le code devait se découper proprement : un composant par modèle, un store pour l'état que les deux moitiés lisent.
+- **Un jury sur n'importe quel portable.** La scène est jugée dans un navigateur sur un matériel que nous ne verrions jamais, donc **le poids et le coût par frame passaient avant le détail**.
+- **Les règles des défis.** Le défi national voulait une URL déployée et le code source ; le défi rétro voulait l'élément accessible depuis la page, avec des instructions.
+
+## Approche
+
+Nous avons partagé le travail par couche. Colin a monté la scène, le sable, le brouillard, le post-traitement, l'écran de chargement, le son et l'interface au-dessus du canvas. J'ai pris ce qui se trouve dans la scène : les modèles, leur disposition sur le fond marin, le survol de l'organe, le cadrage de la caméra et la baudroie qui traverse l'arrière-plan.
+
+**J'ai construit le fond marin avec des modèles low poly gratuits** au lieu de modéliser quoi que ce soit. Une nuit ne laissait pas le temps de modéliser, et le low poly reste cohérent sous le brouillard et le flou, là où des modèles de détail inégal ne le seraient pas. Chaque GLB est devenu un petit composant React, placé à la main autour de l'organe. Les onze modèles que charge la scène pèsent 716 Ko en tout.
+
+L'organe présenté est l'un des trois, et **les trois sont montés dès le départ**, au même endroit. En choisir un le fait grandir jusqu'à sa taille avec GSAP en une seconde, sur `power4.out`, pendant que les autres rétrécissent jusqu'à zéro. Charger chaque organe à la demande aurait imposé une attente à chaque changement, et un second écran de chargement que nous n'avions pas le temps de concevoir. Au survol, le contour `Outlines` de drei, calculé à l'écran, trace un bord blanc autour de l'organe pour montrer qu'il est cliquable, et un clic ouvre ses deux panneaux.
+
+La caméra glisse vers une position lue à partir du pointeur et garde l'organe en vue, donc la scène répond à la main sans contrôles d'orbite qu'un visiteur devrait apprendre.
+
+Le mode rétro était celui de Colin, et il a remporté le prix du défi « On veut du gros pixel ». La chaîne normale applique une distorsion d'eau et un flou tilt-shift après le tone mapping ; le bouton d'arcade remplace les deux par **une seule passe `Pixelation`**, avec une granularité de 15. La scène, ses lumières et ses interactions restent telles quelles, donc le mode a coûté un drapeau dans le store et une condition dans le composant de post-traitement.
+
+<Figure
+  src={retro}
+  alt="Le cœur low poly sur le fond marin parmi des rochers bleu-vert, coupé en deux par une ligne corail. La moitié gauche est pixelisée en gros blocs carrés ; la moitié droite montre la même scène avec ses facettes intactes."
+  caption="Les modèles du projet, redessinés ici aux couleurs de ce site. À gauche de la ligne, une passe Pixelation de granularité 15, environ 96 blocs sur une fenêtre de 1 440 px."
+/>
+
+Nous avons coupé ce qui ne tenait pas. Les poumons sont devenus le cerveau, un modèle de varech est parti, et les reins sont arrivés cinq minutes avant le rendu.
+
+## Notes d'ingénierie
+
+La lumière sur un fond marin scintille, et on dessine ça d'habitude avec un shader de caustiques. Colin a trouvé moins cher : three.js permet à un spot de projeter une texture, donc **une vidéo de caustiques en boucle devient la `map` de la lumière**, via `useVideoTexture` de drei, avec `decay` à 0 pour qu'elle atteigne le sable à pleine intensité depuis dix unités de haut. Je l'ai déplacée dans son propre composant quand nous avons découpé la scène. Elle n'a demandé aucun travail de shader, une lumière et le décodage d'une vidéo par frame. Elle se paie en poids : avec 2,5 Mo, la vidéo est le fichier le plus lourd du site, devant la normal map du sable (1,2 Mo) et le son d'ambiance (1,1 Mo).
+
+En relisant le code, deux mouvements sont écrits par frame plutôt que par seconde. La baudroie avance de 0,03 unité sur son chemin à chaque frame, et la caméra parcourt 2,5 % de la distance vers sa cible à chaque frame. Sur un écran à 60 Hz, ils ressemblent à ce que nous avions réglé ; **sur un écran à 120 Hz, le poisson nage deux fois plus vite** et la caméra suit le pointeur de plus près. Les deux corrections tiennent en une ligne chacune : multiplier le pas par le `delta` de la frame, et transformer le facteur de la caméra en `1 - Math.exp(-k * delta)`, qui donne le même amorti à n'importe quelle fréquence. Le balancement latéral du poisson utilisait déjà `delta`, donc sur un écran rapide il ne correspond plus à sa propre vitesse d'avancée.
+
+## Résultat
+
+Nous avons rendu le projet à 7 h 40 le 6 décembre, déployé sur Netlify avec son code public, comme le demandait le défi national. **Il a remporté le prix du défi « On veut du gros pixel »** pour son mode rétro. La scène est toujours en ligne telle qu'elle a été rendue : l'écran de chargement, le son d'ambiance, les trois organes avec leurs panneaux, le mode rétro et une page de crédits.

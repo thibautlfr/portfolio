@@ -1,0 +1,58 @@
+---
+title: "Bowser Bros : un Mario vertical en C++ et Qt, construit en deux semaines et demie"
+description: "Un jeu d'école de première année, en 2023 : quatre versions jouables en deux semaines et demie, et le C++ que j'écrirais autrement aujourd'hui."
+---
+
+import climb from "./climb.mp4";
+import levelFour from "./level-4.png";
+
+En juin 2023, en première année de BUT informatique à La Rochelle, nous avions à six deux semaines et demie pour sortir un jeu rétro en C++ avec Qt, la stack imposée par le cours. Nous l'avons appelé Bowser Bros. Je l'ai rouvert cette année, et il compile toujours avec Qt 6.12 sans le moindre changement, ce qui en dit plus sur la stabilité de Qt que sur notre code. En le relisant avec trois ans de plus, les parties qui ont tenu sont celles qui concernent la livraison, et celles qui n'ont pas tenu, c'est le C++.
+
+L'idée de l'équipe reprenait la verticalité de [Donkey Kong Jr.](https://fr.wikipedia.org/wiki/Donkey_Kong_Jr.) avec les sauts de Mario Bros : on grimpe un niveau vers un coffre pendant que Bowser, dans sa Clown Car, suit la caméra et lâche des boules de feu. Une boule de feu par seconde au premier niveau, une toutes les 0,8 seconde au cinquième.
+
+<Video
+  src={climb}
+  label="Mario grimpe deux échelles et saute entre des plateformes de briques pendant que la caméra le suit vers le haut et que Bowser lâche une boule de feu depuis le haut de l'écran."
+  caption="Niveau 1, rendu à partir du code de 2023 avec des entrées scriptées, une image toutes les 40 ms de temps de jeu."
+/>
+
+## Quatre versions en deux semaines et demie
+
+Le premier commit était un cube bleu qui se déplaçait et sautait. Le même jour, il était jouable, encore sans caméra. Ce cube a fixé la règle du reste du projet : il y avait toujours une version que notre enseignant, qui jouait le client, pouvait lancer. **Nous en avons livré quatre**, toutes jouables, la dernière le 15 juin, avec cinq niveaux, des échelles, des Goombas et des Koopas, un menu pause, des réglages de volume sauvegardés, un mode entraînement et un tableau des cinq meilleurs scores.
+
+Ma part touchait un peu à tout. Je gérais le dépôt et les versions, j'étais le contact de l'équipe avec les enseignants, et j'ai écrit ma part du code qui reliait les morceaux : la classe `Entity` dont dérivent Mario, Bowser et les ennemis, l'enchaînement des niveaux, la fin d'une partie, le tableau des scores et la pause. Vers la fin, une bonne partie de mon temps est partie dans la version Windows : un installateur qui embarque les bibliothèques Qt, pour que le jeu tourne sur une machine où Qt n'a jamais été installé.
+
+Six personnes sur un dépôt, c'était nouveau pour nous tous, et ça s'est vu tôt. Le 2 juin, une fusion entre deux branches personnelles s'est terminée par moi supprimant le dossier pour le recopier en entier depuis l'autre branche. Ensuite, nous avons gardé une branche par fonctionnalité, fusionnée dans `dev`, puis dans une branche de version pour chaque livraison. Ce n'était pas élégant, et les fusions sont restées pénibles jusqu'au bout, mais chaque version est sortie de cette branche. Tous les changements n'ont pas survécu non plus : une optimisation des tests de collision est entrée le 10 juin et a été annulée le lendemain, parce qu'elle avait cassé les collisions.
+
+## Un niveau est un fichier texte
+
+Chaque niveau est un simple fichier texte avec une ligne par bloc : `x;y;type`, où le type dit brique, bloc cassable, échelle, coffre, Goomba ou Koopa. Le jeu le lit ligne par ligne au chargement. Le format est arrivé le 2 juin, deux jours après le premier commit, à la place de blocs ajoutés un par un depuis le C++ avec leurs coordonnées. À partir de là, dessiner ou déplacer une plateforme ne touchait plus aucun fichier `.cpp`, donc les changements de niveaux et de code ne se croisaient plus dans les fusions.
+
+Ça a payé à la fin. Le 12 juin, un coéquipier a ajouté un [éditeur de niveaux](https://thibautlfr.github.io/IUT-BowserBros/) en HTML et JavaScript simples : on peint des blocs sur une grille de 40 par 60 et on exporte le fichier. **Trois des cinq niveaux sont arrivés pendant les trois derniers jours**, pendant que les échelles et les Koopas étaient encore en cours de fusion.
+
+<Figure
+  src={levelFour}
+  alt="Le niveau 4 de Bowser Bros : des plateformes de briques et deux échelles au-dessus de collines bleues arrondies sous la neige, deux Goombas qui marchent sur une longue plateforme, un Koopa près de Mario au sol, Bowser dans sa Clown Car en haut à droite et une boule de feu sous lui."
+  caption="Niveau 4 : le niveau entier tient en 73 lignes de x;y;type."
+/>
+
+## Ce que j'écrirais autrement
+
+Le code des collisions est l'endroit où l'inexpérience se lit le plus facilement. Quand un ennemi rentre dans un mur, il doit faire demi-tour, mais la fonction de collision ne recevait qu'une `Entity`. Elle reconnaissait donc les ennemis à leur vitesse :
+
+```cpp
+// -0.4 est un Goomba ou un Koopa qui marche, -1.5 une carapace de Koopa frappée
+if (anEntity->getXSpeed() == float(-0.4) || anEntity->getXSpeed() == float(-0.5) ||
+    anEntity->getXSpeed() == float(-1.5))
+{
+    anEntity->reverseXSpeed();
+}
+```
+
+Ça marche, parce que les vitesses sont fixées à partir des mêmes littéraux que ceux avec lesquels on les compare. Le `-0.5` ne correspond à rien : c'est la vitesse maximale de Bowser, et Bowser n'atteint jamais cette fonction. **Ça veut aussi dire que changer la vitesse d'un ennemi casse ses collisions sans prévenir**, et que le type d'une chose se devine à partir d'un flottant. Une méthode virtuelle sur `Entity`, ou simplement demander à l'ennemi s'il fait demi-tour contre les murs, aurait coûté dix minutes.
+
+Le reste suit le même schéma. `gameform.cpp` a grossi jusqu'à 1 376 lignes, parce que le formulaire du jeu était l'endroit où tout pouvait atteindre tout le reste. Le tableau des scores est lu depuis `../../../../../DataBase/ScoreBoard.json` sur macOS, cinq dossiers au-dessus de l'endroit d'où le jeu est lancé, donc il ne trouve le fichier que quand le jeu tourne depuis le dossier de build de Qt Creator.
+
+Rien de tout ça ne nous était caché à l'époque. Le commit qui a ajouté les Koopas, le 12 juin, dit déjà que les collisions demandaient encore beaucoup de travail. La dernière version est sortie trois jours plus tard, par-dessus.
+
+Le code source, l'éditeur et le README de 2023 sont sur [GitHub](https://github.com/thibautlfr/IUT-BowserBros).

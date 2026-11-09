@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { selectFeatured, selectLatest, selectPublished } from "./content";
+import { mergeTranslation, selectFeatured, selectLatest, selectPublished } from "./content";
 
 const project = (id: string, data: Partial<{ draft: boolean; featured: boolean; order: number }> = {}) => ({
   id,
@@ -48,5 +48,43 @@ describe("selectLatest", () => {
       2,
     );
     expect(result.map((entry) => entry.id)).toEqual(["new", "mid"]);
+  });
+});
+
+describe("mergeTranslation", () => {
+  const english = {
+    title: "Steerkit",
+    stack: ["TypeScript", "Vite"],
+    cover: { src: "cover.png", alt: "The cover." },
+    links: [
+      { label: "Source", url: "https://github.com/thibautlfr/steerkit", kind: "source" },
+      { label: "Demo", url: "https://steerkit.dev", kind: "demo" },
+    ],
+    decisions: ["One.", "Two.", "Three."],
+    pubDate: new Date("2026-10-01"),
+    draft: false,
+  };
+
+  it("takes what the translation sets and keeps the rest from English", () => {
+    const merged = mergeTranslation(english, { title: "Steerkit FR", cover: { alt: "La couverture." } });
+    expect(merged.title).toBe("Steerkit FR");
+    expect(merged.cover).toEqual({ src: "cover.png", alt: "La couverture." });
+    expect(merged.stack).toEqual(["TypeScript", "Vite"]);
+    expect(merged.pubDate).toEqual(new Date("2026-10-01"));
+  });
+
+  it("merges lists of objects item by item, and replaces lists of words whole", () => {
+    const merged = mergeTranslation(english, { links: [{ label: "Code source" }], decisions: ["Un.", "Deux."] });
+    expect(merged.links).toEqual([
+      { label: "Code source", url: "https://github.com/thibautlfr/steerkit", kind: "source" },
+      { label: "Demo", url: "https://steerkit.dev", kind: "demo" },
+    ]);
+    expect(merged.decisions).toEqual(["Un.", "Deux."]);
+  });
+
+  it("leaves the English data untouched", () => {
+    mergeTranslation(english, { title: "Autre", cover: { alt: "Autre." } });
+    expect(english.title).toBe("Steerkit");
+    expect(english.cover.alt).toBe("The cover.");
   });
 });

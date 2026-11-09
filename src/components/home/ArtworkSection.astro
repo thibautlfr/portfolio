@@ -6,6 +6,8 @@ import ExternalMark from "@/components/ui/ExternalMark.astro";
 import Media from "@/components/ui/Media.astro";
 import SectionTitle from "@/components/ui/SectionTitle.astro";
 import Sheet from "@/components/ui/Sheet.astro";
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 
 interface Props {
   title: string;
@@ -15,7 +17,7 @@ interface Props {
 }
 
 const { title, artworks, more } = Astro.props;
-const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing", illustration: "Illustration" };
+const t = useTranslations(localeOf(Astro.url));
 ---
 
 <Sheet aria-labelledby="artworks-title">
@@ -48,7 +50,7 @@ const kindLabels = { poster: "Poster", painting: "Painting", drawing: "Drawing",
           )}
         </span>
         <span class="artwork-kind">
-          {kindLabels[data.kind]}
+          {t(`artwork.${data.kind}`)}
           {data.year && `, ${data.year}`}
         </span>
         {data.description && <span class="artwork-description">{data.description}</span>}

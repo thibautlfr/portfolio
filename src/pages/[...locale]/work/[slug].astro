@@ -1,6 +1,4 @@
 ---
-import { getCollection, render, type CollectionEntry } from "astro:content";
-
 import Figure from "@/components/mdx/Figure.astro";
 import Video from "@/components/mdx/Video.astro";
 import ProjectBrief from "@/components/project/ProjectBrief.astro";
@@ -12,22 +10,30 @@ import FactList from "@/components/ui/FactList.astro";
 import Sheet from "@/components/ui/Sheet.astro";
 import ZoomMedia from "@/components/ui/ZoomMedia.astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { profile } from "@/data/profile";
+import { localProfile } from "@/data/profile";
+import { getLocalizedCollection, renderLocalized, type LocalizedEntry } from "@/i18n/content";
+import { localeOf, localeParam, locales, localizePath, ogPath } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { selectPublished } from "@/lib/content";
 import { formatClient, formatContext } from "@/lib/format";
 import { breadcrumbs, work } from "@/lib/seo/json-ld";
 
 export async function getStaticPaths() {
-  const projects = selectPublished(await getCollection("projects"));
-  return projects.map((project, index) => ({
-    params: { slug: project.id },
-    props: { project, next: projects[(index + 1) % projects.length] },
-  }));
+  const paths = await Promise.all(
+    locales.map(async (locale) => {
+      const projects = selectPublished(await getLocalizedCollection("projects", locale));
+      return projects.map((project, index) => ({
+        params: { locale: localeParam(locale), slug: project.id },
+        props: { project, next: projects[(index + 1) % projects.length] },
+      }));
+    }),
+  );
+  return paths.flat();
 }
 
 interface Props {
-  project: CollectionEntry<"projects">;
-  next: CollectionEntry<"projects"> | undefined;
+  project: LocalizedEntry<"projects">;
+  next: LocalizedEntry<"projects"> | undefined;
 }
 
 const { project, next } = Astro.props;
@@ -48,17 +54,21 @@ const {
   schemaType,
   seo,
 } = project.data;
-const { Content, headings } = await render(project);
+const { Content, headings } = await renderLocalized(project);
 
+const locale = localeOf(Astro.url);
+const t = useTranslations(locale);
+const profile = localProfile(locale);
+const home = localizePath("/", locale);
 const site = Astro.site ?? Astro.url;
-const url = new URL(`/work/${project.id}/`, site).href;
+const url = new URL(localizePath(`/work/${project.id}/`, locale), site).href;
 const source = links.find((link) => link.kind === "source");
 ---
 
 <BaseLayout
-  title={`${seo?.title ?? title}, case study · ${profile.name}`}
+  title={`${seo?.title ?? title}, ${t("work.titleSuffix")} · ${profile.name}`}
   description={seo?.description ?? summary}
-  ogImage={`/og/work/${project.id}.png`}
+  ogImage={ogPath(`/work/${project.id}`, locale)}
   type="article"
   jsonLd={[
     work({
@@ -67,20 +77,22 @@ const source = links.find((link) => link.kind === "source");
       description: summary,
       url,
       authorUrl: site.href,
+      inLanguage: locale,
       keywords: stack,
       ...(year && { year }),
       ...(source && { codeRepository: source.url }),
       ...(client && { producer: client }),
     }),
     breadcrumbs([
-      { name: profile.name, url: site.href },
+      { name: profile.name, url: new URL(home, site).href },
       { name: title, url },
     ]),
   ]}
+  {locales}
 >
   <article class="page">
     <Sheet as="div">
-      <Breadcrumbs items={[{ label: profile.name, href: "/" }, { label: title }]} />
+      <Breadcrumbs items={[{ label: profile.name, href: home }, { label: title }]} {locales} />
       <Cell as="header" class:list={["title-block", { "has-cover": cover }]}>
         <div class="intro">
           <h1>{title}</h1>
@@ -89,10 +101,10 @@ const source = links.find((link) => link.kind === "source");
           <div class="facts">
             <FactList
               facts={[
-                { term: "Context", value: formatContext(context, year) },
-                ...(client ? [{ term: "Client", value: formatClient(client) }] : []),
-                { term: "Role", value: role },
-                { term: "Stack", value: stack },
+                { term: t("facts.context"), value: formatContext(t(`context.${context}`), year) },
+                ...(client ? [{ term: t("facts.client"), value: formatClient(client) }] : []),
+                { term: t("facts.role"), value: role },
+                { term: t("facts.stack"), value: stack },
               ]}
             />
             {links.length > 0 && (
@@ -128,9 +140,9 @@ const source = links.find((link) => link.kind === "source");
       </ArticleBody>
       {next && next.id !== project.id && (
         <Cell as="footer" class="next card">
-          <p class="next-label">Next case study</p>
+          <p class="next-label">{t("work.next")}</p>
           <p class="next-title">
-            <a class="card-link" href={`/work/${next.id}/`}>
+            <a class="card-link" href={localizePath(`/work/${next.id}/`, locale)}>
               {next.data.title}
             </a>
           </p>

@@ -1,4 +1,6 @@
 ---
+import { localeOf } from "@/i18n/locales";
+import { useTranslations } from "@/i18n/ui";
 import { isExternal } from "@/lib/links";
 
 interface Props {
@@ -10,12 +12,13 @@ interface Props {
 // in words for screen readers. The link still opens in the same tab. The note stays here
 // rather than in the markup, which would repeat it in the page for every link.
 const show = isExternal(Astro.props.href, Astro.site ?? Astro.url);
+const t = useTranslations(localeOf(Astro.url));
 ---
 
 {show && (
   <>
     <span class="external" aria-hidden="true" />
-    <span class="visually-hidden"> (external site)</span>
+    <span class="visually-hidden">{t("site.external")}</span>
   </>
 )}
 
