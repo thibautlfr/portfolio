@@ -101,7 +101,7 @@ export const profile = {
   collaborations,
   portrait: {
     src: portrait,
-    alt: "Black and white portrait of Thibaut Lefrançois, smiling, in a white shirt.",
+    alt: "Black and white portrait of Thibaut Lefrançois, smiling, with short hair and glasses, in a white T-shirt.",
   },
   avatar: {
     src: avatar,
@@ -127,7 +127,8 @@ const french = {
   mobility: "Télétravail partout en France, sur site à Bordeaux, La Rochelle, Niort et alentours",
   languages: ["Français", "Anglais"],
   cvPath: "/cv/thibaut-lefrancois-cv-fr.pdf" as string | undefined,
-  portraitAlt: "Portrait en noir et blanc de Thibaut Lefrançois, souriant, en chemise blanche.",
+  portraitAlt:
+    "Portrait en noir et blanc de Thibaut Lefrançois, souriant, cheveux courts et lunettes, en t-shirt blanc.",
   avatarAlt: "Avatar dessiné de Thibaut, les cheveux en trame, un crayon derrière l'oreille.",
   credits: {
     raccourci: "Youbook, pour le logiciel touristique du Groupe Yoni",
